@@ -1,0 +1,330 @@
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      mem0, 3.4.7                                 │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[08/22/26 15:23:47] INFO     Starting MCP server 'mem0' with    transport.py:241
+                             transport 'stdio'                                  
+WARNING:mem0.memory.main:The 'chroma' vector store does not support keyword search. Hybrid (BM25) scoring will be disabled and search will use semantic similarity only. To enable hybrid search, switch to a store with keyword_search support (e.g. qdrant, elasticsearch, pgvector).
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      mandol, 3.4.7                               │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[08/22/26 15:23:50] INFO     Starting MCP server 'mandol' with  transport.py:241
+                             transport 'stdio'                                  
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:316 - INFO - Initializing embedding model: embedding-3
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:331 - INFO - Cloud embedding adapter loaded: embedding-3 (dim=2048)
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:332 - INFO -    provider: siliconflow
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:333 - INFO -    note: each call may incur provider API cost
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:401 - WARNING - The primary embedding model does not declare image support; the separate image model path is disabled. Use a unified multimodal model whose MODEL_CONFIG modalities include 'image' for image embeddings.
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:722 - INFO - Created IndexIDMap index with base type: Flat (inner product over normalized vectors for cosine similarity)
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:731 - INFO - FAISS index 'IDMap,Flat' initialized. Total vectors: 0
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:436 - INFO -  SemanticMap initialization complete:
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:437 - INFO -    - embedding model: embedding-3  (cloud) 
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:438 - INFO -    - supported modalities: text
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:439 - INFO -    - image model:  (disabled/unavailable)
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:440 - INFO -    - embedding dimension: 2048
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:441 - INFO -    - FAISS index: IDMap,Flat
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_graph - semantic_graph.py:1870 - INFO - Loading SemanticGraph from: /Users/guanhongli/Documents/repo/memory-bench/.state/mandol/graph
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:259 - WARNING - SemanticMap.__init__ received unknown parameters and will ignore them: ['semantic_map_instance']
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:316 - INFO - Initializing embedding model: embedding-3
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:331 - INFO - Cloud embedding adapter loaded: embedding-3 (dim=2048)
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:332 - INFO -    provider: siliconflow
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:333 - INFO -    note: each call may incur provider API cost
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:401 - WARNING - The primary embedding model does not declare image support; the separate image model path is disabled. Use a unified multimodal model whose MODEL_CONFIG modalities include 'image' for image embeddings.
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:722 - INFO - Created IndexIDMap index with base type: Flat (inner product over normalized vectors for cosine similarity)
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:731 - INFO - FAISS index 'IDMap,Flat' initialized. Total vectors: 0
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:436 - INFO -  SemanticMap initialization complete:
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:437 - INFO -    - embedding model: embedding-3  (cloud) 
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:438 - INFO -    - supported modalities: text
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:439 - INFO -    - image model:  (disabled/unavailable)
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:440 - INFO -    - embedding dimension: 2048
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:441 - INFO -    - FAISS index: IDMap,Flat
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:3068 - INFO - [v3] Loaded 5882 dense embeddings (safetensors)
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:3118 - INFO - [v3] global_id_mapping loaded from JSON
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:3135 - INFO - Restored FAISS index directly with 5882 vectors
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:962 - INFO - Memory space 'conv-26' created
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:962 - INFO - Memory space 'conv-30' created
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:962 - INFO - Memory space 'conv-41' created
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:962 - INFO - Memory space 'conv-42' created
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:962 - INFO - Memory space 'conv-43' created
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:962 - INFO - Memory space 'conv-44' created
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:962 - INFO - Memory space 'conv-47' created
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:962 - INFO - Memory space 'conv-48' created
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:962 - INFO - Memory space 'conv-49' created
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_map - semantic_map.py:962 - INFO - Memory space 'conv-50' created
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_graph - semantic_graph.py:58 - INFO - SemanticGraph initialized with the rustworkx backend.
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_graph - semantic_graph.py:1904 - INFO - Loaded rustworkx graph: 5882 nodes, 0 edges
+2026-08-22 15:23:58 - AgentMemorySystem.semantic_graph - semantic_graph.py:1921 - INFO - Detected retriever index directory: /Users/guanhongli/Documents/repo/memory-bench/.state/mandol/graph/retrieval_indices, it will be loaded when MultiRetriever is first requested
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      memos, 3.4.7                                │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[08/22/26 15:23:58] INFO     Starting MCP server 'memos' with   transport.py:241
+                             transport 'stdio'                                  
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      mock, 3.4.7                                 │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[08/22/26 15:23:59] INFO     Starting MCP server 'mock' with    transport.py:241
+                             transport 'stdio'                                  
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      rag_baseline, 3.4.7                         │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[08/22/26 15:24:03] INFO     Starting MCP server 'rag_baseline' transport.py:241
+                             with transport 'stdio'                             
+run: /Users/guanhongli/Documents/repo/memory-bench/runs/locomo-r1
+arms=['mem0', 'mandol', 'memos', 'full_context', 'mock', 'rag_baseline'] convs=3 n=1
+  [mem0] 全部已灌，restore(locomo_full) OK
+  [mem0] conv-30 retrieve 完成（累计新增 0）
+  [mem0] conv-41 retrieve 完成（累计新增 0）
+  [mem0] conv-42 retrieve 完成（累计新增 0）
+  [mem0] evidence 就绪（skip 1986，新增 0）
+  [mandol] 全部已灌，restore(locomo_full) OK
+  [mandol] conv-30 retrieve 完成（累计新增 0）
+  [mandol] conv-41 retrieve 完成（累计新增 0）
+  [mandol] conv-42 retrieve 完成（累计新增 0）
+  [mandol] evidence 就绪（skip 1986，新增 0）
+  [memos] conv-30 retrieve 完成（累计新增 0）
+  [memos] conv-41 retrieve 完成（累计新增 0）
+  [memos] conv-42 retrieve 完成（累计新增 0）
+  [memos] evidence 就绪（skip 1986，新增 0）
+  [full_context] evidence 就绪（skip 558，新增 0）
+  [mock] conv-30 灌完（19 sessions）
+  [mock] conv-41 灌完（32 sessions）
+  [mock] conv-42 灌完（29 sessions）
+  [mock] 补灌 3 conv / 1661 turns → snapshot OK
+  [mock] conv-30 retrieve 完成（累计新增 0）
+  [mock] conv-41 retrieve 完成（累计新增 0）
+  [mock] conv-42 retrieve 完成（累计新增 0）
+  [mock] evidence 就绪（skip 558，新增 0）
+  [rag_baseline] conv-30 灌完（19 sessions）
+  [rag_baseline] conv-41 灌完（32 sessions）
+  [rag_baseline] conv-42 灌完（29 sessions）
+  [rag_baseline] 补灌 3 conv / 1661 turns → snapshot OK
+  [rag_baseline] conv-30 retrieve 完成（累计新增 0）
+  [rag_baseline] conv-41 retrieve 完成（累计新增 0）
+  [rag_baseline] conv-42 retrieve 完成（累计新增 0）
+  [rag_baseline] evidence 就绪（skip 558，新增 0）
+Phase B: 待答 3348 题，并发 8，答题=qwen38-27b-nvfp4，判分=qwen38-27b-nvfp4
+  进度 25/3348（0.3 题/s，ETA 170.6 min）
+  进度 50/3348（0.5 题/s，ETA 117.6 min）
+  进度 75/3348（0.4 题/s，ETA 126.6 min）
+  进度 100/3348（0.4 题/s，ETA 126.9 min）
+  进度 125/3348（0.4 题/s，ETA 130.5 min）
+  进度 150/3348（0.4 题/s，ETA 132.0 min）
+  进度 175/3348（0.4 题/s，ETA 131.5 min）
+  进度 200/3348（0.4 题/s，ETA 130.8 min）
+  进度 225/3348（0.4 题/s，ETA 129.7 min）
+  进度 250/3348（0.4 题/s，ETA 128.4 min）
+  进度 275/3348（0.4 题/s，ETA 127.3 min）
+  进度 300/3348（0.4 题/s，ETA 120.2 min）
+  进度 325/3348（0.4 题/s，ETA 120.8 min）
+  进度 350/3348（0.4 题/s，ETA 120.3 min）
+  进度 375/3348（0.4 题/s，ETA 119.3 min）
+  进度 400/3348（0.4 题/s，ETA 118.0 min）
+  进度 425/3348（0.4 题/s，ETA 117.2 min）
+  进度 450/3348（0.4 题/s，ETA 115.5 min）
+  进度 475/3348（0.4 题/s，ETA 114.0 min）
+  进度 500/3348（0.4 题/s，ETA 111.1 min）
+  进度 525/3348（0.4 题/s，ETA 109.9 min）
+  进度 550/3348（0.4 题/s，ETA 109.0 min）
+  进度 575/3348（0.4 题/s，ETA 108.4 min）
+  进度 600/3348（0.4 题/s，ETA 107.3 min）
+  进度 625/3348（0.4 题/s，ETA 106.5 min）
+  进度 650/3348（0.4 题/s，ETA 105.4 min）
+  进度 675/3348（0.4 题/s，ETA 103.8 min）
+  进度 700/3348（0.4 题/s，ETA 102.3 min）
+  进度 725/3348（0.4 题/s，ETA 100.8 min）
+  进度 750/3348（0.4 题/s，ETA 99.8 min）
+  进度 775/3348（0.4 题/s，ETA 98.7 min）
+  进度 800/3348（0.4 题/s，ETA 97.8 min）
+  进度 825/3348（0.4 题/s，ETA 96.8 min）
+  进度 850/3348（0.4 题/s，ETA 96.0 min）
+  进度 875/3348（0.4 题/s，ETA 94.8 min）
+  进度 900/3348（0.4 题/s，ETA 94.1 min）
+  进度 925/3348（0.4 题/s，ETA 92.9 min）
+  进度 950/3348（0.4 题/s，ETA 91.9 min）
+  进度 975/3348（0.4 题/s，ETA 91.1 min）
+  进度 1000/3348（0.4 题/s，ETA 90.3 min）
+  进度 1025/3348（0.4 题/s，ETA 89.5 min）
+  进度 1050/3348（0.4 题/s，ETA 88.4 min）
+  进度 1075/3348（0.4 题/s，ETA 87.6 min）
+  进度 1100/3348（0.4 题/s，ETA 86.4 min）
+  进度 1125/3348（0.4 题/s，ETA 85.5 min）
+  进度 1150/3348（0.4 题/s，ETA 84.7 min）
+  进度 1175/3348（0.4 题/s，ETA 83.4 min）
+  进度 1200/3348（0.4 题/s，ETA 82.5 min）
+  进度 1225/3348（0.4 题/s，ETA 81.3 min）
+  进度 1250/3348（0.4 题/s，ETA 80.6 min）
+  进度 1275/3348（0.4 题/s，ETA 79.6 min）
+  进度 1300/3348（0.4 题/s，ETA 78.5 min）
+  进度 1325/3348（0.4 题/s，ETA 77.4 min）
+  进度 1350/3348（0.4 题/s，ETA 76.3 min）
+  进度 1375/3348（0.4 题/s，ETA 75.4 min）
+  进度 1400/3348（0.4 题/s，ETA 74.5 min）
+  进度 1425/3348（0.4 题/s，ETA 73.5 min）
+  进度 1450/3348（0.4 题/s，ETA 72.6 min）
+  进度 1475/3348（0.4 题/s，ETA 71.7 min）
+  进度 1500/3348（0.4 题/s，ETA 70.8 min）
+  进度 1525/3348（0.4 题/s，ETA 69.8 min）
+  进度 1550/3348（0.4 题/s，ETA 68.8 min）
+  进度 1575/3348（0.4 题/s，ETA 67.8 min）
+  进度 1600/3348（0.4 题/s，ETA 66.7 min）
+  进度 1625/3348（0.4 题/s，ETA 65.7 min）
+  进度 1650/3348（0.4 题/s，ETA 64.7 min）
+  进度 1675/3348（0.4 题/s，ETA 63.7 min）
+  进度 1700/3348（0.4 题/s，ETA 63.0 min）
+  进度 1725/3348（0.4 题/s，ETA 62.1 min）
+  进度 1750/3348（0.4 题/s，ETA 61.2 min）
+  进度 1775/3348（0.4 题/s，ETA 60.2 min）
+  进度 1800/3348（0.4 题/s，ETA 59.3 min）
+  进度 1825/3348（0.4 题/s，ETA 58.3 min）
+  进度 1850/3348（0.4 题/s，ETA 57.3 min）
+  进度 1875/3348（0.4 题/s，ETA 56.4 min）
+  进度 1900/3348（0.4 题/s，ETA 55.4 min）
+  进度 1925/3348（0.4 题/s，ETA 54.5 min）
+  进度 1950/3348（0.4 题/s，ETA 53.4 min）
+  进度 1975/3348（0.4 题/s，ETA 52.5 min）
+  进度 2000/3348（0.4 题/s，ETA 51.7 min）
+  进度 2025/3348（0.4 题/s，ETA 50.8 min）
+  进度 2050/3348（0.4 题/s，ETA 50.1 min）
+  进度 2075/3348（0.4 题/s，ETA 49.1 min）
+  进度 2100/3348（0.4 题/s，ETA 48.1 min）
+  进度 2125/3348（0.4 题/s，ETA 47.1 min）
+  进度 2150/3348（0.4 题/s，ETA 46.1 min）
+  进度 2175/3348（0.4 题/s，ETA 45.2 min）
+  进度 2200/3348（0.4 题/s，ETA 44.2 min）
+  进度 2225/3348（0.4 题/s，ETA 43.3 min）
+  进度 2250/3348（0.4 题/s，ETA 42.2 min）
+  进度 2275/3348（0.4 题/s，ETA 41.3 min）
+  进度 2300/3348（0.4 题/s，ETA 40.3 min）
+  进度 2325/3348（0.4 题/s，ETA 39.3 min）
+  进度 2350/3348（0.4 题/s，ETA 38.3 min）
+  进度 2375/3348（0.4 题/s，ETA 37.3 min）
+  进度 2400/3348（0.4 题/s，ETA 36.3 min）
+  进度 2425/3348（0.4 题/s，ETA 35.3 min）
+  进度 2450/3348（0.4 题/s，ETA 34.3 min）
+  进度 2475/3348（0.4 题/s，ETA 33.4 min）
+  进度 2500/3348（0.4 题/s，ETA 32.4 min）
+  进度 2525/3348（0.4 题/s，ETA 31.4 min）
+  进度 2550/3348（0.4 题/s，ETA 30.4 min）
+  进度 2575/3348（0.4 题/s，ETA 29.5 min）
+  进度 2600/3348（0.4 题/s，ETA 28.5 min）
+  进度 2625/3348（0.4 题/s，ETA 27.5 min）
+  进度 2650/3348（0.4 题/s，ETA 26.6 min）
+  进度 2675/3348（0.4 题/s，ETA 25.6 min）
+  进度 2700/3348（0.4 题/s，ETA 24.6 min）
+  进度 2725/3348（0.4 题/s，ETA 23.7 min）
+  进度 2750/3348（0.4 题/s，ETA 22.7 min）
+  进度 2775/3348（0.4 题/s，ETA 21.7 min）
+  进度 2800/3348（0.4 题/s，ETA 20.8 min）
+  进度 2825/3348（0.4 题/s，ETA 19.9 min）
+  进度 2850/3348（0.4 题/s，ETA 18.9 min）
+  进度 2875/3348（0.4 题/s，ETA 17.9 min）
+  进度 2900/3348（0.4 题/s，ETA 17.0 min）
+  进度 2925/3348（0.4 题/s，ETA 16.0 min）
+  进度 2950/3348（0.4 题/s，ETA 15.1 min）
+  进度 2975/3348（0.4 题/s，ETA 14.1 min）
+  进度 3000/3348（0.4 题/s，ETA 13.2 min）
+  进度 3025/3348（0.4 题/s，ETA 12.2 min）
+  进度 3050/3348（0.4 题/s，ETA 11.3 min）
+  进度 3075/3348（0.4 题/s，ETA 10.3 min）
+  进度 3100/3348（0.4 题/s，ETA 9.4 min）
+  进度 3125/3348（0.4 题/s，ETA 8.4 min）
+  进度 3150/3348（0.4 题/s，ETA 7.5 min）
+  进度 3175/3348（0.4 题/s，ETA 6.5 min）
+  进度 3200/3348（0.4 题/s，ETA 5.6 min）
+  进度 3225/3348（0.4 题/s，ETA 4.6 min）
+  进度 3250/3348（0.4 题/s，ETA 3.7 min）
+  进度 3275/3348（0.4 题/s，ETA 2.8 min）
+  进度 3300/3348（0.4 题/s，ETA 1.8 min）
+  进度 3325/3348（0.4 题/s，ETA 0.9 min）
+  进度 3348/3348（0.4 题/s，ETA 0.0 min）
+Phase B 完成：3348 题，7573s
+
+arm               n judge_acc     F1  cat 切片（1=multihop 2=temporal 3=open 4=single 5=adv）
+full_context    558     0.518  0.380  c1:26/79 c2:67/93 c3:6/19 c4:186/241 c5:4/126
+mandol          558     0.294  0.243  c1:9/79 c2:35/93 c3:3/19 c4:114/241 c5:3/126
+mem0            558     0.401  0.367  c1:19/79 c2:55/93 c3:2/19 c4:143/241 c5:5/126
+memos           558     0.387  0.335  c1:19/79 c2:48/93 c3:4/19 c4:142/241 c5:3/126
+mock            558     0.224  0.193  c1:8/79 c2:33/93 c3:1/19 c4:80/241 c5:3/126
+rag_baseline    558     0.204  0.180  c1:3/79 c2:25/93 c3:3/19 c4:80/241 c5:3/126
+（judge 解析失败行: 0）
+
+完成。产物：/Users/guanhongli/Documents/repo/memory-bench/runs/locomo-r1/answers.jsonl

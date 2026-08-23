@@ -1,0 +1,24 @@
+[project]
+name = "memory-bench"
+version = "0.1.0"
+description = "统一 MCP 接口下的 agent 记忆系统横向评测（LoCoMo / LongMemEval）"
+readme = "README.md"
+requires-python = ">=3.12"
+
+# 跑台本身的依赖。各记忆系统（mem0ai / graphiti-core / MemOS / chromadb ...）
+# 不列在这里：它们按 DEPLOY.md §1 的矩阵分别装进 .venv / .venv-amem / .venv-mandol，
+# 版本互相冲突，写进同一个 dependencies 反而装不上。
+dependencies = [
+    "fastmcp>=3.4",
+    "httpx>=0.28",
+    "pyyaml>=6.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

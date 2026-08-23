@@ -1,0 +1,28 @@
+{
+  "run_id": "locomo-r1",
+  "benchmark": "locomo10",
+  "convs": [
+    "conv-30",
+    "conv-41",
+    "conv-42"
+  ],
+  "arms": [
+    "graphiti"
+  ],
+  "n": 1,
+  "top_k": 5,
+  "concurrency": 16,
+  "answer_model": "qwen38-27b-nvfp4",
+  "judge_model": "qwen38-27b-nvfp4",
+  "answer_protocol": "anthropic",
+  "answer_temp": 0.0,
+  "prompt_version": "bench-design-v0.1",
+  "started_at": "2026-08-21T14:11:57+00:00",
+  "status": "DONE",
+  "finished_at": "2026-08-23T08:09:37+00:00",
+  "phase_b": {
+    "completed": 557,
+    "wall_s": 1291.0,
+    "ts": "2026-08-23T08:09:36+00:00"
+  }
+}

@@ -1,0 +1,583 @@
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      amem, 3.4.7                                 │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[08/22/26 01:29:22] INFO     Starting MCP server 'amem' with    transport.py:241
+                             transport 'stdio'                                  
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+WARNING:huggingface_hub.utils._http:Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 9322.08it/s]
+[amem-pin] 注入失败（公平性受损，未静默）: 'AgenticMemorySystem' object has no attribute 'llm'
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 14 column 50 (char 793)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      graphiti, 3.4.7                             │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[08/22/26 01:35:39] INFO     Starting MCP server 'graphiti'     transport.py:241
+                             with transport 'stdio'                             
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+[08/22/26 01:36:01] WARNING  Invalid arguments for tool           server.py:1336
+                             'add_conversation': [{'type':                      
+                             'missing', 'loc':                                  
+                             ('duplicate_facts',), 'msg': 'Field                
+                             required', 'input': {'answer':                     
+                             {'duplicate_facts': [],                            
+                             'contradicted_facts': []}}},                       
+                             {'type': 'missing', 'loc':                         
+                             ('contradicted_facts',), 'msg':                    
+                             'Field required', 'input':                         
+                             {'answer': {'duplicate_facts': [],                 
+                             'contradicted_facts': []}}}]                       
+run: /Users/guanhongli/Documents/repo/memory-bench/runs/locomo-r1
+arms=['graphiti'] convs=10 n=1
+  ⚠️ [graphiti] Phase A 失败: ToolError: 2 validation errors for EdgeDuplicate
+duplicate_facts
+  Field required [type=missing, input_value={'answer': {'duplicate_fa...ontradicted_facts': []}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+contradicted_facts
+  Field required [type=missing, input_value={'answer': {'duplicate_fa...ontradicted_facts': []}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+
+完成。产物：/Users/guanhongli/Documents/repo/memory-bench/runs/locomo-r1/answers.jsonl
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      memos, 3.4.7                                │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[08/22/26 01:36:02] INFO     Starting MCP server 'memos' with   transport.py:241
+                             transport 'stdio'                                  
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+ERROR:agentic_memory.memory_system:Error in memory evolution: Expecting value: line 1 column 1 (char 0)
+run: /Users/guanhongli/Documents/repo/memory-bench/runs/locomo-r1
+arms=['memos'] convs=10 n=1
+  [memos] conv-44 灌完（28 sessions）
+  [memos] conv-47 灌完（31 sessions）
+  [memos] conv-48 灌完（30 sessions）
+  [memos] conv-49 灌完（25 sessions）
+  [memos] conv-50 灌完（30 sessions）
+  [memos] 补灌 5 conv / 2667 turns → snapshot SNAPSHOT_UNSUPPORTED
+  [memos] conv-26 retrieve 完成（累计新增 199）
+  [memos] conv-30 retrieve 完成（累计新增 304）
+  [memos] conv-41 retrieve 完成（累计新增 497）
+  [memos] conv-42 retrieve 完成（累计新增 757）
+  [memos] conv-43 retrieve 完成（累计新增 999）
+  [memos] conv-44 retrieve 完成（累计新增 1157）
+  [memos] conv-47 retrieve 完成（累计新增 1347）
+  [memos] conv-48 retrieve 完成（累计新增 1586）
+  [memos] conv-49 retrieve 完成（累计新增 1782）
+  [memos] conv-50 retrieve 完成（累计新增 1986）
+  [memos] evidence 就绪（skip 0，新增 1986）
+
+完成。产物：/Users/guanhongli/Documents/repo/memory-bench/runs/locomo-r1/answers.jsonl
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      graphiti, 3.4.7                             │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[08/22/26 14:46:04] INFO     Starting MCP server 'graphiti'     transport.py:241
+                             with transport 'stdio'                             
+LLM returned invalid duplicate_facts idx values [7] (valid range: 0-5 for EXISTING FACTS)
+LLM returned invalid duplicate_facts idx values [2] (valid range: 0-1 for EXISTING FACTS)
+LLM returned invalid duplicate_facts idx values [1] (valid range: 0-0 for EXISTING FACTS)
+Target entity not found in nodes for edge relation: PLANS_TO_CHECK_OUT
+LLM returned invalid duplicate_facts idx values [1] (valid range: 0-0 for EXISTING FACTS)
+LLM returned invalid duplicate_facts idx values [5] (valid range: 0-0 for EXISTING FACTS)
+LLM returned invalid duplicate_facts idx values [7] (valid range: 0-5 for EXISTING FACTS)
+LLM returned invalid duplicate_facts idx values [0] (valid range: 0--1 for EXISTING FACTS)
+Transaction failed and will be retried in 0.8255323798407862s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 0.8529406738972534s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 1.0084490464360494s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.1257713630438198s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 0.8625661667428715s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 0.9939177899545982s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.1932706342272335s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 0.9894445102855216s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 0.9942612439534506s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 0.9027628743848498s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 1.1864088720295833s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 0.9402710638002366s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 0.8626106233117442s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 0.9441387311337683s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 0.995206002732589s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 1.0301975229788445s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 1.1845444875280777s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 0.8864192665383677s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 1.190150073594816s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 0.8545169845926427s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 1.07473610454938s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 0.8039336267889728s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 0.8334599507557034s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 0.9470801193461835s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 0.8912220065319257s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.0744489032100832s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.0480406384355823s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 0.8078075363158349s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.0670895076192226s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 0.9320377677003239s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.1156304608227494s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 0.834647517136649s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 0.9216524697810313s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 0.9149832898061223s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.048446218261385s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 0.8930653044758192s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.059766150816957s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.1599717667471368s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.046852353622246s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 0.8523843881931753s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.7163859766551963s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.0301814444983917s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.6401426688867864s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.9055272082708798s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.9614167230006716s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.976898703062887s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.7618306248304039s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.9153842405003574s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.2248489408569707s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.7890862982947053s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.9390205925366288s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.1161379478988347s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.102833075861378s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.0176031010857547s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.8436398194439765s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.2900191650300297s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.2564852478725093s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 2.0967451488327717s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.256617628849893s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.878532504050123s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.6096408760809395s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.71231416627994s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.32802010743935s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 2.091885458735873s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.7250066490670772s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.3370021737992683s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.84520148695814s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.229585163838393s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.116395951770542s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.1314913983949255s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.3984678724524056s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.654747951965768s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.1942936739712833s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.763728088809542s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.649959210240925s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.643615782425423s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 2.1180213665644025s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.8781216134684147s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.6862057729242814s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 1.6505563586835457s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.95608603315345s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.776525727378714s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.176471739818279s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.02755364667521s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.546457373778078s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.59907934713391s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.934821816814474s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.65965381416447s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.686891035776698s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.769533413555289s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.349776159687383s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.3340755323338405s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.567793432667878s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.414023011965972s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.243865356860521s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.531419014609501s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.808898816659878s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.33349596892951s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.777818610927357s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.4162921702918077s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.6037105100496234s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.692396060401084s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.4170964376578175s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.357343536422292s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.426561593877488s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.2153347564820045s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.7380538499403655s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.715356320471814s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.781170590757418s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.558841203013118s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.7237830038595074s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.199436789171966s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.5027266583100625s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+Transaction failed and will be retried in 4.071077153555957s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.7223772629016363s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.963519743378459s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.528684585228622s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.7609719844101535s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Connection to [::1]:7687 closed with incomplete handshake response
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 4.748274973635009s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Failed to read four byte Bolt handshake response from server ResolvedIPv4Address(('127.0.0.1', 7687)) (deadline Deadline(timeout=60.0)))
+Transaction failed and will be retried in 3.66007619681158s (Couldn't connect to localhost:7687 (resolved to ('[::1]:7687', '127.0.0.1:7687')):
+Failed to read four byte Bolt handshake response from server ResolvedIPv6Address(('::1', 7687, 0, 0)) (deadline Deadline(timeout=60.0))
+Connection to 127.0.0.1:7687 closed with incomplete handshake response)
+run: /Users/guanhongli/Documents/repo/memory-bench/runs/locomo-r1
+arms=['graphiti'] convs=10 n=1
+  [graphiti] conv-26 灌完（19 sessions）
+  [graphiti] conv-30 灌完（19 sessions）
+  [graphiti] conv-41 灌完（32 sessions）
+  [graphiti] conv-42 灌完（29 sessions）
+  [graphiti] conv-43 灌完（29 sessions）
+  [graphiti] conv-44 灌完（28 sessions）
+  [graphiti] conv-47 灌完（31 sessions）
+  [graphiti] conv-48 灌完（30 sessions）
+  [graphiti] conv-49 灌完（25 sessions）
+  [graphiti] conv-50 灌完（30 sessions）
+  [graphiti] 补灌 10 conv / 5864 turns → snapshot OK
+  [graphiti] conv-26 retrieve 完成（累计新增 199）
+  [graphiti] conv-30 retrieve 完成（累计新增 304）
+  [graphiti] conv-41 retrieve 完成（累计新增 497）
+  [graphiti] conv-42 retrieve 完成（累计新增 757）
+  [graphiti] conv-43 retrieve 完成（累计新增 999）
+  [graphiti] conv-44 retrieve 完成（累计新增 1157）
+  [graphiti] conv-47 retrieve 完成（累计新增 1347）
+  [graphiti] conv-48 retrieve 完成（累计新增 1586）
+  [graphiti] conv-49 retrieve 完成（累计新增 1782）
+  [graphiti] conv-50 retrieve 完成（累计新增 1986）
+  [graphiti] evidence 就绪（skip 0，新增 1986）
+
+完成。产物：/Users/guanhongli/Documents/repo/memory-bench/runs/locomo-r1/answers.jsonl
+=== graphiti exit 0 Sat Aug 22 16:21:29 +08 2026 ===

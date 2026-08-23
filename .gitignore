@@ -1,0 +1,40 @@
+# ---- Python ----
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info/
+.pytest_cache/
+
+# ---- Virtual environments ----
+# Three of them by necessity: mandol pins numpy<2 (conflicts with chromadb),
+# a-mem installs the upstream repo with `pip -e`. See servers.yaml.
+.venv/
+.venv-*/
+
+# ---- Node / Bun (servers/intent) ----
+node_modules/
+
+# ---- Secrets ----
+# Key rotation happens in .env only; never commit it.
+.env
+.env.*
+!.env.example
+
+# ---- Memory-system state ----
+# ~2GB of per-system stores and ingest snapshots. Rebuildable: re-ingest,
+# or restore(tag) via the interface-spec snapshot/restore contract.
+.state/
+
+# ---- Run outputs ----
+# Run *metadata* is tracked (manifest.json, system_stats.jsonl, failures.jsonl,
+# ingest_progress, *.log) so provenance survives off-laptop.
+# Bulk artifacts are not: answers.jsonl is ~58MB/run and evidence/ ~73MB/run.
+# Archive those with scripts/archive_run.sh instead.
+runs/*/answers.jsonl
+runs/*/evidence/
+
+# ---- Scratch ----
+_to_delete/
+archives/

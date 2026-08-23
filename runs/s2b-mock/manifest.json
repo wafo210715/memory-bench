@@ -1,0 +1,28 @@
+{
+  "run_id": "s2b-mock",
+  "benchmark": "locomo10",
+  "convs": [
+    "conv-30"
+  ],
+  "arms": [
+    "intent"
+  ],
+  "n": 1,
+  "top_k": 5,
+  "concurrency": 8,
+  "answer_model": "qwen38-27b-nvfp4",
+  "judge_model": "qwen38-27b-nvfp4",
+  "answer_protocol": "anthropic",
+  "answer_temp": 0.0,
+  "prompt_version": "bench-design-v0.1",
+  "started_at": "2026-08-21T13:14:08+00:00",
+  "status": "DONE",
+  "suspended_reason": "重试耗尽（4 次）: HTTP 429: {\"error\":{\"message\":\"Rate limit exceeded. Please retry later.\",\"type\":\"rate_limit_error\"}}",
+  "suspended_at": "2026-08-21T13:14:42+00:00",
+  "phase_b": {
+    "completed": 105,
+    "wall_s": 263.1,
+    "ts": "2026-08-21T14:08:37+00:00"
+  },
+  "finished_at": "2026-08-21T14:08:37+00:00"
+}

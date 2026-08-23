@@ -1,0 +1,48 @@
+# 记忆系统 MCP server 注册表
+# 评测循环 / smoke test 按 system 名拉起对应 server（stdio）。
+# env_required：拉起前必须存在的环境变量（缺失时 smoke test 显式报缺，不静默降级）。
+
+servers:
+  mock:
+    command: ".venv/bin/python"
+    args: ["servers/mock/server.py"]
+
+  mem0:
+    command: ".venv/bin/python"
+    args: ["servers/mem0/server.py"]
+    env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL, MEMBENCH_LLM_MODEL]
+
+  graphiti:
+    command: ".venv/bin/python"
+    args: ["servers/graphiti/server.py"]
+    env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL, MEMBENCH_LLM_MODEL]
+    # 另需 docker 容器 membench-neo4j（启动命令见 DEPLOY.md）
+
+  mandol:
+    command: ".venv-mandol/bin/python"   # 独立 venv：mandol 锁 numpy<2，与 chromadb 冲突
+    args: ["servers/mandol/server.py"]
+    env_required: [SILICONFLOW_EMBEDDINGS_URL, SILICONFLOW_API_KEY]
+
+  amem:
+    command: ".venv-amem/bin/python"      # 独立 venv：官方 repo agiresearch/A-mem（pip -e）
+    args: ["servers/amem/server.py"]
+    env_required: [OPENAI_API_KEY, OPENAI_BASE_URL]
+
+  memos:
+    command: ".venv/bin/python"            # 纯 REST，主 venv
+    args: ["servers/memos/server.py"]
+    # 另需 MemOS compose 栈在 ：8000（启动命令见 DEPLOY.md）
+
+  rag_baseline:
+    command: ".venv/bin/python"     # 裸向量 RAG 对照臂（bench-design §3），仅 embedding 无 LLM
+    args: ["servers/rag_baseline/server.py"]
+    env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL]
+
+  intent:
+    command: "bun"                        # TS/Bun，与 intent-recall-mcp 同栈
+    args: ["run", "servers/intent/server.ts"]
+    env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL, MEMBENCH_LLM_MODEL]
+
+  # 待封装（Phase 1 后续）：
+  # graphiti: Neo4j Docker + neo4j-admin dump 快照
+  # memos / a-mem / mandol / intent

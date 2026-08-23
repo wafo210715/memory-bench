@@ -1,0 +1,48 @@
+{
+  "mock": {
+    "conv-30": [
+      "conv-30_s01",
+      "conv-30_s02",
+      "conv-30_s03",
+      "conv-30_s04",
+      "conv-30_s05",
+      "conv-30_s06",
+      "conv-30_s07",
+      "conv-30_s08",
+      "conv-30_s09",
+      "conv-30_s10",
+      "conv-30_s11",
+      "conv-30_s12",
+      "conv-30_s13",
+      "conv-30_s14",
+      "conv-30_s15",
+      "conv-30_s16",
+      "conv-30_s17",
+      "conv-30_s18",
+      "conv-30_s19"
+    ]
+  },
+  "intent": {
+    "conv-30": [
+      "conv-30_s01",
+      "conv-30_s02",
+      "conv-30_s03",
+      "conv-30_s04",
+      "conv-30_s05",
+      "conv-30_s06",
+      "conv-30_s07",
+      "conv-30_s08",
+      "conv-30_s09",
+      "conv-30_s10",
+      "conv-30_s11",
+      "conv-30_s12",
+      "conv-30_s13",
+      "conv-30_s14",
+      "conv-30_s15",
+      "conv-30_s16",
+      "conv-30_s17",
+      "conv-30_s18",
+      "conv-30_s19"
+    ]
+  }
+}

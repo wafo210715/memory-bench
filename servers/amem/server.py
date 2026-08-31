@@ -54,6 +54,23 @@ def _save_scopes(scope_id: str | None, session_id: str | None, n: int) -> None:
     _SIDECAR.write_text(json.dumps(s, ensure_ascii=False))
 
 
+def _note_metadata(note) -> dict:
+    """统一的 chroma metadata 构造（add_note / consolidate / restore 三处口径必须一致）。"""
+    return {
+        "id": note.id,
+        "content": note.content,
+        "keywords": note.keywords,
+        "links": note.links,
+        "retrieval_count": note.retrieval_count,
+        "timestamp": note.timestamp,
+        "last_accessed": note.last_accessed,
+        "context": note.context,
+        "evolution_history": note.evolution_history,
+        "category": note.category,
+        "tags": note.tags,
+    }
+
+
 def _strip_fence(s: str) -> str:
     """剥掉 ```json fence（仅用于观测，不影响原生臂行为）。"""
     s = (s or "").strip()
@@ -144,20 +161,31 @@ def _get_system(scope_id: str):
         old_home = os.environ.get("HOME")
         os.environ["HOME"] = str(home)
         os.environ.setdefault("SENTENCE_TRANSFORMERS_HOME", str(ST_CACHE))
+        llm_model = os.environ.get("MEMBENCH_LLM_MODEL", "glm-5.3")
+        from servers.amem.embedding import (
+            CloudChromaRetriever,
+            CloudEmbeddingFunction,
+            no_chroma_reset,
+        )
+
         try:
-            sysm = AgenticMemorySystem(
-                model_name="all-MiniLM-L6-v2",
-                llm_backend="openai",
-                llm_model=os.environ.get("MEMBENCH_LLM_MODEL", "glm-5.3"),
-            )
+            # P8（2026-08-30）：AgenticMemorySystem.__init__ 里的 client.reset() 是**全局**的，
+            # 每建一个新 scope 就会清空之前所有 scope 的 collection。LoCoMo 10 个 conversation
+            # = 10 个 scope，等于只有最后一个存活。实测确认。
+            with no_chroma_reset():
+                sysm = AgenticMemorySystem(
+                    model_name="all-MiniLM-L6-v2",
+                    llm_backend="openai",
+                    llm_model=llm_model,
+                )
+                # P2 修复（2026-08-19）：per-scope 唯一 collection 名，避免多实例共用写死的 "memories"。
+                # 2026-08-30：向量模型换 embedding-3，与 mem0/graphiti/mandol/rag_baseline 同口径——
+                # 它属于“我们注入的统一配置”（同 temperature/thinking），而非“A-MEM 代码原生”。
+                sysm.embed_fn = CloudEmbeddingFunction()
+                sysm.retriever = CloudChromaRetriever(f"mem_{scope_id}", sysm.embed_fn)
         finally:
             if old_home is not None:
                 os.environ["HOME"] = old_home
-        # P2 修复（2026-08-19 核查）：A-MEM 用内存版 chromadb.Client()（同进程共享单例），
-        # 多实例共用写死的 collection "memories" 会互相损坏。替换为 per-scope 唯一 collection 名。
-        sysm.retriever = ChromaRetriever(
-            collection_name=f"mem_{scope_id}", model_name="all-MiniLM-L6-v2"
-        )
         _wrap_llm_observability(sysm)
         _pin_reasoning(sysm)
         _SYSTEMS[scope_id] = sysm
@@ -187,6 +215,14 @@ def add_conversation(session_id: str, turns: list[dict], scope: dict, metadata: 
     for i, t in enumerate(turns):
         sysm.add_note(f"{t.get('role', 'user')}: {t.get('content', '')}", time=t.get("timestamp"))
         n += 1
+    # P10 就绪屏障（2026-08-30）：chroma 的写入不保证对随后的 query 立即可见。
+    # 实测：add 完立即 retrieve 会读到 0 条，而只要中间多一次 count() 就正常
+    # ——典型的海森堡 bug（诊断代码本身改变了结果）。这里显式加一道屏障。
+    try:
+        _ready = sysm.retriever.collection.count()
+    except Exception as e:
+        _ready = -1
+        print(f"[amem-barrier] count() 失败: {e}", file=sys.stderr)
     _save_scopes(sid, session_id, n)
     _stats.n_sessions = len(_scopes()["sessions"])
     _stats.add_tokens("internal_llm", None)  # A-MEM 未暴露内部 LLM 计量
@@ -255,6 +291,15 @@ def stats() -> dict:
     # evolution 到底成功了多少次（上游把失败吞在 except 里，外部本来无从得知）
     for key in ("n_llm_calls", "n_evo_ok", "n_evo_fail", "n_evo_fence_recoverable"):
         d[key] = sum(getattr(s, key, 0) for s in _SYSTEMS.values())
+    # embedding 换云端后必须记账（本地模型时代无此开销）
+    calls = tokens = 0
+    for sysm in _SYSTEMS.values():
+        fn = getattr(sysm, "embed_fn", None)
+        if fn is not None:
+            calls += getattr(fn, "calls", 0)
+            tokens += getattr(fn, "tokens", 0)
+    d["embed_calls"] = calls
+    d["embed_tokens"] = tokens
     return d
 
 
@@ -281,6 +326,9 @@ def _inject_notes(scope_id: str, notes: list[dict]) -> None:
     sysm = _get_system(scope_id)
     from agentic_memory.memory_system import MemoryNote
 
+    docs: list[str] = []
+    metas: list[dict] = []
+    ids: list[str] = []
     for d in notes:
         nid = str(d.get("id") or d.get("_id"))
         try:
@@ -290,22 +338,24 @@ def _inject_notes(scope_id: str, notes: list[dict]) -> None:
             note = MemoryNote(content=d.get("content", ""))
             note.id = nid
         sysm.memories[nid] = note
-        # 重建 chroma 索引（照抄 add_note 的 metadata 构造，不调 LLM）
-        meta = {
-            "id": note.id,
-            "content": note.content,
-            "keywords": getattr(note, "keywords", None),
-            "links": getattr(note, "links", None),
-            "retrieval_count": getattr(note, "retrieval_count", 0),
-            "timestamp": str(getattr(note, "timestamp", "") or ""),
-            "last_accessed": str(getattr(note, "last_accessed", "") or ""),
-            "context": getattr(note, "context", None),
-            "evolution_history": getattr(note, "evolution_history", None),
-            "category": getattr(note, "category", None),
-            "tags": getattr(note, "tags", None),
-        }
-        meta = {k: (json.dumps(v, ensure_ascii=False, default=str) if isinstance(v, (dict, list)) else (str(v) if v is not None else "")) for k, v in meta.items()}
-        sysm.retriever.add_document(note.content, meta, note.id)
+        docs.append(sysm.embed_text(note) if hasattr(sysm, "embed_text") else note.content)
+        meta = _note_metadata(note)
+        metas.append({
+            k: (json.dumps(v, ensure_ascii=False, default=str) if isinstance(v, (dict, list))
+                else (str(v) if v is not None else ""))
+            for k, v in meta.items()
+        })
+        ids.append(nid)
+
+    # P12（2026-08-30）：**必须批量写入**。原实现逐条 add_document，在本地 MiniLM 时代
+    # 是毫秒级；换成云端 embedding-3 后每条都是一次 API 调用，1297 条要 500+ 秒，
+    # 直接撞破 MCP 的 180s 超时（实测：conv-26/conv-30 注入完后在 conv-49 超时）。
+    # 批量后 embedding function 内部按 64 分批，同样的量 24 秒完成。
+    B = 512
+    for i in range(0, len(docs), B):
+        sysm.retriever.collection.add(
+            documents=docs[i : i + B], metadatas=metas[i : i + B], ids=ids[i : i + B]
+        )
 
 
 @mcp.tool
@@ -319,16 +369,31 @@ def snapshot(tag: str) -> dict:
     _state.snap_root.mkdir(parents=True, exist_ok=True)
     dst.mkdir(parents=True, exist_ok=True)
     notes_dump = {sid: _dump_notes(sid) for sid in _scopes()["scope_ids"]}
-    # P7 修复：防静默空快照覆盖——实例不在内存（server 重启后未 add）时拒绝快照
+    # 防静默空快照覆盖——实例不在内存（server 重启后未 add）时拒绝快照。
+    # P13（2026-08-31）：原判据要求 actual == expected，但 sidecar 的 n_notes 是**跨进程累加**的，
+    # 而内存 notes 随进程结束丢失，两者在“分多次会话灌数据”时永远不相等（实测：conv-30
+    # 灌完 actual=369、expected=445，快照被拒，75 分钟的 ingest 没保住）。真正要防的是
+    # “空快照覆盖”，故判据改为 actual == 0；部分数据应该允许落盘。
+    # 另：失败时必须清掉半成品目录，否则 restore 会把空目录误判为“有快照”。
     expected = _scopes().get("n_notes", 0)
     actual = sum(len(v) for v in notes_dump.values())
-    if expected > 0 and actual != expected:
-        return {"ok": False, "error": "SNAPSHOT_STATE_MISMATCH",
-                "hint": f"内存 notes({actual}) ≠ sidecar 计数({expected})——实例已丢失，快照会写空覆盖旧 tag", "tag": tag}
+    if expected > 0 and actual == 0:
+        shutil.rmtree(dst, ignore_errors=True)
+        return {"ok": False, "error": "SNAPSHOT_EMPTY_STATE",
+                "hint": f"内存 notes 为 0 而 sidecar 计数 {expected}——实例已丢失，拒绝写空覆盖", "tag": tag}
+    if actual != expected:
+        print(f"[amem-snapshot] 内存 {actual} 条 vs sidecar 累计 {expected} 条（跨会话累加差异，按内存实际落盘）",
+              file=sys.stderr)
     (dst / "notes.json").write_text(json.dumps(notes_dump, ensure_ascii=False, default=str))
-    _drop_systems()
+    # P11（2026-08-30）：原实现在这里调 _drop_systems()，理由是「释放 chroma 对目录的占用
+    # 才能安全 copytree」。但 A-MEM 用的是**内存版** chromadb.Client()，homes/ 下实测只有一个
+    # huggingface 日志文件（40K），根本没有 chroma 数据——占用不存在，drop 纯属自毁：
+    # 它清空 _SYSTEMS，导致 snapshot 之后的 retrieve 全部拿到新建的空系统。
+    # runner 的 Phase A 恰好是 ingest → snapshot → retrieve，于是 1500 条 evidence 全空
+    # （retrieve_wall_ms p50 = 1ms，连一次 embedding 往返都不够）。smoke_test 测不出来，
+    # 因为它 snapshot 之后紧跟着 restore。快照真正的载体是上面的 notes.json。
     if HOMES.exists():
-        shutil.copytree(HOMES, dst / "homes")
+        shutil.copytree(HOMES, dst / "homes", dirs_exist_ok=True)
     if _SIDECAR.exists():
         shutil.copy2(_SIDECAR, dst / "scopes.json")
     _stats.snapshots = _state.tags()

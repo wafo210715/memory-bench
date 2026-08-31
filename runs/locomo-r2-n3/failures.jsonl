@@ -1,0 +1,4 @@
+{"arm": "rag_baseline", "phase": "A", "error": "[Errno 2] No such file or directory: '/Users/guanhongli/Documents/repo/memory-bench/runs/locomo-r2-n3/evidence/rag_baseline.jsonl'", "ts": "2026-08-29T17:19:28+00:00"}
+{"arm": "intent", "phase": "A", "error": "[Errno 2] No such file or directory: '/Users/guanhongli/Documents/repo/memory-bench/runs/locomo-r2-n3/evidence/intent.jsonl'", "ts": "2026-08-29T17:49:23+00:00"}
+{"arm": "rag_baseline", "phase": "A", "error": "Error calling tool 'retrieve': Connection error.", "ts": "2026-08-30T02:12:02+00:00"}
+{"arm": "rag_baseline", "phase": "A", "error": "Timed out while waiting for response to ClientRequest. Waited 300.0 seconds.", "ts": "2026-08-30T03:45:20+00:00"}

@@ -1,0 +1,38 @@
+{
+  "run_id": "locomo-r2-n3",
+  "benchmark": "locomo10",
+  "convs": [
+    "conv-26",
+    "conv-30",
+    "conv-41",
+    "conv-42",
+    "conv-43",
+    "conv-44",
+    "conv-47",
+    "conv-48",
+    "conv-49",
+    "conv-50"
+  ],
+  "arms": [
+    "mem0",
+    "graphiti",
+    "intent",
+    "rag_baseline"
+  ],
+  "n": 3,
+  "top_k": 20,
+  "concurrency": 16,
+  "answer_model": "glm-5.3",
+  "judge_model": "glm-5.3",
+  "answer_protocol": "anthropic",
+  "answer_temp": 0.0,
+  "answer_endpoint": "open.bigmodel.cn/api/anthropic",
+  "judge_endpoint": "open.bigmodel.cn/api/anthropic",
+  "answer_thinking": "on(provider-default)",
+  "judge_thinking": "on(provider-default)",
+  "answer_max_tokens": 2048,
+  "judge_max_tokens": 2048,
+  "prompt_version": "bench-design-v0.1",
+  "started_at": "2026-08-29T17:05:43+00:00",
+  "status": "RUNNING"
+}

@@ -1,0 +1,45 @@
+{
+  "run_id": "locomo-r2-n3",
+  "benchmark": "locomo10",
+  "convs": [
+    "conv-26",
+    "conv-30",
+    "conv-41",
+    "conv-42",
+    "conv-43",
+    "conv-44",
+    "conv-47",
+    "conv-48",
+    "conv-49",
+    "conv-50"
+  ],
+  "arms": [
+    "mem0",
+    "graphiti",
+    "rag_baseline"
+  ],
+  "n": 3,
+  "top_k": 20,
+  "concurrency": 10,
+  "answer_model": "glm-5.3",
+  "judge_model": "glm-5.3",
+  "answer_protocol": "anthropic",
+  "answer_temp": 0.0,
+  "answer_endpoint": "open.bigmodel.cn/api/anthropic",
+  "judge_endpoint": "open.bigmodel.cn/api/anthropic",
+  "answer_thinking": "on(provider-default)",
+  "judge_thinking": "on(provider-default)",
+  "answer_max_tokens": 2048,
+  "judge_max_tokens": 2048,
+  "prompt_version": "bench-design-v0.1",
+  "started_at": "2026-08-29T17:17:31+00:00",
+  "status": "DONE",
+  "finished_at": "2026-08-30T07:56:31+00:00",
+  "suspended_reason": "重试耗尽（4 次）: ConnectError: [Errno 8] nodename nor servname provided, or not known",
+  "suspended_at": "2026-08-30T02:14:11+00:00",
+  "phase_b": {
+    "completed": 4,
+    "wall_s": 8.8,
+    "ts": "2026-08-30T07:56:30+00:00"
+  }
+}

@@ -1,0 +1,15 @@
+run: /Users/guanhongli/Documents/repo/memory-bench/runs/locomo-r2-n3
+arms=['intent'] convs=10 n=3
+  [intent] conv-26 灌完（19 sessions）
+  [intent] conv-41 灌完（32 sessions）
+  [intent] conv-42 灌完（29 sessions）
+  [intent] conv-43 灌完（29 sessions）
+  [intent] conv-44 灌完（28 sessions）
+  [intent] conv-47 灌完（31 sessions）
+  [intent] conv-48 灌完（30 sessions）
+  [intent] conv-49 灌完（25 sessions）
+  [intent] conv-50 灌完（30 sessions）
+  [intent] 补灌 9 conv / 5513 turns → snapshot OK
+  ⚠️ [intent] Phase A 失败: FileNotFoundError: [Errno 2] No such file or directory: '/Users/guanhongli/Documents/repo/memory-bench/runs/locomo-r2-n3/evidence/intent.jsonl'
+
+完成。产物：/Users/guanhongli/Documents/repo/memory-bench/runs/locomo-r2-n3/answers.jsonl

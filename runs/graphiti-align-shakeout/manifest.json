@@ -1,0 +1,21 @@
+{
+  "run_id": "graphiti-align-shakeout",
+  "benchmark": "locomo10",
+  "convs": [
+    "conv-30"
+  ],
+  "arms": [
+    "graphiti"
+  ],
+  "n": 1,
+  "top_k": 5,
+  "concurrency": 16,
+  "answer_model": "qwen38-27b-nvfp4",
+  "judge_model": "qwen38-27b-nvfp4",
+  "answer_protocol": "anthropic",
+  "answer_temp": 0.0,
+  "prompt_version": "bench-design-v0.1",
+  "started_at": "2026-08-29T11:38:40+00:00",
+  "status": "DONE",
+  "finished_at": "2026-08-29T11:41:35+00:00"
+}

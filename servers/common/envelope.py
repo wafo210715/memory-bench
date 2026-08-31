@@ -25,11 +25,18 @@ def make_envelope(
     timestamp: str | None = None,
     score: float | None = None,
     raw_format: str | None = None,
+    display_time: str | None = None,
 ) -> dict:
-    """构造一条标准 envelope。score 为原生相似度（尽力归一到 0-1），无则 None。"""
+    """构造一条标准 envelope。score 为原生相似度（尽力归一到 0-1），无则 None。
+
+    display_time：只影响 text 里"时间戳"槽位的**显示串**，不改 timestamp 字段。默认 None＝沿用
+    timestamp（所有既有 arm 行为不变）。为 graphiti 引入：Zep 论文 §3 的 constructor χ 对每条 fact
+    返回的是 tvalid/tinvalid **区间**而非单点，需要把 "2023-05-20 → present" 放进同一个槽位，
+    才能在不新增字段、不改 §4 渲染结构的前提下保住双时间轴。
+    """
     return {
         "memory_id": str(memory_id),
-        "text": render_text(text, timestamp, session_id),
+        "text": render_text(text, display_time or timestamp, session_id),
         "source": {"session_id": session_id, "turn_range": turn_range},
         "timestamp": timestamp,
         "score": score,

@@ -87,9 +87,23 @@ def add_conversation(session_id: str, turns: list[dict], scope: dict, metadata: 
     return {"accepted_turns": n, "native_notes": f"MemOS 抽取完成，耗时 {int((time.perf_counter() - t0) * 1000)}ms（内部 LLM 计量未暴露；容器内 reasoning 深度未透传=服务端默认）"}
 
 
+# MemOS 服务端默认阈值（2026-08-30 核实）：
+#   APISearchRequest.relativity 默认 0.45（MemOS/src/memos/api/product_models.py:166-173）
+#   “Only memories with metadata.relativity >= relativity will be returned. Use 0 to disable.”
+#   search_handler.py:105-108 对假值置 0；_apply_relativity_threshold 逐条过滤，全员低于阈值时 bucket 变空。
+# 实测后果（runs/locomo-r1）：621/1986 题不足 top_k，**78 题返回 0 条证据**——而其余 arm 都是满额。
+# 决策（与 mem0 threshold / graphiti sim_min_score 同口径）：**保持上游默认，但显式传入 + 逐题可观测**。
+# 三家阈值作用在不同分数尺度上（cosine / relativity / cosine-单路），不可通约，强行统一是伪对齐。
+UPSTREAM_RELATIVITY_DEFAULT = 0.45
+RELATIVITY = float(os.environ.get("MEMBENCH_MEMOS_RELATIVITY", UPSTREAM_RELATIVITY_DEFAULT))
+
+
 @mcp.tool
 def retrieve(query: str, query_mode: str = "fixed", top_k: int = 5, filter: dict | None = None) -> dict:
-    """/product/search；返回 text_mem[].memories[] → envelope。"""
+    """/product/search；返回 text_mem[].memories[] → envelope。
+
+    显式传 relativity（不再靠服务端默认静默生效），并在 native_notes 里报告截断情况。
+    """
     t0 = time.perf_counter()
     parts = []
     scope_ids = _scopes()["scope_ids"]
@@ -101,24 +115,42 @@ def retrieve(query: str, query_mode: str = "fixed", top_k: int = 5, filter: dict
         sid = scope_ids[0] if scope_ids else "default"
     if filter and any(k for k in filter if k != "scope_id"):
         parts.append("FILTER_IGNORED: 仅支持 scope_id")
-    res = _post("search", {"query": query, "user_id": sid, "readable_cube_ids": [_cube(sid)], "top_k": top_k})
+    res = _post("search", {"query": query, "user_id": sid, "readable_cube_ids": [_cube(sid)],
+                           "top_k": top_k, "relativity": RELATIVITY})
     if res.get("code") != 200:
         raise RuntimeError(f"MemOS search 失败: {res.get('message')}")
     results = []
+    n_raw = 0
     for block in (res.get("data") or {}).get("text_mem", []) or []:
         if _cube(sid) not in (block.get("cube_id"),):
             continue
         for mem in block.get("memories", []) or []:
+            n_raw += 1
             meta = mem.get("metadata") or {}
+            # score：MemOS 把相关性写在 metadata.relativity（item.py:279 + search_handler.py:235），
+            # 顶层没有 "score" 字段——旧代码读 mem["score"] 导致全部 envelope 的 score 恒为 None，
+            # 契约 §4 的“score 降序”在本 arm 上无法验证。2026-08-30 修。
+            score = meta.get("relativity")
+            if score is None:
+                score = mem.get("score")
             results.append(make_envelope(
                 memory_id=mem.get("id", ""),
                 text=mem.get("memory", ""),
                 session_id=meta.get("session_id"),
                 turn_range=None,
-                timestamp=None,
-                score=mem.get("score"),
+                # chat_time = 对话发生时间（item.py:40），优于 created_at（入库墙钟）。
+                # 旧代码恒传 None，于是 temporal 类题拿不到任何时间锚点。
+                timestamp=meta.get("chat_time") or meta.get("created_at"),
+                score=score,
                 raw_format="memos_text",
             ))
+    parts.append(f"RELATIVITY: {RELATIVITY}"
+                 + ("" if RELATIVITY == UPSTREAM_RELATIVITY_DEFAULT else f" (upstream default {UPSTREAM_RELATIVITY_DEFAULT})"))
+    parts.append(f"RETURNED: {len(results)}/{top_k}")
+    if len(results) < top_k:
+        # 服务端阈值截断的直接证据；0 条时本题必然答错，出分时应单独统计。
+        parts.append(f"TRUNCATED_BELOW_TOP_K: raw={n_raw} kept={len(results)}"
+                     + (" ZERO_EVIDENCE" if not results else ""))
     return {
         "results": results[:top_k],
         "query_used": query,

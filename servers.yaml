@@ -28,6 +28,14 @@ servers:
     args: ["servers/amem/server.py"]
     env_required: [OPENAI_API_KEY, OPENAI_BASE_URL]
 
+  amem_fixed:
+    # 同一份上游代码，以 MEMBENCH_AMEM_MODE=fixed 拉起（servers/amem/fixed.py 的 F3/F4/F5/F8/F9）。
+    # embedding 换成 embedding-3，与 mem0/graphiti/mandol/rag_baseline 同口径，
+    # 故多需 MEMBENCH_LLM_* 两项（embedding 端点从它们推导，同 rag_baseline）。
+    command: ".venv-amem/bin/python"
+    args: ["servers/amem/server_fixed.py"]
+    env_required: [OPENAI_API_KEY, OPENAI_BASE_URL, MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL]
+
   memos:
     command: ".venv/bin/python"            # 纯 REST，主 venv
     args: ["servers/memos/server.py"]

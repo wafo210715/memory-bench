@@ -1,5 +1,13 @@
 # amem：A档系统（arXiv:2502.12110，Zettelkasten 式自演化记忆网络，官方 repo agiresearch/A-mem）
 # 机制：add_note 时 LLM 生成 keywords/tags/context 并建立 note 间链接（记忆演化）；检索走混合搜索 + 网络扩散
+#
+# ⚠️ 双模式（MEMBENCH_AMEM_MODE，2026-08-30 加）：
+#   native（默认）＝原生臂，行为与上游 repo 完全一致，包括其三处已实测确认的失效：
+#     ① 向量只编码 content，keywords/tags/context 不进向量（论文 Eq.3 未实现，实测 L2 距离=0）
+#     ② evolution 把检索排名序号当记忆下标，改写的是最早插入的前 5 条而非真实邻居
+#     ③ 沿链扩展被 `return memories[:k]` 全部截断，实测 is_neighbor 恒为 0
+#   fixed  ＝按论文理念修复臂，见 servers/amem/fixed.py 的 F3/F4/F5/F8/F-emb/F-dirty，
+#           并在本文件的 retrieve 里把 context 拼进 envelope（F9）。两臂 state 目录独立。
 # LLM：llm_controller 用 OpenAI SDK（api_key + OPENAI_BASE_URL env）→ 智谱 coding 端点；reasoning_effort 同款 monkeypatch 钉 low
 # embedding：本地 all-MiniLM-L6-v2（A-MEM 原生设定，嵌入强度是系统属性——与 embedding-3 的差异在 spec 声明）
 # scope 隔离：无原生 scope → per-scope AgenticMemorySystem 实例 + HOME 切换（chroma 目录写死 ~/.chromadb，
@@ -27,9 +35,14 @@ from servers.common.base import BaseState
 from servers.common.envelope import make_envelope
 from servers.common.stats import StatsTracker
 
-mcp = FastMCP("amem")
+# 双模式开关：native=原生复现，fixed=按论文理念修复（两臂 state/collection 完全隔离）
+MODE = os.environ.get("MEMBENCH_AMEM_MODE", "native").strip().lower()
+IS_FIXED = MODE == "fixed"
+SYSTEM_NAME = "amem_fixed" if IS_FIXED else "amem"
 
-_state = BaseState("amem")
+mcp = FastMCP(SYSTEM_NAME)
+
+_state = BaseState(SYSTEM_NAME)
 _stats = StatsTracker()
 _SIDECAR = _state.state_dir / "scopes.json"
 HOMES = _state.state_dir / "homes"            # per-scope HOME（chroma 落 ~/.chromadb）
@@ -72,17 +85,16 @@ def _note_metadata(note) -> dict:
 
 
 def _patch_consolidate(sysm, collection_name: str, embed_fn) -> None:
-    """P9（2026-08-30）：上游 consolidate_memories 会把 retriever 重建成
+    """P9 修复（2026-08-30）：上游 consolidate_memories 会把 retriever 重建成
     `ChromaRetriever("memories", 本地 MiniLM)`——写死的 collection 名 + 原厂向量模型。
 
     触发点在 add_note 末尾：每成功演化 evo_threshold(=100) 次调一次。后果：
       ① 统一的 embedding-3 被换回 384d 本地模型；
       ② 所有 scope 挤进同一个 "memories" collection 互相污染。
-    3 条的 smoke test 碰不到（演化次数远不到 100），但 5882 turns 会触发几十次。
-    实测：conv-49 灌到一半时日志里出现了这个重建。
+    3 条的 smoke test 碰不到，但 5882 turns 会触发几十次。
 
-    保留“每 100 次整理一次”这个行为本身（它属于 A-MEM 代码原生，不该动），
-    只换掉它重建时用的向量模型和 collection 名。document 仍只传 content。
+    保留“每 100 次整理一次”这个行为本身（属于代码原生），只换掉它重建时用的
+    向量模型和 collection 名。document 仍只传 content，不拼 K/G/X——那是 F3，属于 fixed 臂。
     """
     from servers.amem.embedding import CloudChromaRetriever
 
@@ -105,15 +117,14 @@ def _strip_fence(s: str) -> str:
 
 
 def _wrap_llm_observability(system) -> None:
-    """纯观测，不改行为：统计 evolution 的 LLM 返回有多少能被上游解析。
+    """D2（纯观测，不改行为）：统计原生臂 evolution 的 LLM 返回有多少能被上游解析。
 
     上游 process_memory 用裸 `json.loads(response)` 并把异常吃掉（return False, note），
-    从外部区分不了“LLM 说不需要演化”和“解析失败静默丢弃”——而这两者对评测结论
-    的含义完全相反。这里在 get_completion 旁路复刻一次上游的裸解析来计数，
-    **原样返回字符串**，不改变任何原生行为。
+    从外部区分不了“LLM 说不需要演化”和“解析失败静默丢弃”。这里在 get_completion 旁路
+    复刻一次上游的裸解析来计数，**原样返回字符串**，不改变任何原生行为。
 
-    n_evo_fence_recoverable 回答“失败里有多少只是 markdown fence 问题”——它与机制
-    本身无关，属于输出格式噪声，需要单独计量才不会把两类原因混谈。
+    n_evo_fence_recoverable 回答“失败里有多少只是 fence 问题”——它是 fixed 臂宽容解析
+    能白赚回来的那部分，与机制本身无关。
     """
     system.n_llm_calls = 0
     system.n_evo_ok = 0
@@ -146,16 +157,15 @@ def _pin_reasoning(system) -> None:
     """A-MEM 的 llm_controller 直接用 OpenAI SDK——同款 extra_body 手法钉 reasoning_effort；
     并强制 temperature=0（官方默认 0.7，违约 spec §7）。
 
-    ⚠️ P7（2026-08-30）：原实现写的是 `system.llm.client`，但 AgenticMemorySystem 上
-    没有 .llm 属性（真实路径是 .llm_controller.llm）——AttributeError 被下面的 except
-    吃掉，只往 stderr 打一行，而 stdio 模式下那行不进评测日志。
+    ⚠️ 2026-08-30 修正：原实现写的是 `system.llm.client`，但 AgenticMemorySystem 上没有
+    .llm 属性（真实路径是 .llm_controller.llm）——AttributeError 被下面的 except 吃掉，
+    只往 stderr 打一行，而 stdio 模式下那行不进评测日志。后果：pin 从未生效，
+    A-MEM 一直用 temperature=0.7 + 服务端默认思考深度在跑，思考吃光上游写死的
+    max_tokens=1000 → content 返回空 → evolution 100% 静默失败（实测 7/7）。
 
-    后果链：pin 从未生效 → temperature 一直是上游默认 0.7、reasoning_effort 从未钉住
-    → 思考与正文共用额度，吃光上游写死的 max_tokens=1000 → content 返回空
-    → json.loads 报 'Expecting value: line 1 column 1' → evolution **100% 静默失败**
-    （实测 7/7）。修正路径后失败率降到 29%，且剩下的失败全是 markdown fence。
-
-    同时新增 pin_ok 上报——不能再依赖 stderr 里一行没人看的提示。
+    注意：这里只统一**我们注入的配置**（temperature / reasoning_effort）。
+    max_tokens=1000 是 A-MEM 代码自己写死的，属于“代码原生”的一部分，**不在此处覆盖**，
+    否则 amem vs amem_fixed 就不再是“代码原生 vs 论文原生”的对照。
     """
     mode = os.environ.get("MEMBENCH_THINKING", "low")
     try:
@@ -193,26 +203,38 @@ def _get_system(scope_id: str):
         )
 
         try:
-            # P8（2026-08-30）：AgenticMemorySystem.__init__ 里的 client.reset() 是**全局**的，
+            # P8 修复（2026-08-30）：AgenticMemorySystem.__init__ 里的 client.reset() 是**全局**的，
             # 每建一个新 scope 就会清空之前所有 scope 的 collection。LoCoMo 10 个 conversation
-            # = 10 个 scope，等于只有最后一个存活。实测确认。
+            # = 10 个 scope，等于只有最后一个存活。两臂同时中招，实测已确认。
             with no_chroma_reset():
-                sysm = AgenticMemorySystem(
-                    model_name="all-MiniLM-L6-v2",
-                    llm_backend="openai",
-                    llm_model=llm_model,
-                )
-                # P2 修复（2026-08-19）：per-scope 唯一 collection 名，避免多实例共用写死的 "memories"。
-                # 2026-08-30：向量模型换 embedding-3，与 mem0/graphiti/mandol/rag_baseline 同口径——
-                # 它属于“我们注入的统一配置”（同 temperature/thinking），而非“A-MEM 代码原生”。
-                sysm.embed_fn = CloudEmbeddingFunction()
-                sysm.retriever = CloudChromaRetriever(f"mem_{scope_id}", sysm.embed_fn)
-                # P9：上游的“每 100 次大扫除”会把上面两行推倒重来，先换掉它
-                _patch_consolidate(sysm, f"mem_{scope_id}", sysm.embed_fn)
+                if IS_FIXED:
+                    # fixed 臂：子类内部已建好 per-scope collection + embedding-3
+                    from servers.amem.fixed import FixedAgenticMemorySystem
+
+                    sysm = FixedAgenticMemorySystem(
+                        collection_name=f"mem_{scope_id}", llm_model=llm_model
+                    )
+                else:
+                    sysm = AgenticMemorySystem(
+                        model_name="all-MiniLM-L6-v2",
+                        llm_backend="openai",
+                        llm_model=llm_model,
+                    )
+                    # P2 修复（2026-08-19）：per-scope 唯一 collection 名，避免多实例共用写死的 "memories"。
+                    # 2026-08-30：native 也换 embedding-3——向量模型属于“我们注入的统一配置”（同
+                    # temperature/thinking），不属于“A-MEM 代码原生”；不统一的话 native vs fixed
+                    # 的差异里会混着 384d↔2048d，机制收益无法归因。
+                    sysm.embed_fn = CloudEmbeddingFunction()
+                    sysm.retriever = CloudChromaRetriever(f"mem_{scope_id}", sysm.embed_fn)
+                    # P9：上游的“每 100 次大扫除”会把上面两行推倒重来，先换掉它
+                    _patch_consolidate(sysm, f"mem_{scope_id}", sysm.embed_fn)
         finally:
             if old_home is not None:
                 os.environ["HOME"] = old_home
-        _wrap_llm_observability(sysm)
+        if not IS_FIXED and os.environ.get("MEMBENCH_AMEM_NO_OBSERVE") != "1":
+            # D2：原生臂加纯观测计数（fixed 臂自带同名字段，无需包装）。
+            # MEMBENCH_AMEM_NO_OBSERVE=1 可关闭——用于排查它是否引入了 MCP 层不稳定。
+            _wrap_llm_observability(sysm)
         _pin_reasoning(sysm)
         _SYSTEMS[scope_id] = sysm
     return sysm
@@ -241,9 +263,14 @@ def add_conversation(session_id: str, turns: list[dict], scope: dict, metadata: 
     for i, t in enumerate(turns):
         sysm.add_note(f"{t.get('role', 'user')}: {t.get('content', '')}", time=t.get("timestamp"))
         n += 1
+    # F-dirty：fixed 臂在 evolution 改写 context/tags 后需重算向量（native 无此步，因其向量不含这些字段）
+    reindexed = 0
+    if IS_FIXED and hasattr(sysm, "flush_dirty"):
+        reindexed = sysm.flush_dirty()
     # P10 就绪屏障（2026-08-30）：chroma 的写入不保证对随后的 query 立即可见。
-    # 实测：add 完立即 retrieve 会读到 0 条，而只要中间多一次 count() 就正常
-    # ——典型的海森堡 bug（诊断代码本身改变了结果）。这里显式加一道屏障。
+    # 实测：native 臂 add 完立即 retrieve 会读到 0 条（而只要中间多一次 count()
+    # 就正常）——典型的海森堡 bug。fixed 臂因为 flush_dirty 里有额外读写而碰巧避开了。
+    # 这里显式加一道屏障，两臂都走，不再依赖巧合。
     try:
         _ready = sysm.retriever.collection.count()
     except Exception as e:
@@ -252,7 +279,8 @@ def add_conversation(session_id: str, turns: list[dict], scope: dict, metadata: 
     _save_scopes(sid, session_id, n)
     _stats.n_sessions = len(_scopes()["sessions"])
     _stats.add_tokens("internal_llm", None)  # A-MEM 未暴露内部 LLM 计量
-    return {"accepted_turns": n, "native_notes": f"A-MEM 记忆演化完成，耗时 {int((time.perf_counter() - t0) * 1000)}ms（每 note 含 LLM 演化调用）"}
+    extra = f"；F-dirty 重算向量 {reindexed} 条" if IS_FIXED else ""
+    return {"accepted_turns": n, "native_notes": f"A-MEM({MODE}) 记忆演化完成，耗时 {int((time.perf_counter() - t0) * 1000)}ms（每 note 含 LLM 演化调用）{extra}"}
 
 
 @mcp.tool
@@ -266,9 +294,27 @@ def retrieve(query: str, query_mode: str = "fixed", top_k: int = 5, filter: dict
     else:
         sid = scope_ids[0] if scope_ids else "default"
     sysm = _get_system(sid)
+    if os.environ.get("MEMBENCH_AMEM_DIAG"):
+        try:
+            _cnt = sysm.retriever.collection.count()
+        except Exception as _e:
+            _cnt = f"ERR:{_e}"
+        print(f"[amem-diag] sid={sid!r} scope_ids={scope_ids} sys_keys={list(_SYSTEMS)} "
+              f"memories={len(getattr(sysm, 'memories', {}))} chroma={_cnt} "
+              f"retriever={type(sysm.retriever).__name__}", file=sys.stderr)
     results = sysm.search_agentic(query, k=top_k)
+    n_neighbor = 0
     for item in results:
         content = item.get("content", "")
+        # F9（fixed 臂）：A-MEM 对原文的再加工（LLM 生成的一句话 context）是其核心贡献之一，
+        # 原生封装只取 content 等于把它挡在答题上下文外。先例：envelope 已为 graphiti 的
+        # 双时间轴开过 display_time 口子（envelope.py:31-35）。native 臂不受影响。
+        if IS_FIXED:
+            ctx = str(item.get("context") or "").strip()
+            if ctx and ctx != "General":
+                content = f"{content}〔{ctx}〕"
+            if item.get("is_neighbor"):
+                n_neighbor += 1
         ts = item.get("timestamp") or item.get("last_accessed")
         results_note = make_envelope(
             memory_id=item.get("id", ""),
@@ -281,6 +327,8 @@ def retrieve(query: str, query_mode: str = "fixed", top_k: int = 5, filter: dict
         )
         notes.append(results_note)
     parts = []
+    if IS_FIXED:
+        parts.append(f"F8: 沿链邻居 {n_neighbor}/{len(notes)} 条")
     if len(scope_ids) > 1 and not (filter and filter.get("scope_id")):
         parts.append("MULTI_SCOPE: 未指定 filter.scope_id，仅检索首个 scope")
     if filter and any(k for k in filter if k != "scope_id"):
@@ -312,12 +360,13 @@ def reset() -> dict:
 @mcp.tool
 def stats() -> dict:
     d = _stats.to_dict(n_memories=_scopes().get("n_notes", 0))
-    # pin 是否真的注入成功——P7 的教训：静默失败必须可观测
+    d["mode"] = MODE
+    # pin 是否真的注入成功——不能再依赖 stderr 里一行没人看的提示
     d["pin_ok"] = all(getattr(s, "pin_ok", False) for s in _SYSTEMS.values()) if _SYSTEMS else None
-    # evolution 到底成功了多少次（上游把失败吞在 except 里，外部本来无从得知）
-    for key in ("n_llm_calls", "n_evo_ok", "n_evo_fail", "n_evo_fence_recoverable"):
+    # 两臂同口径上报：evolution 到底成功了多少次（静默失败必须可观测）
+    for key in ("n_llm_calls", "n_evo_ok", "n_evo_fail"):
         d[key] = sum(getattr(s, key, 0) for s in _SYSTEMS.values())
-    # embedding 换云端后必须记账（本地模型时代无此开销）
+    # embedding 计量：两臂现均走云端 embedding-3（2026-08-30 统一）
     calls = tokens = 0
     for sysm in _SYSTEMS.values():
         fn = getattr(sysm, "embed_fn", None)
@@ -326,6 +375,14 @@ def stats() -> dict:
             tokens += getattr(fn, "tokens", 0)
     d["embed_calls"] = calls
     d["embed_tokens"] = tokens
+    if IS_FIXED:
+        for key in ("n_construct_ok", "n_links", "n_json_retry"):
+            d[key] = sum(getattr(s, key, 0) for s in _SYSTEMS.values())
+    else:
+        # D2：失败里有多少只是 fence（= fixed 臂宽容解析白赚回来的部分）
+        d["n_evo_fence_recoverable"] = sum(
+            getattr(s, "n_evo_fence_recoverable", 0) for s in _SYSTEMS.values()
+        )
     return d
 
 
@@ -345,8 +402,13 @@ def _dump_notes(scope_id: str) -> list[dict]:
 
 
 def _inject_notes(scope_id: str, notes: list[dict]) -> None:
-    """restore 后重建实例并注入：A-MEM 的 chroma 是内存版（不落盘），
-    快照恢复必须同步重建 chroma 索引（本地嵌入重算，毫秒级）。"""
+    """restore 后重建实例并注入：A-MEM 的 chroma 是内存版（不落盘），快照恢复必须同步重建索引。
+
+    P12（2026-08-30）：**必须批量写入**。原实现逐条 add_document，在本地 MiniLM 时代是毫秒级；
+    换成云端 embedding-3 后每条都是一次 API 调用，1297 条要 500+ 秒，直接撞破 MCP 的
+    180s 超时（实测 conv-26/conv-30 注入完后在 conv-49 超时）。批量后 embedding function
+    内部按 64 分批，同样的量几十秒完成。
+    """
     if not notes:
         return
     sysm = _get_system(scope_id)
@@ -364,6 +426,8 @@ def _inject_notes(scope_id: str, notes: list[dict]) -> None:
             note = MemoryNote(content=d.get("content", ""))
             note.id = nid
         sysm.memories[nid] = note
+        # fixed 臂用子类的富文本索引（F3 = content+keywords+tags+context），
+        # native 用原文——两臂的向量口径必须与各自 ingest 时一致
         docs.append(sysm.embed_text(note) if hasattr(sysm, "embed_text") else note.content)
         meta = _note_metadata(note)
         metas.append({
@@ -373,11 +437,7 @@ def _inject_notes(scope_id: str, notes: list[dict]) -> None:
         })
         ids.append(nid)
 
-    # P12（2026-08-30）：**必须批量写入**。原实现逐条 add_document，在本地 MiniLM 时代
-    # 是毫秒级；换成云端 embedding-3 后每条都是一次 API 调用，1297 条要 500+ 秒，
-    # 直接撞破 MCP 的 180s 超时（实测：conv-26/conv-30 注入完后在 conv-49 超时）。
-    # 批量后 embedding function 内部按 64 分批，同样的量 24 秒完成。
-    B = 512
+    B = 512   # chroma 单次 add 上限保守取值；embedding function 内部再按 64 分批调 API
     for i in range(0, len(docs), B):
         sysm.retriever.collection.add(
             documents=docs[i : i + B], metadatas=metas[i : i + B], ids=ids[i : i + B]
@@ -395,29 +455,28 @@ def snapshot(tag: str) -> dict:
     _state.snap_root.mkdir(parents=True, exist_ok=True)
     dst.mkdir(parents=True, exist_ok=True)
     notes_dump = {sid: _dump_notes(sid) for sid in _scopes()["scope_ids"]}
-    # 防静默空快照覆盖——实例不在内存（server 重启后未 add）时拒绝快照。
-    # P13（2026-08-31）：原判据要求 actual == expected，但 sidecar 的 n_notes 是**跨进程累加**的，
-    # 而内存 notes 随进程结束丢失，两者在“分多次会话灌数据”时永远不相等（实测：conv-30
-    # 灌完 actual=369、expected=445，快照被拒，75 分钟的 ingest 没保住）。真正要防的是
-    # “空快照覆盖”，故判据改为 actual == 0；部分数据应该允许落盘。
-    # 另：失败时必须清掉半成品目录，否则 restore 会把空目录误判为“有快照”。
+    # P7 修复：防静默空快照覆盖——实例不在内存（server 重启后未 add）时拒绝快照。
+    # P13 修正（2026-08-31）：原判据要求 actual == expected，但 sidecar 的 n_notes 是**跨进程累加**的，
+    # 而内存 notes 随进程结束丢失，两者在“分多次会话灌数据”的场景下永远不相等（实测：
+    # conv-30 灌完后 actual=369、expected=445，快照被拒，75 分钟的 ingest 没保住）。
+    # 真正要防的是“空快照覆盖”，所以判据改为 actual == 0；部分数据应该允许落盘。
     expected = _scopes().get("n_notes", 0)
     actual = sum(len(v) for v in notes_dump.values())
     if expected > 0 and actual == 0:
-        shutil.rmtree(dst, ignore_errors=True)
+        shutil.rmtree(dst, ignore_errors=True)   # 不留半成品目录，否则 restore 会误判为“有快照”
         return {"ok": False, "error": "SNAPSHOT_EMPTY_STATE",
                 "hint": f"内存 notes 为 0 而 sidecar 计数 {expected}——实例已丢失，拒绝写空覆盖", "tag": tag}
     if actual != expected:
         print(f"[amem-snapshot] 内存 {actual} 条 vs sidecar 累计 {expected} 条（跨会话累加差异，按内存实际落盘）",
               file=sys.stderr)
     (dst / "notes.json").write_text(json.dumps(notes_dump, ensure_ascii=False, default=str))
-    # P11（2026-08-30）：原实现在这里调 _drop_systems()，理由是「释放 chroma 对目录的占用
+    # P11 修复（2026-08-30）：原实现在这里调 _drop_systems()，理由是「释放 chroma 对目录的占用
     # 才能安全 copytree」。但 A-MEM 用的是**内存版** chromadb.Client()，homes/ 下实测只有一个
     # huggingface 日志文件（40K），根本没有 chroma 数据——占用不存在，drop 纯属自毁：
     # 它清空 _SYSTEMS，导致 snapshot 之后的 retrieve 全部拿到新建的空系统。
     # runner 的 Phase A 恰好是 ingest → snapshot → retrieve，于是 1500 条 evidence 全空
-    # （retrieve_wall_ms p50 = 1ms，连一次 embedding 往返都不够）。smoke_test 测不出来，
-    # 因为它 snapshot 之后紧跟着 restore。快照真正的载体是上面的 notes.json。
+    # （2026-08-30 实测 min=0 max=0，检索延迟 1ms）。smoke_test 测不出来，因为它 snapshot
+    # 之后紧跟 restore。快照真正的载体是上面那份 notes.json（内存 dump），与 drop 无关。
     if HOMES.exists():
         shutil.copytree(HOMES, dst / "homes", dirs_exist_ok=True)
     if _SIDECAR.exists():

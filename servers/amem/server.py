@@ -9,6 +9,7 @@
 
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -53,20 +54,82 @@ def _save_scopes(scope_id: str | None, session_id: str | None, n: int) -> None:
     _SIDECAR.write_text(json.dumps(s, ensure_ascii=False))
 
 
+def _strip_fence(s: str) -> str:
+    """剥掉 ```json fence（仅用于观测，不影响原生臂行为）。"""
+    s = (s or "").strip()
+    if s.startswith("```"):
+        s = re.sub(r"^```[a-zA-Z]*\s*", "", s)
+        s = re.sub(r"\s*```$", "", s)
+    return s
+
+
+def _wrap_llm_observability(system) -> None:
+    """纯观测，不改行为：统计 evolution 的 LLM 返回有多少能被上游解析。
+
+    上游 process_memory 用裸 `json.loads(response)` 并把异常吃掉（return False, note），
+    从外部区分不了“LLM 说不需要演化”和“解析失败静默丢弃”——而这两者对评测结论
+    的含义完全相反。这里在 get_completion 旁路复刻一次上游的裸解析来计数，
+    **原样返回字符串**，不改变任何原生行为。
+
+    n_evo_fence_recoverable 回答“失败里有多少只是 markdown fence 问题”——它与机制
+    本身无关，属于输出格式噪声，需要单独计量才不会把两类原因混谈。
+    """
+    system.n_llm_calls = 0
+    system.n_evo_ok = 0
+    system.n_evo_fail = 0
+    system.n_evo_fence_recoverable = 0
+    try:
+        orig = system.llm_controller.llm.get_completion
+
+        def observed(prompt, response_format=None, temperature=0.7):
+            raw = orig(prompt, response_format, temperature)
+            system.n_llm_calls += 1
+            try:
+                json.loads(raw)                     # 与上游 process_memory 完全同口径
+                system.n_evo_ok += 1
+            except Exception:
+                system.n_evo_fail += 1
+                try:
+                    json.loads(_strip_fence(raw))   # 仅 fence 导致？
+                    system.n_evo_fence_recoverable += 1
+                except Exception:
+                    pass
+            return raw                              # 原样返回，行为零变化
+
+        system.llm_controller.llm.get_completion = observed
+    except Exception as e:
+        print(f"[amem-observe] 注入失败（仅影响计数，不影响结果）: {e}", file=sys.stderr)
+
+
 def _pin_reasoning(system) -> None:
-    """A-MEM 的 llm_controller 直接用 OpenAI SDK——同款 extra_body 手法钉 reasoning_effort=low；
-    并强制 temperature=0（P4 修复：官方默认 0.7，违约 spec §7）。"""
+    """A-MEM 的 llm_controller 直接用 OpenAI SDK——同款 extra_body 手法钉 reasoning_effort；
+    并强制 temperature=0（官方默认 0.7，违约 spec §7）。
+
+    ⚠️ P7（2026-08-30）：原实现写的是 `system.llm.client`，但 AgenticMemorySystem 上
+    没有 .llm 属性（真实路径是 .llm_controller.llm）——AttributeError 被下面的 except
+    吃掉，只往 stderr 打一行，而 stdio 模式下那行不进评测日志。
+
+    后果链：pin 从未生效 → temperature 一直是上游默认 0.7、reasoning_effort 从未钉住
+    → 思考与正文共用额度，吃光上游写死的 max_tokens=1000 → content 返回空
+    → json.loads 报 'Expecting value: line 1 column 1' → evolution **100% 静默失败**
+    （实测 7/7）。修正路径后失败率降到 29%，且剩下的失败全是 markdown fence。
+
+    同时新增 pin_ok 上报——不能再依赖 stderr 里一行没人看的提示。
+    """
     mode = os.environ.get("MEMBENCH_THINKING", "low")
     try:
-        create = system.llm.client.chat.completions.create
+        client = system.llm_controller.llm.client
+        create = client.chat.completions.create
 
         def create_pinned(**kwargs):
             kwargs["temperature"] = 0
             kwargs.setdefault("extra_body", {})["reasoning_effort"] = "low" if mode == "low" else "high"
             return create(**kwargs)
 
-        system.llm.client.chat.completions.create = create_pinned
+        client.chat.completions.create = create_pinned
+        system.pin_ok = True
     except Exception as e:
+        system.pin_ok = False
         print(f"[amem-pin] 注入失败（公平性受损，未静默）: {e}", file=sys.stderr)
 
 
@@ -95,6 +158,7 @@ def _get_system(scope_id: str):
         sysm.retriever = ChromaRetriever(
             collection_name=f"mem_{scope_id}", model_name="all-MiniLM-L6-v2"
         )
+        _wrap_llm_observability(sysm)
         _pin_reasoning(sysm)
         _SYSTEMS[scope_id] = sysm
     return sysm
@@ -185,7 +249,13 @@ def reset() -> dict:
 
 @mcp.tool
 def stats() -> dict:
-    return _stats.to_dict(n_memories=_scopes().get("n_notes", 0))
+    d = _stats.to_dict(n_memories=_scopes().get("n_notes", 0))
+    # pin 是否真的注入成功——P7 的教训：静默失败必须可观测
+    d["pin_ok"] = all(getattr(s, "pin_ok", False) for s in _SYSTEMS.values()) if _SYSTEMS else None
+    # evolution 到底成功了多少次（上游把失败吞在 except 里，外部本来无从得知）
+    for key in ("n_llm_calls", "n_evo_ok", "n_evo_fail", "n_evo_fence_recoverable"):
+        d[key] = sum(getattr(s, key, 0) for s in _SYSTEMS.values())
+    return d
 
 
 def _dump_notes(scope_id: str) -> list[dict]:

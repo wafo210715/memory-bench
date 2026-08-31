@@ -99,8 +99,17 @@ def f1_single(pred: str, gold: str) -> float:
     return 2 * precision * recall / (precision + recall)
 
 
-def f1_score(pred: str, golds: list[str] | str) -> float:
-    """multi-answer 取 max（LoCoMo answer 是数组）。"""
-    if isinstance(golds, str):
+def f1_score(pred: str, golds) -> float:
+    """multi-answer 取 max（LoCoMo answer 是数组）。
+
+    ⚠️ gold 不一定是 str：LoCoMo 全量 1986 题里有 6 题的 answer 是 **int**（如 2022、2，全在
+    conv-26）。旧实现只判 isinstance(golds, str)，int 会落到迭代分支 → TypeError → 整个
+    Phase B 崩掉。历史 run 只跑过 conv-30/41/42，所以这个雷到 2026-08-29 首次全量跑才引爆。
+    统一归一成 str；同时排掉 None（str(None)=="None" 会污染 F1）。
+    """
+    if not isinstance(golds, (list, tuple)):
         golds = [golds]
-    return max((f1_single(pred, g) for g in golds if g), default=0.0)
+    return max(
+        (f1_single(pred, str(g)) for g in golds if g is not None and str(g).strip()),
+        default=0.0,
+    )

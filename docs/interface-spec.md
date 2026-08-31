@@ -139,7 +139,8 @@
 | 内部 LLM | 所有系统内部调 LLM（抽取/推断）**必须同一 endpoint、同一模型、temperature=0**；配置从环境变量读，逐系统写入 run manifest |
 | 答题 LLM | 各臂完全一致（评测循环职责，与本规范无涉但在此声明） |
 | embedding | 有原生 embedding 的系统用其默认并记录模型名；无嵌入系统记 "none" |
-| top_k | 默认 5，全臂一致 |
+| top_k | **默认 20，全 arm 一致**（2026-08-30 由 5 改为 20；依据：主流记忆系统的默认 top_k 普遍在 10–20，例如 mem0 v3 `top_k=20`、graphiti `DEFAULT_SEARCH_LIMIT`。旧 run（locomo-r1 / s2b-mock）用的是 5，**与新 run 不可混表**） |
+| 检索阈值 | **各系统保持上游默认，不强行统一**（三家有、四家无，且作用在不同分数尺度上，不可通约）：<br>· mem0 `threshold=0.1`——卡语义 cosine 分，**融合前**排除（`utils/scoring.py:74-75`）<br>· memos `relativity=0.45`——服务端卡 `metadata.relativity`（`product_models.py:166`）<br>· graphiti `sim_min_score=0.6`——只卡 cosine 通道，BM25/BFS 不受影响（`search_utils.py:65`）<br>· mandol / rag_baseline / mock / intent——**无阈值**<br>**硬要求**：每个有阈值的 arm 必须逐题上报是否触发截断（`TRUNCATED_BELOW_TOP_K`），出分时单独统计 |
 | 截断/渲染 | §4 锁死 |
 
 **逐系统实际配置清单**（P6 声明，2026-08-19 核查后补齐；偏离统一配置的均为系统原生属性，论文显式声明）：

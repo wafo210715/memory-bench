@@ -47,6 +47,20 @@ def utcnow() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
+def _endpoint_tag(url: str | None) -> str | None:
+    """只取 host（+ /anthropic 这类协议面后缀）写进 manifest，不落盘 key。"""
+    if not url:
+        return None
+    from urllib.parse import urlparse
+    u = urlparse(url)
+    return f"{u.netloc}{u.path.rstrip('/')}" or url
+
+
+def _thinking_tag(on: bool) -> str:
+    """on 时不传参数走 provider 默认态，写清楚以免事后无法复现。"""
+    return "on(provider-default)" if on else "off(thinking.type=disabled)"
+
+
 def parse(result) -> dict:
     data = getattr(result, "data", None)
     if isinstance(data, dict):
@@ -247,9 +261,9 @@ async def answer_and_judge(ev: dict, http: httpx.AsyncClient, ans: "AnthropicCom
         raw, usage_a, parsed = "", {}, None
         prompt = scoring.answer_user(ev["evidence_text"] or "(empty)", ev["question"])
         for attempt in range(2):
+            # max_tokens 交给 client（按 thinking 开关分档：off=600 / on=2048），不再硬编码
             raw, usage_a = await ans.chat(http, scoring.ANSWER_SYSTEM,
-                                          prompt if attempt == 0 else prompt + "\nOutput ONLY the JSON object.",
-                                          max_tokens=600)
+                                          prompt if attempt == 0 else prompt + "\nOutput ONLY the JSON object.")
             parsed = scoring.parse_answer(raw)
             if parsed:
                 break
@@ -260,14 +274,13 @@ async def answer_and_judge(ev: dict, http: httpx.AsyncClient, ans: "AnthropicCom
         if ev["category"] != 5:
             f1 = round(scoring.f1_score(pred if parsed else "", ev["gold"]), 4)
 
-        # 判分（同样 2 次解析机会；再失败兜底 correct=0 并标记，出分时可单独统计——2026-08-21 实测
-        # qwen 偶尔输出直隐形内容烧光 max_tokens，故提到 600）
+        # 判分（同样 2 次解析机会；再失败兜底 correct=0 并标记，出分时可单独统计）。
+        # max_tokens 同样交给 client：thinking 开时 reasoning 与正文共用额度，600 会截成空 content。
         jraw, usage_j, judged, jfail = "", {}, None, False
         jprompt = scoring.judge_user(ev["question"], str(ev["gold"]), pred)
         for attempt in range(2):
             jraw, usage_j = await jud.chat(http, scoring.JUDGE_SYSTEM,
-                                           jprompt if attempt == 0 else jprompt + "\nOutput ONLY the compact JSON object.",
-                                           max_tokens=600)
+                                           jprompt if attempt == 0 else jprompt + "\nOutput ONLY the compact JSON object.")
             judged = scoring.parse_judge(jraw)
             if judged:
                 break
@@ -391,7 +404,8 @@ def main() -> None:
                    help="逗号分隔。检索臂 = servers.yaml 系统 名（mock/mem0/.../rag_baseline/intent）；full_context 为内置臂")
     p.add_argument("--convs", default="all", help="逗号分隔 conversation_id，默认全部 10 个")
     p.add_argument("--n", type=int, default=1, help="重复次数（LLM 非确定性方差）")
-    p.add_argument("--top-k", type=int, default=5)
+    p.add_argument("--top-k", type=int, default=20,
+                   help="默认 20，与 interface-spec §7 一致（2026-08-30 由 5 改为 20；旧 run 用的是 5，不可混表）")
     p.add_argument("--concurrency", type=int, default=16, help="Phase B 答题并发（用户定：16 实测稳定；持续流 RPM 限流由 429 长退避扛）")
     p.add_argument("--run-id", required=True)
     p.add_argument("--resume", action="store_true")
@@ -411,7 +425,13 @@ def main() -> None:
             sys.exit(f"未知 conv: {sorted(missing)}")
         convs = [c for c in convs if c["conversation_id"] in want]
 
+    # MCP server 侧的可审查日志按 run 归档（trace 落 runs/<run_id>/mcp_trace/）。child_env() 会把
+    # MEMBENCH_* 透传给 stdio 子进程，所以这里设一次即可。
+    os.environ["MEMBENCH_RUN_ID"] = args.run_id
+
     run = Run(args.run_id, args.resume)
+    # 只为读配置写 manifest（纯配置对象，不建连接）；Phase B 会自己再取一次
+    ans_cfg, jud_cfg = answer_llm_from_env(), judge_llm_from_env()
     m = run.load_manifest()
     m.update({
         "run_id": args.run_id, "benchmark": "locomo10",
@@ -421,6 +441,15 @@ def main() -> None:
         "judge_model": os.environ.get("MEMBENCH_JUDGE_MODEL", os.environ.get("MEMBENCH_ANSWER_MODEL")),
         "answer_protocol": os.environ.get("MEMBENCH_ANSWER_PROTOCOL"),
         "answer_temp": 0.0,
+        # ★ 换答题器/改 thinking = 换测量仪器，跨 run 不可比。这几项必须留痕
+        #   （2026-08-29：locomo-r1 的 manifest 因单臂续跑被覆盖成 arms=[graphiti]，配置漂移无记录）
+        "answer_endpoint": _endpoint_tag(os.environ.get("MEMBENCH_ANSWER_BASE_URL")),
+        "judge_endpoint": _endpoint_tag(
+            os.environ.get("MEMBENCH_JUDGE_BASE_URL", os.environ.get("MEMBENCH_ANSWER_BASE_URL"))),
+        "answer_thinking": _thinking_tag(ans_cfg.thinking),
+        "judge_thinking": _thinking_tag(jud_cfg.thinking),
+        "answer_max_tokens": ans_cfg.max_tokens,
+        "judge_max_tokens": jud_cfg.max_tokens,
         "prompt_version": "bench-design-v0.1",
         "started_at": m.get("started_at") or utcnow(),
         "status": "RUNNING",

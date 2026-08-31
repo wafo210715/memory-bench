@@ -34,6 +34,12 @@ node_modules/
 # Archive those with scripts/archive_run.sh instead.
 runs/*/answers.jsonl
 runs/*/evidence/
+# MCP 调用 trace（2026-08-29 引入）：逐题一行 JSON，~2.7MB/arm/run（graphiti 实测 9.4MB）。
+# 属于可重建的过程产物，与 answers/evidence 同类；需要时跟 run 一起归档。
+runs/*/mcp_trace/
+
+# 后台进程 PID：只对本机当次运行有意义，入库只会制造冲突
+runs/*.pid
 
 # ---- Scratch ----
 _to_delete/

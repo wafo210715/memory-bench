@@ -71,6 +71,30 @@ def _note_metadata(note) -> dict:
     }
 
 
+def _patch_consolidate(sysm, collection_name: str, embed_fn) -> None:
+    """P9（2026-08-30）：上游 consolidate_memories 会把 retriever 重建成
+    `ChromaRetriever("memories", 本地 MiniLM)`——写死的 collection 名 + 原厂向量模型。
+
+    触发点在 add_note 末尾：每成功演化 evo_threshold(=100) 次调一次。后果：
+      ① 统一的 embedding-3 被换回 384d 本地模型；
+      ② 所有 scope 挤进同一个 "memories" collection 互相污染。
+    3 条的 smoke test 碰不到（演化次数远不到 100），但 5882 turns 会触发几十次。
+    实测：conv-49 灌到一半时日志里出现了这个重建。
+
+    保留“每 100 次整理一次”这个行为本身（它属于 A-MEM 代码原生，不该动），
+    只换掉它重建时用的向量模型和 collection 名。document 仍只传 content。
+    """
+    from servers.amem.embedding import CloudChromaRetriever
+
+    def consolidate() -> None:
+        sysm.retriever = CloudChromaRetriever(collection_name, embed_fn)
+        for m in sysm.memories.values():
+            sysm.retriever.add_document(m.content, _note_metadata(m), m.id)
+        print(f"[amem-consolidate] 重建 {collection_name}，{len(sysm.memories)} 条", file=sys.stderr)
+
+    sysm.consolidate_memories = consolidate
+
+
 def _strip_fence(s: str) -> str:
     """剥掉 ```json fence（仅用于观测，不影响原生臂行为）。"""
     s = (s or "").strip()
@@ -183,6 +207,8 @@ def _get_system(scope_id: str):
                 # 它属于“我们注入的统一配置”（同 temperature/thinking），而非“A-MEM 代码原生”。
                 sysm.embed_fn = CloudEmbeddingFunction()
                 sysm.retriever = CloudChromaRetriever(f"mem_{scope_id}", sysm.embed_fn)
+                # P9：上游的“每 100 次大扫除”会把上面两行推倒重来，先换掉它
+                _patch_consolidate(sysm, f"mem_{scope_id}", sysm.embed_fn)
         finally:
             if old_home is not None:
                 os.environ["HOME"] = old_home

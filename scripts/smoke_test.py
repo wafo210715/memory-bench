@@ -88,7 +88,9 @@ async def run(system: str) -> "Checker":
 
     # 关键：MCP stdio 子进程只继承最小环境（PATH/HOME 等），不继承父进程变量——
     # MEMBENCH_* 与重定向变量（mandol 的 SILICONFLOW_*）必须显式转发
-    child_env = {k: v for k, v in os.environ.items() if k.startswith(("MEMBENCH_", "SILICONFLOW_", "OPENAI_"))}
+    # HF_/HUGGING_FACE_（2026-08-31 补）：mandol 的 SPLADE/cross-encoder 需 HF 鉴权，不转发会 401 静默降级
+    child_env = {k: v for k, v in os.environ.items()
+                 if k.startswith(("MEMBENCH_", "SILICONFLOW_", "OPENAI_", "HF_", "HUGGING_FACE_"))}
     config = {"mcpServers": {system: {"command": cfg["command"], "args": cfg["args"], "env": child_env}}}
     c = Checker()
     baseline_ids: set[str] = set()

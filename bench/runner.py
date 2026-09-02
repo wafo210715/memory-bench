@@ -77,9 +77,14 @@ async def acall(client: Client, tool: str, args: dict, timeout: float = 180.0) -
 
 
 def child_env() -> dict:
-    """MCP stdio 子进程最小环境转发（与 scripts/smoke_test.py 同约定）。"""
+    """MCP stdio 子进程最小环境转发（与 scripts/smoke_test.py 同约定）。
+
+    HF_/HUGGING_FACE_（2026-08-31 补）：mandol 的 SPLADE（naver/splade-v3，gated repo）
+    与 cross-encoder 需 HF 鉴权；不转发则子进程拿不到 token → 401 → **静默降级**
+    （SemanticMap 会 skip sparse embedding 而不报错）。
+    """
     return {k: v for k, v in os.environ.items()
-            if k.startswith(("MEMBENCH_", "SILICONFLOW_", "OPENAI_"))}
+            if k.startswith(("MEMBENCH_", "SILICONFLOW_", "OPENAI_", "HF_", "HUGGING_FACE_"))}
 
 
 def mcp_config(system: str) -> dict:

@@ -970,3 +970,72 @@ amem_fixed     1495     0.510  0.201  c1:98/239 c2:214/287 c3:39/78 c4:387/558 c
 （judge 解析失败行: 0）
 
 完成。产物：/Users/guanhongli/Documents/repo/memory-bench/runs/amem-ab-3conv/answers.jsonl
+run: /Users/guanhongli/Documents/repo/memory-bench/runs/amem-ab-3conv
+arms=['amem_fixed'] convs=1 n=3
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      amem_fixed, 3.4.7                           │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[08/31/26 19:38:53] INFO     Starting MCP server 'amem_fixed'   transport.py:241
+                             with transport 'stdio'                             
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+WARNING:huggingface_hub.utils._http:Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 7839.96it/s]
+[amem-restore] scope=conv-49 notes注入=509 chroma=509 内存dict=509
+  [amem_fixed] conv-26 灌完（19 sessions）
+[amem-snapshot] 内存 928 条 vs sidecar 累计 1716 条（跨会话累加差异，按内存实际落盘）
+  [amem_fixed] 补灌 1 conv / 419 turns → snapshot OK
+  [amem_fixed] conv-26 retrieve 完成（累计新增 597）
+  [amem_fixed] evidence 就绪（skip 903，新增 597）
+/Users/guanhongli/.local/share/uv/python/cpython-3.12.10-macos-aarch64-none/lib/python3.12/multiprocessing/resource_tracker.py:279: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
+Phase B: 待答 597 题，并发 16，答题=glm-5.3，判分=glm-5.3
+  进度 25/597（0.9 题/s，ETA 10.4 min）
+  进度 50/597（0.9 题/s，ETA 9.6 min）
+  进度 75/597（0.9 题/s，ETA 9.2 min）
+  进度 100/597（0.8 题/s，ETA 10.4 min）
+  进度 125/597（0.8 题/s，ETA 10.1 min）
+  进度 150/597（0.8 题/s，ETA 9.6 min）
+  进度 175/597（0.8 题/s，ETA 9.1 min）
+  进度 200/597（0.8 题/s，ETA 8.8 min）
+  进度 225/597（0.8 题/s，ETA 8.0 min）
+  LLM 失败（连续 1）: amem_fixed|conv-26|q5|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 250/597（0.8 题/s，ETA 7.3 min）
+  进度 275/597（0.8 题/s，ETA 6.7 min）
+  进度 300/597（0.8 题/s，ETA 6.1 min）
+  LLM 失败（连续 1）: amem_fixed|conv-26|q33|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 325/597（0.8 题/s，ETA 5.5 min）
+  进度 350/597（0.8 题/s，ETA 4.9 min）
+  进度 375/597（0.9 题/s，ETA 4.3 min）
+  进度 400/597（0.9 题/s，ETA 3.7 min）
+  进度 425/597（0.9 题/s，ETA 3.3 min）
+  进度 450/597（0.9 题/s，ETA 2.8 min）
+  LLM 失败（连续 1）: amem_fixed|conv-26|q62|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 475/597（0.9 题/s，ETA 2.3 min）
+  进度 500/597（0.9 题/s，ETA 1.8 min）
+  进度 525/597（0.9 题/s，ETA 1.3 min）
+  进度 550/597（0.9 题/s，ETA 0.9 min）
+  进度 575/597（0.9 题/s，ETA 0.4 min）
+Phase B 完成：594 题，859s
+
+arm               n judge_acc     F1  cat 切片（1=multihop 2=temporal 3=open 4=single 5=adv）
+amem           1498     0.425  0.190  c1:62/240 c2:182/288 c3:27/78 c4:339/559 c5:27/333
+amem_fixed     1496     0.563  0.219  c1:112/239 c2:232/285 c3:43/78 c4:428/561 c5:27/333
+（judge 解析失败行: 0）
+
+完成。产物：/Users/guanhongli/Documents/repo/memory-bench/runs/amem-ab-3conv/answers.jsonl

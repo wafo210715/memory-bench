@@ -2,12 +2,9 @@
   "run_id": "amem-ab-3conv",
   "benchmark": "locomo10",
   "convs": [
-    "conv-26",
-    "conv-30",
-    "conv-49"
+    "conv-26"
   ],
   "arms": [
-    "amem",
     "amem_fixed"
   ],
   "n": 3,
@@ -27,9 +24,9 @@
   "started_at": "2026-08-30T12:30:16+00:00",
   "status": "DONE",
   "phase_b": {
-    "completed": 2365,
-    "wall_s": 1760.4,
-    "ts": "2026-08-30T21:05:24+00:00"
+    "completed": 594,
+    "wall_s": 858.8,
+    "ts": "2026-08-31T13:41:33+00:00"
   },
-  "finished_at": "2026-08-30T21:05:24+00:00"
+  "finished_at": "2026-08-31T13:41:33+00:00"
 }

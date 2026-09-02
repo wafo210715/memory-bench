@@ -42,6 +42,10 @@ runs/**/mcp_trace/
 # 后台进程 PID：只对本机当次运行有意义，入库只会制造冲突
 runs/**/*.pid
 
+# nohup 重定向的原始运行日志：mandol 等系统的 INFO 刷屏，实测 8.2MB / 48,568 行每个 run。
+# 有价值的部分（失败条目 + 判分结果）抽到同目录 run-summary.txt 且保留入库。
+runs/**/run.log
+
 # ---- Scratch ----
 _to_delete/
 archives/

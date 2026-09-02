@@ -1,0 +1,34 @@
+{
+  "run_id": "mandol-p2-towers-3conv",
+  "benchmark": "locomo10",
+  "convs": [
+    "conv-26",
+    "conv-30",
+    "conv-49"
+  ],
+  "arms": [
+    "mandol"
+  ],
+  "n": 3,
+  "top_k": 20,
+  "concurrency": 16,
+  "answer_model": "glm-5.3",
+  "judge_model": "glm-5.3",
+  "answer_protocol": "anthropic",
+  "answer_temp": 0.0,
+  "answer_endpoint": "open.bigmodel.cn/api/anthropic",
+  "judge_endpoint": "open.bigmodel.cn/api/anthropic",
+  "answer_thinking": "on(provider-default)",
+  "judge_thinking": "on(provider-default)",
+  "answer_max_tokens": 2048,
+  "judge_max_tokens": 2048,
+  "prompt_version": "bench-design-v0.1",
+  "started_at": "2026-08-31T18:44:20+00:00",
+  "status": "DONE",
+  "finished_at": "2026-08-31T19:24:20+00:00",
+  "phase_b": {
+    "completed": 1494,
+    "wall_s": 1522.9,
+    "ts": "2026-08-31T19:24:20+00:00"
+  }
+}

@@ -1,0 +1,15 @@
+# mandol-p3-retrieval-3conv —— run.log 摘要（原始日志 48K 行 mandol INFO 已按 .gitignore 排除）
+
+## Phase B 失败（429 限流退避耗尽，与检索无关）
+  LLM 失败（连续 1）: mandol|conv-26|q1|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 2）: mandol|conv-26|q0|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 3）: mandol|conv-26|q3|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 4）: mandol|conv-26|q1|rep0: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-26|q30|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-26|q135|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-30|q84|rep2: 429 退避耗尽（9 次）
+
+## 判分结果
+arm               n judge_acc     F1  cat 切片（1=multihop 2=temporal 3=open 4=single 5=adv）
+mandol         1493     0.590  0.222  c1:135/239 c2:227/285 c3:39/77 c4:453/560 c5:27/332
+（judge 解析失败行: 0）

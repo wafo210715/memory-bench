@@ -1,0 +1,1 @@
+{"arm": "mandol", "stats": {"n_memories": 7179, "n_sessions": 272, "tokens_used": {"ingest": 0, "retrieve": 0, "internal_llm": 0}, "llm_calls": 0, "last_reset_at": null, "snapshots": ["locomo_full", "smoke"], "mandol": {"n_scopes": 10, "sparse": {"requested": true, "attempted": 1297, "generated": 1297, "code": "ok"}}}, "ts": "2026-08-31T17:18:16+00:00"}

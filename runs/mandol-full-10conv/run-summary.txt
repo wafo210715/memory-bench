@@ -1,0 +1,57 @@
+# mandol-full-10conv —— run.log 摘要（原始日志已按 .gitignore 排除）
+
+## Phase B 失败（429 限流退避耗尽，与检索无关）
+  LLM 失败（连续 1）: mandol|conv-26|q30|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-26|q119|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-26|q167|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-30|q12|rep0: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-30|q88|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-41|q151|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-41|q157|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-41|q154|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-41|q160|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 2）: mandol|conv-41|q161|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-42|q47|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-42|q67|rep0: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-42|q69|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-42|q205|rep0: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-42|q259|rep0: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-43|q3|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-43|q40|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-43|q134|rep0: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-43|q146|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-43|q228|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-44|q11|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-44|q28|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-44|q33|rep0: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-44|q72|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-44|q135|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-44|q135|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-47|q51|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-47|q52|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-47|q62|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-47|q118|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-47|q146|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-47|q162|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-47|q163|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-47|q180|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-48|q17|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-48|q54|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 2）: mandol|conv-48|q53|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-48|q86|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-48|q115|rep0: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-48|q148|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-48|q161|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-48|q209|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-49|q6|rep0: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-49|q11|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-49|q35|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-49|q116|rep2: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-49|q124|rep0: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-49|q134|rep1: 429 退避耗尽（9 次）
+  LLM 失败（连续 1）: mandol|conv-50|q88|rep2: 429 退避耗尽（9 次）
+
+## 判分结果
+arm               n judge_acc     F1  cat 切片（1=multihop 2=temporal 3=open 4=single 5=adv）
+mandol         5909     0.602  0.233  c1:452/838 c2:748/954 c3:126/285 c4:2178/2509 c5:53/1323
+（judge 解析失败行: 0）

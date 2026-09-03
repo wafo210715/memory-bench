@@ -233,9 +233,14 @@ def _to_chunks(triples: list[tuple[Any, float, str]]) -> list[Any]:
         cid = str(getattr(unit, "uid", f"c{i}"))
         if CASCADE_IDS_ON:
             ents = _entity_ids(raw, meta, tower, text)
-            # 官方：`_extract_source_chunk_ids_for_cascade(unit) or [chunk_id]`（:737）
-            src = raw.get("source_chunk_ids") or raw.get("source_ids") \
-                or meta.get("source_unit_uids") or []
+            # 官方：`_extract_source_chunk_ids_for_cascade(unit) or [chunk_id]`（:737），
+            # 而官方只读 raw_data 的 source_chunk_ids / source_ids（:545）。
+            #
+            # ⚠️ 故意不读 `meta.source_unit_uids`（本项目自加的字段）：它是 Phase 2 建图之后才加的，
+            # conv-26/30/49 磁盘上为空而新建 conv 有值。读它会让同一张主表内逐 conv 行为不一致
+            # （stage2 在部分 conv 活、部分 conv 死）。统一走官方兜底分支，十个 conv 行为一致，
+            # 且与已定稿的 3-conv 完整组逐字节相同。实测的跨塔冲突本来就全部来自 entity_ids。
+            src = raw.get("source_chunk_ids") or raw.get("source_ids") or []
             src = [str(s) for s in src if s] if isinstance(src, list) else []
             src = src or [cid]
         else:  # 首版行为：只有 KG 塔有实体、source 全空（stage2 结构性失效）

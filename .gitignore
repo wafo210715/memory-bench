@@ -49,3 +49,7 @@ runs/**/run.log
 # ---- Scratch ----
 _to_delete/
 archives/
+
+# 编排脚本的原始输出：含 ingest/建塔全过程 INFO，实测 39MB / 26 万行每次全量跑。
+# 有价值的阶段标记与建塔统计抽到同目录 orchestrator-summary.txt 保留入库。
+runs/**/orchestrator.log

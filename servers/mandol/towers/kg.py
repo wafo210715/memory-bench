@@ -88,7 +88,20 @@ def _cluster_by_similarity(names: list[str], threshold: float) -> dict[int, list
 
 
 def _entity_candidates_text(ents: list[dict[str, Any]]) -> str:
-    """step2:386-389 的候选清单格式。"""
+    """候选清单格式。
+
+    > [!warning] 已知偏离（导致 KG 塔零关系边，详见 docs §12）
+    > 官方 step2:382 的格式是：
+    >     `- ID: {entity_id} | Name: {name} | Type: {entity_type}`
+    >     `  Context: ... / Temporal Info: ... / Spatial Info: ... / Aliases: ...`
+    > 本函数漏了 **entity_id** 与上下文字段。而
+    > `RELATION_EXTRACTION_PROMPT` 明确要求 head_entity/tail_entity 填
+    > “EXACT Entity ID from the list above”并且禁止用实体名——
+    > 清单里没给 ID，LLM 就无法产出可解析的关系。
+    > 修复需同时改本函数与 `load.py:load_kg` 的键名与映射基准。
+    > 因官方主路径 `_cfg_full()` 的 `topk_graph=0` / `use_entity_relation=False`
+    > 从不做关系遍历，此缺陷**不影响分数**，但不得声称已构建知识图谱。
+    """
     s = ""
     for i, e in enumerate(ents, 1):
         s += f"{i}. Name: {e.get('name', '')}\n"

@@ -162,6 +162,19 @@ Phase 3 检索层 = 纯查询期、不用重灌的
   原因是 bf16 在 CPU 上无原生指令（125 vs 18 ms/对）；fp32 精度更高，不存在质量损失。属硬件适配而非机制改动。
 - **episodic / kg 塔零显式边**：溯源边跨图指向 base 图的 L0 单元，`add_relationship` 静默返回 False。
   已改存 `metadata.source_unit_uids`。因主路径 `topk_graph=0` 不做图遍历，不影响分数，但不应声称「已建完整事件图」。
+- **❗ KG 塔实为实体集合，关系边全部未落地**（全量跑实测：5,208 条关系 → 0 边）。
+  四层移植错误叠加，均为本项目造成，非官方问题：
+  1. `_entity_candidates_text` 漏了 `entity_id`（官方 step2:382 为 `- ID: {id} | Name: ... | Type: ...`），
+     而 prompt 要求 head/tail 填“EXACT Entity ID”并明文禁止用名字；
+  2. `load_kg` 读 `source`/`subject`/`head`，而 prompt 返回 `head_entity`/`tail_entity`；
+  3. `load_kg` 按**实体名**查 `uid_by_name`，而字段值是**实体 ID**；
+  4. 跨会话关系读 `relations`，而 `CROSS_SESSION_RELATION_PROMPT` 返回 `cross_session_relations`。
+
+  **分数不受影响（已核实非假设）**：`_cfg_full()`（locomo_tower_router.py:66）设
+  `topk_graph=0` 与 `use_entity_relation=False`，而 locomo_triple_router.py:2010 的
+  `entity_retriever.search(question, self.topk_graph)` 在 topk=0 时返回空，
+  `graph_results=[]`——官方主复现路径从不遍历关系边。
+  但**不得在论文中声称已复现知识图谱塔**；它目前只是带描述的实体语义检索面。
 
 > [!important] 需修正 WEEKEND-PLAN 的一条记录
 > L459 附近"Category Router 按题型选策略 → 别抄，消费数据集 gold label"——方向对但**定位错**。router 在主结果配置下恒等，真正消费 gold label 的是答题 prompt 注入。建议改写该条。
@@ -510,6 +523,52 @@ ON    stage2 冲突=2 丢弃=2 · stage3 惩罚=690 · tokens 2861
    只给 mandol 加缓存会让 latency 列失去可比性，故不改。
 3. **可见终端会折断长命令**：内联长命令被回显折行破坏引号（卡在 `dquote>`），改用 `scripts/run_mandol_p3.sh`。
 
+### 全量跑的三个额外坑（2026-09-02）
+
+1. **`runner --ingest-only` 并不只做 ingest**：它只跳过 Phase B（runner.py:473），
+   Phase A 的全部检索照跑——全量下就是 5,958 次约 16.6 小时。
+   故另写 `scripts/ingest_mandol_full.py` 只灌数据。
+
+2. **ingest 结尾的 snapshot 会因建塔超时**：`ingest_system` 用 `timeout=600`（runner.py:186），
+   而 `TOWERS_ON=1` 时 snapshot 会先跑 `_build_towers()`（7 个 conv 约 2 小时）→ 必然超时，
+   且是在灌完一小时之后才炸。建塔必须交给 `build_mandol_towers.py`（那边 `timeout=36000`）。
+
+3. **❗ `stats` 没有 `scope_ids` 字段**（真实事故，已回滚）：
+   `stats` 只暴露 `mandol.n_scopes`（计数，server.py:331）。首版 ingest 脚本凭空假设了
+   `mandol.scope_ids`，取到 None → 已灌集合判为空 → **重灌已建塔的 conv**。
+   `add_conversation` 同 uid 即更新，会把 God Mode 改写过的 `indexing_text`
+   静默覆盖回原始对话文本。conv-26/30 已被重灌后发现并中断。
+
+   侥幸的是 snapshot 在 ingest **结尾**才调用，快照未被覆盖，
+   `rm -rf .state/mandol && cp -R 快照 .state/mandol` 完整恢复（已验证 419/419 个 L0 改写尚存）。
+
+   修正：改从磁盘 `scopes.json` 读已灌集合，并增加**安全网**——
+   有 `.state/mandol/towers/<cid>.done.json` 的 conv 一律拒绝重灌，
+   且 `built - have` 非空时直接报错退出。
+
+   > [!warning] 教训
+   > 读写外部工具返回的字段前必须先核实字段名，不能凭印象假设。
+   > 此类错误在“跳过/覆盖”语义下是静默的，不报错、不中断，只会您默默销毁数据。
+
+4. **长时无人值守必须脱离终端**（真实事故，2026-09-03 02:05 断在 41%）：
+   `run_mandol_full.sh` 的第三段是前台执行（三段必须串行），直接在终端里跑，
+   终端关闭时整个进程组收 SIGHUP 而死。**`caffeinate -i` 只防空闲休眠，不防终端关闭**。
+
+   诊断难点：Python 不留 traceback、系统不生成崩溃报告，看上去就像凭空消失。
+   排查顺序：`pmset -g log` 无休眠事件 → 无 jetsam/OOM → libomp 仍收拢为 1 份 →
+   **`~/Library/Logs/DiagnosticReports` 在事发时刻无任何 `.ips`**——
+   段错误一定会留报告，没报告就说明是信号终止而非自身崩溃。
+
+   macOS 无 `setsid`；本仓库用系统自带的 `screen`：
+
+   ```bash
+   screen -dmS mandolfull bash -c 'cd <repo> && caffeinate -i bash scripts/run_mandol_full.sh <run-id>'
+   screen -r mandolfull    # 回去看实时输出，Ctrl-A D 退出
+   ```
+
+   可用 `ps -eo pid,ppid,args` 确认 SCREEN 的 **PPID=1**（已被 init 收养）。
+   三段均幂等，中断后重跑同一条命令即从断点接上（实测：2459 条全部跳过，无重复 key）。
+
 ## 11. 实验结果
 
 ### 基线（Phase 1 态，`mandol-p1-baseline-3conv`）
@@ -639,12 +698,66 @@ P1 → P2       +0.1463                              构建层是主力
 完整组 rep 方差明显更小（sd 0.0026 vs 消融组 0.0096），把差异衬托出来。
 先前用消融组得到的 p≈0.05 边缘结论应以此为准修正。
 
+## 13. 全量 10-conv 定稿结果（`mandol-full-10conv`，2026-09-03）
+
+口径：10 conv · 1,986 题 · n=3 · top_k=20 · glm-5.3 答题与判分 · `CASCADE_IDS=1` 完整管线。
+
+```text
+总体准确率  0.6020        平均 F1  0.3003        n=5,909
+逐 rep     0.6009 / 0.6012 / 0.6038   sd 0.0016
+
+cat1 multi-hop     0.539   (n= 838)
+cat2 temporal      0.784   (n= 954)
+cat3 open-domain   0.442   (n= 285)
+cat4 single-hop    0.868   (n=2509)
+cat5 adversarial   0.040   (n=1323)
+```
+
+构建总账：LLM 8,071 次 · in 11,118,014 / out 3,011,202 token · 失败 21。
+L0 改写 5,848 条（仅 conv-30 漏 1 条，覆盖率 99.98%）· 事实 2,414 · 实体 3,800。
+
+### 一致性检验（最重要的一张表）
+
+把全量结果限制到 conv-26/30/49，与独立的 3-conv 完整组对拍——两次**完全独立**的运行：
+
+```text
+                  全量的子集   独立3conv      差异
+总体准确率          0.5923     0.5952    -0.0028
+平均 F1            0.2780     0.2798    -0.0017
+cat1 multi-hop     0.550      0.561     -0.010
+cat2 temporal      0.811      0.822     -0.010
+cat3 open-domain   0.519      0.500     +0.019
+cat4 single-hop    0.815      0.817     -0.002
+cat5 adversarial   0.076      0.073     +0.003
+```
+
+总体差 0.0028，各类别均 ≤ 0.02，远小于 rep 方差。同时验证三件事：
+管线可复现、**per-conv 独立图设计（Q7）成立**、新增 7 个 conv 未扰动已有的 3 个。
+
+> [!warning] 不要直接拿 0.6020 与 3-conv 的 0.5952 比
+> 两者题型配比不同：全量里最易的 single-hop 占 42.5%，3-conv 只占 37.4%。
+> 按 3-conv 配比重新加权后，全量为 **0.5934**，与 0.5952 只差 0.0018——
+> 表观优势 +0.0086 **全部来自配比**，不是性能差异。
+
+### 逐 conv 分布
+
+```text
+conv-47 0.673 · conv-30 0.668 · conv-48 0.652 · conv-41 0.645 · conv-44 0.618
+conv-49 0.595 · conv-50 0.591 · conv-42 0.565 · conv-26 0.551 · conv-43 0.523
+
+极差 0.150 · 标准差 0.0516
+```
+
+conv 间极差（0.150）远大于 rep 方差（0.0016），说明**对话难度差异是主导方差源**。
+少量 conv 的实验（如 3-conv）结果会强依赖抽到哪几个，跨实验对比必须固定 conv 集合。
+
 ### 待做
 
-- resume 补建剩余 7 conv → 全量 10-conv 定稿跑一次进主表（配置用 `CASCADE_IDS=1` 完整管线）
-- ⚠️ 全量考试的检索耗时需先评估：10 conv 约 5,000 次检索 × 10s 串行 ≈ **14 小时**。
+- 将本结果归入主表，与 mem0/graphiti/MemOS/A-MEM 同表横比（均属 A 档被动检索面）
+- 若需 P1/P2 的全量对照（目前只有 3-conv 尺度），需另跑，单次约 18h
+- ⚠️ 检索耗时：实测 5,958 次 × 约 11.5s 串行 = **16.6h**（+ Phase B 答题 1.8h）。
   因检索链路全程确定性（3 个 rep 结果逐字节相同，已实测），若在 harness 层按
-  （conv, qa_id）缓存检索结果，可降至 ~4.7 小时且 evidence 位级一致；
+  （conv, qa_id）缓存检索结果，可降至 ~5.5h 且 evidence 位级一致；
   但该改动影响全 arm 的 latency 口径，需先定。
 
 ## 8. 相关文档

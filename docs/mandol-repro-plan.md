@@ -766,3 +766,56 @@ conv 间极差（0.150）远大于 rep 方差（0.0016），说明**对话难度
 - `WEEKEND-PLAN.md` —— 移植优先级表（P1 MAD／P3 L0 双视图）、§9 诚实性护栏
 - `docs/REPRO-PLAN.md` —— A/B 档模块划分
 - OB 笔记 `2-fleeting/papers/Zhang-et-al-2026-Mandol-An-Agglomerative-Agent-Memory-System-for-Long-Term-Conversations.md` —— 2026-08-30/31 两轮论文↔代码核对记录
+
+## 14. 主表横比（2026-09-03）
+
+口径：LoCoMo-10 · **cat1-4**（cat5 单列，遵 `bench-design.md:146` 对齐 mem0 原版惯例）·
+n=3 · top_k=20 · glm-5.3 答题与判分 · `prompt_version=bench-design-v0.1`。
+
+对照来源 `runs/locomo-r2-n3`（mem0 / graphiti / rag_baseline）与 `runs/mandol-full-10conv`。
+**可比性已逐项核对**：benchmark、n、top_k、答题与判分模型、协议、温度、端点、thinking、
+max_tokens、prompt_version、conv 集合全部一致；仅 `concurrency`（10 vs 16）不同，
+该参数只影响墙钟不影响结果。取四臂共同作答的题目（交集 5,909 条，cat1-4 计 4,586 条）。
+
+```text
+系统            判对率   rep sd   multi-hop  temporal  open-dom  single-hop
+mandol         0.7641   0.0028     0.539     0.784     0.442     0.868
+mem0           0.6901   0.0017     0.467     0.768     0.358     0.773
+rag_baseline   0.5203   0.0014     0.222     0.534     0.260     0.644
+graphiti       0.4470   0.0029     0.323     0.504     0.323     0.481
+
+cat5 对抗题（单列）  mandol 0.0401 · mem0 0.0385 · rag_baseline 0.0529 · graphiti 0.0325
+```
+
+### 读数要点
+
+- **mandol 全类别第一**，总体领先 mem0 7.4 个百分点；rep 方差均 ≤ 0.003，差距远超噪声。
+- 增量集中在检索难度高的题：open-domain +0.084 / single-hop +0.095 / multi-hop +0.072，
+  而 temporal 仅 +0.016——两家都已 0.77+，接近该证据面能支撑的上限。
+- **rag_baseline 打赢 graphiti**（0.5203 vs 0.4470）。该基线原为防「记忆系统只是向量检索」
+  的质疑而设，结果反过来证伪了 graphiti 的图结构在此任务上的价值：
+  graphiti 仅在 multi-hop / open-domain 略优，被 single-hop 的巨大劣势（0.481 vs 0.644）拖垮。
+- cat5 四家全线 0.033–0.053，且最朴素的 rag_baseline 最高。协议层问题，非记忆系统能解。
+
+> [!warning] F1 副表**不可跨臂比较**
+> ```text
+> mandol 0.3003 · mem0 0.3554 · rag_baseline 0.2621 · graphiti 0.2406
+> ```
+> F1 与判对率方向相反。机制已定位：
+> ```text
+> 时间题(cat2)   ISO格式占比   判对率     F1
+> mandol           68.8%     0.7841   0.2601
+> mem0              0.2%     0.7684   0.4628
+> ```
+> 判对率几乎相同而 F1 差 0.20——mandol 的 L0 改写在每条证据前注入 `[Date: YYYY-MM-DD]`，
+> 答题模型照抄 ISO 格式，而 gold 是「7 May 2023」；judge 认得出是同一天，词重叠 F1 认不出。
+> 叠加 mandol 答案中位长 88 字符（mem0 47 / gold 22），精确率进一步稀释。
+> **F1 在此处实际测的是答案格式而非答案质量**，符合 `bench-design.md:145` 将其定位为
+> 「副表交叉验证」的原意，但必须标注其跨臂失效，不得写成 mandol 的劣势。
+
+### 未纳入主表的系统
+
+- **MemOS**：无同口径全量跑。
+- **A-MEM**：仅有 `amem-ab-3conv`（3 conv），样本量与 conv 集合均不可比。
+- **Letta / MRAgent**：属 B 档 agentic 面（`interface-spec.md` §9 `agent_decide`），
+  与 A 档被动检索面**不可混表**。

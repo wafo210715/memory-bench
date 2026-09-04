@@ -7,36 +7,51 @@
 对照锚点：`rag_baseline`（裸向量检索，无 LLM）与 `full_context`（整段历史塞进上下文）。
 没有这两个，"记忆系统是不是只是向量检索"这个质疑就没有落点。
 
-**当前状态**：Phase 1（8 臂封装 + 契约门禁）完成；Phase 2（LoCoMo 跑分）进行中。
-路线与阶段划分见 [PLAN.md](PLAN.md)。
+**当前状态**：Phase 1（8 臂封装 + 契约门禁）完成；Phase 2 第一轮跑分完成
+（locomo-r2-n3，2026-08-30：mem0 / graphiti / rag_baseline × 10 conv × n=3，top_k=20；
+intent 因有效性威胁退出该轮，evidence 已保留）。路线与阶段划分见 [PLAN.md](PLAN.md)。
 
 ---
 
-## 快速开始
+## 快速开始（mem0 / graphiti 的 MCP 用法）
 
-```bash
-# 0) 密钥：复制模板后填值。.env 已 gitignore，轮换只改这里。
-cp .env.example .env && $EDITOR .env
+按顺序走完这八步，就能从零跑通一次评测。每步细节看括号里指向的文档。
 
-# 0b) 测试依赖（pytest 尚未装进 .venv）
-uv pip install --group dev
+1. **装环境**：`uv venv -p 3.12` 起主 venv 并装依赖；跑测试另需 `uv pip install --group dev`。
+   `python main.py ...` 会自动 re-exec 进 `.venv`，不用手动激活。三个 venv 为什么分开见
+   [DEPLOY.md](DEPLOY.md) §1。
+2. **配密钥**：`cp .env.example .env` 后填两组 key——`MEMBENCH_LLM_*`（ingest/内政 LLM）与
+   `MEMBENCH_ANSWER_*`（答题+判分）。字段语义见 [DEPLOY.md](DEPLOY.md) §2。
+3. **起外部依赖**（只有 graphiti 需要；mem0 用 chroma，无外部依赖）：
+   `docker start membench-neo4j`。首次创建见 [DEPLOY.md](DEPLOY.md) §4。
+4. **看可用臂**：`python main.py arms`——列出全部臂及各自 env 是否就绪。
+5. **过契约门禁**：`python main.py smoke mem0`、`python main.py smoke graphiti`，
+   **断言 8/8 全过**才能进实验矩阵（覆盖 add/retrieve/snapshot/reset/restore 复现/双 scope 隔离，
+   断言清单见 [docs/interface-spec.md](docs/interface-spec.md) §10）。2026-09-04 复验两臂均 8/8。
+6. **正式跑分**：
 
-# 1) 契约门禁：任何 server 进实验矩阵前必须 6/6 通过
-python main.py smoke mock          # 无 LLM，验证契约链路本身
-python main.py smoke mem0          # 真实系统
+   ```bash
+   python main.py run --arms mem0,graphiti,rag_baseline \
+     --run-id my-run --n 3 --top-k 20 --concurrency 10
+   ```
 
-# 2) 冒烟跑分：单 conv、单臂，确认端到端通
-python main.py run --arms mock,full_context --convs conv-30 --run-id shakeout
+   两阶段协议（Phase A 检索串行 / Phase B 答题并发）与产物结构见
+   [docs/bench-design.md](docs/bench-design.md)。先小规模验证端到端可用
+   `--convs conv-30` 单 conv。
+   > [!warning] 快照已存在时必须预置 progress
+   > 若 `.state/__snapshots__/<arm>/locomo_full` 已在：**先预置
+   > `runs/<run-id>/ingest_progress/progress.json`**，否则 runner 会在 restore 后把 10 个 conv
+   > 全量重灌并 `snapshot` 覆盖快照（2026-08-30 实测踩过）。机理与预置方法见
+   > [DEPLOY.md](DEPLOY.md) §6。
+7. **断了就续**：同一 run-id 加 `--resume`。幂等键 `arm|conv|qa_id|rep`，两阶段各自跳过
+   已完成行，已答的题绝不重算。注意 `--resume` 不建目录——手工建过 run 目录的先确认
+   `evidence/` 存在。补跑单臂也是同一条命令（`--arms intent` 只跑它）。
+8. **看结果**：`runs/<run-id>/answers.jsonl`（逐题答案+判分）、`evidence/<arm>.jsonl`
+   （检索 envelope 原文，可审计）。主表口径与方差读法见 [docs/bench-design.md](docs/bench-design.md) §5–§6。
 
-# 3) 正式跑分（断点续跑：加 --resume 重跑同一 run-id 即可）
-python main.py run --arms mem0,graphiti,intent,rag_baseline --run-id locomo-r1
-```
-
-`main.py` 只是分发器。等价的直接调用是
+MCP 六工具的逐字段语义（含 canonical envelope 与各臂原生粒度）见
+[docs/interface-spec.md](docs/interface-spec.md)。`main.py` 只是分发器，等价的直接调用是
 `.venv/bin/python scripts/smoke_test.py <system>` 和 `.venv/bin/python -m bench.runner ...`。
-
-部分臂需要外部依赖先起来（Graphiti 要 Neo4j 容器，MemOS 要 compose 栈），
-启动命令见 [DEPLOY.md](DEPLOY.md)。
 
 ---
 

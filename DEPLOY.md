@@ -124,6 +124,8 @@ Tier 2 精读（`read_session_detail` / `recall_timeline`）属 agent 用法，�
   `{duplicate_facts, contradicted_facts}` → `EdgeDuplicate(**llm_response)` pydantic 校验崩。
   已 patch site-packages `edge_operations.py` 第 732 行（先 `flat = llm_response.get("answer", llm_response)` 再构造）。
   **重装或重建 `.venv` 会丢这个 patch。** smoke 的 3 turns 边太少不触发，LoCoMo 大规模 ingest 才踩到。
+  ✅ 2026-09-04 已物化进仓：两个 patch 后的完整文件在 `patches/graphiti/`（含 SHA256SUMS），
+  重建 venv 后跑 `bash patches/apply.sh` 即可恢复（版本钉死 0.29.3，幂等，hash 校验）。
 
 **2026-08-19 深度核查修复（子会话 deep-verification）**
 
@@ -139,7 +141,35 @@ Tier 2 精读（`read_session_detail` / `recall_timeline`）属 agent 用法，�
 
 - mandol：add 后不自动落盘 → 评测须 `restore` 起跑，或在进程内完成 ingest→QA
 - memos：容器内温度 / reasoning 未受控
+- intent：检索期 Tier 2 精读依赖网络，失败降级为机械摘录（`native_notes` 记 `TIER2_FALLBACK`，
+  基线降级率 ~12%）；且 `summarize()` 的中文 prompt 生成中文摘要，英文 query 的 token 重叠仅
+  2/7（仅专有名词穿透）——英文语料上意图层基本未生效（locomo-r2-n3 退出原因，V-1）。
+  修复方向：prompt 要求「用与原文相同的语言输出」后重灌
 - 逐系统配置清单表见 interface-spec §7
+
+**2026-08-30 全量 run（locomo-r2-n3）实录的运维坑**
+
+- 🔴 **progress 机制陷阱（本轮头号坑）**：`ingest_system()` 只看
+  `runs/<run_id>/ingest_progress/progress.json` 决定是否跳过 ingest。新 run-id 的 progress
+  为空 → restore 之后照样全量重灌，并在最后 `snapshot` **覆盖快照**。快照已完备的臂，跑前
+  必须预置 progress（从旧 run 复制，或按快照实际内容构造，构造脚本思路：
+  mem0/graphiti 从 locomo-r1 复制；intent 取快照 scopes.json 的 sessions；rag_baseline 取
+  chunks.jsonl 的 distinct session_id——标记数必须与快照内容一致，多标一个 session = 那段
+  数据永远不被补灌）
+- **`--resume` 跳过 `mkdir`**：`Run.__init__` 只在非 resume 时建 `evidence/`。手工建过 run
+  目录（比如只为预置 progress）的，resume 前确认 `evidence/` 存在，否则 Phase A 写盘
+  FileNotFoundError
+- **Phase A 单臂失败不阻塞 Phase B**：retrieve 挂了会写 `failures.jsonl` 然后直接进
+  Phase B（在不完整数据集上跑）。每次 run 后核对各臂 evidence 行数是否 = 1986 × n
+- **并发与吞吐非线性**：`--concurrency` 只作用于 Phase B（Phase A 串行）。429 长退避
+  （5/10/20/30/45/60s，最多 9 次）期间并发槽空转，实测 16 并发有效并发远低于 16；
+  降到 10 吞吐仅 -7%（1.4→1.3 题/s）。**勿按比例外推并发调整的代价**；弃题由
+  `--resume` 补回（不写入 answers.jsonl）
+- **断电/断网恢复**：evidence 与 answers 均行级落盘 + 幂等键，中断后 `--resume` 零重复；
+  jsonl 尾部可能留半写行，读取方需容错。网络类挂起看 `suspended_reason`：
+  `ConnectError` = 断网，`HTTP 429` = 限流，恢复网络后直接 resume
+- **graphiti 容器开销**：restore/snapshot 会自动 stop/start `membench-neo4j`（约 19s）；
+  跑分只剩 Phase B 时可 `docker stop` 省资源（Phase B 不碰任何 MCP server）
 
 ## 7. 跑分入口
 

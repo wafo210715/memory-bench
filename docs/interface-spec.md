@@ -100,6 +100,18 @@
 - `turn_range`：能定位就给，不能给 `null`——**意图系统的原生粒度是 session 级，turn_range 允许为 null**（粒度差异在论文里显式声明，不藏）
 - **这批 envelope 的渲染结果就是喂给答题 LLM 的证据文本**——格式不同 = 混淆，所以格式必须锁死
 
+**各臂 envelope 的原生粒度**（`top_k` 计数的是 envelope 条数，不跨臂等价；
+locomo-r2-n3 实测，top_k=20）：
+
+| 臂 | 一条 envelope 是 | evidence_text 中位长度 |
+|---|---|---|
+| `rag_baseline` | 一个 turn（对话原文单条） | ~2.9k 字符 |
+| `mem0` | 一条 fact（LLM 抽取的事实陈述） | ~3.6k 字符 |
+| `graphiti` | 一个图元素（edge / entity / community，MIX 3:1:1，20 条时 12/4/4） | ~3.7k 字符 |
+| `intent` | 一个 session（整段会话，附原文摘录或 Tier2 精读引用） | ~9.6k 字符 |
+
+同样 `top_k=20`，喂给答题 LLM 的证据体量差 3 倍——跨臂对比结论必须附带粒度声明。
+
 ## 5. `reset` / `stats` / `snapshot` / `restore`
 
 ```json

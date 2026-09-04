@@ -55,6 +55,43 @@ MCP 六工具的逐字段语义（含 canonical envelope 与各臂原生粒度�
 
 ---
 
+## Mandol 快速开始（三层复现版）
+
+与通用八步并行的专用路径：mandol 的三层复现由三个环境开关控制，全量跑走专用脚本。
+
+1. **一次性准备**（顺序不可换）：
+   - 独立 venv：`.venv-mandol`（mandol 锁 `numpy<2`，与主 venv 的 chromadb 冲突，见 [DEPLOY.md](DEPLOY.md) §1）；
+   - **先跑 `bash scripts/fix_mandol_openmp.sh`**：torch 与 faiss 各自捆绑一份 libomp，
+     同进程加载两份会在检索时 SIGSEGV（crash report 已定位）。server 启动时还有
+     `_assert_single_libomp()` 硬检查，不修直接拒启；
+   - 两个本地模型：`naver/splade-v3`（**gated repo，需 HF token + 同意条款**）与
+     `BAAI/bge-reranker-v2-m3`。步骤见 [docs/mandol-repro-plan.md](docs/mandol-repro-plan.md) §9。
+2. **三个开关**（默认值保证“Phase 1 态”基线可重复）：
+
+   | 环境变量 | 控制层 | 默认 | 说明 |
+   |---|---|---|---|
+   | `MEMBENCH_MANDOL_SPARSE` | 存储 | `1` | ingest 时生成 SPLADE 稀疏向量；stats() 逐 unit 监测静默降级 |
+   | `MEMBENCH_MANDOL_TOWERS` | 构建 | `0` | snapshot 落盘前触发三塔离线构建（LLM 重，见 §时间预算） |
+   | `MEMBENCH_MANDOL_TRITOWER` | 检索 | `0` | retrieve 走三塔并行召回 + RRF + bge 重排 + 级联剪枝 |
+   | `MEMBENCH_MANDOL_CASCADE_IDS` | 检索 | `0` | 级联剪枝读 source_unit_uids（定稿跑 =1，详见 repro-plan §5） |
+
+3. **过门禁**：`python main.py smoke mandol`（8/8）。
+4. **全量定稿跑**：`bash scripts/run_mandol_full.sh [run-id]`——三段串行、全程幂等、断点重跑
+   本脚本即续：ingest 剩余 conv（约 40 min）→ 三塔构建（约 2 h，独立阶段
+   `timeout=36000`）→ 考试 1,986 题 × n=3（约 18 h）。需 `.env` 已配好 embedding key。
+5. **结果口径**：定稿 run `mandol-full-10conv` 总体判对率 0.6020，cat1-4 口径 0.7641
+   （全类别第一）。**与论文 92.21% 不可并列**：构建侧 glm-5.3 vs 官方 qwen-thinking，
+   且本复现不含 gold category 注入。剩余保真度偏离清单（KG 塔实为实体集合等）见
+   [docs/mandol-repro-plan.md](docs/mandol-repro-plan.md) §5，对论文逐条 diff 见同文档 §3–§4。
+
+> [!warning] 三个会在半夜静默炸掉的坑（均已在本仓踩过）
+> - `runner --ingest-only` 只跳过 Phase B，Phase A 的 5,958 次检索照跑（`runner.py:473`）；
+> - harness 的 `snapshot` 用 `timeout=600`，而 `TOWERS_ON=1` 时 snapshot 会先建塔
+>   （7 conv 约 2 h）→ 必然超时，所以全量跑必须走三段编排，不许直连 `main.py run`；
+> - `caffeinate -i` 不防终端关闭（SIGHUP，实际断在 41%）→ 用 `screen` 起长跑。
+
+---
+
 ## 八个臂
 
 | 臂 | 类型 | venv | 外部依赖 |

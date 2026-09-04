@@ -53,3 +53,9 @@ archives/
 # 编排脚本的原始输出：含 ingest/建塔全过程 INFO，实测 39MB / 26 万行每次全量跑。
 # 有价值的阶段标记与建塔统计抽到同目录 orchestrator-summary.txt 保留入库。
 runs/**/orchestrator.log
+
+# ---- 2026-09-04 交接清理 ----
+# r2 的原始运行日志（~220MB，72% trace 刷屏）：有价值的部分已抽到同目录 run-summary.txt
+runs/**/logs/
+# server 未设 MEMBENCH_RUN_ID 时落的散 trace（如裸跑 smoke）
+runs/_mcp_trace/

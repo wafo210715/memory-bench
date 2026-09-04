@@ -1,0 +1,44 @@
+# locomo-r2-n3 run summary（2026-08-30）
+
+## 配置
+
+- arms: mem0, graphiti, rag_baseline（intent 计划内、后退出，见下）
+- n=3（整链路重复：每 rep 独立 retrieve+答题+判分）· top_k=20 · Phase B 并发 16→10
+- 答题/判分: glm-5.3 @ 智谱 Anthropic 兼容面，thinking on，temp=0（same-model judge）
+- 数据: locomo10（10 conv / 272 session / 5882 turn / 1986 qa；cat1-4 共 1540 题）
+
+## 结果（judge_acc，cat1-4，每格 mean±std, n=3）
+
+| arm | multi-hop | temporal | open-domain | single-hop | ALL(1-4) |
+|---|---|---|---|---|---|
+| mem0 | 46.8±0.4 | 76.8±0.6 | 35.4±1.0 | 77.3±0.4 | **69.0±0.2** |
+| rag_baseline | 22.2±0.2 | 53.5±0.2 | 25.7±1.6 | 64.4±0.2 | **52.0±0.2** |
+| graphiti | 32.2±1.1 | 50.6±1.0 | 31.9±1.2 | 48.1±0.3 | **44.7±0.4** |
+
+cat5 adversarial（单列）: rag_baseline 5.3±0.7 / mem0 3.9±0.3 / graphiti 3.3±0.5
+
+- 关键结论一：graphiti 输给朴素向量基线 7.3pp，但 multi-hop +10.0、open-domain +6.2——
+  图谱收益集中在多跳，single-hop（占 cat1-4 的 55%）被「三元组丢原文表述 → 34.6% 弃答」拖垮。
+- 关键结论二：**n=10 不必要**。σ=0.21–0.40%（题级 2.5% 翻转率经 √N 聚合压缩，
+  理论值 √(0.025/1540)=0.403% 与实测吻合）；最紧 arm 对差距 7.32pp = 两 CI 之和的 4.7×。
+  注意 n=10 从未实际运行，此结论由 n=3 的方差分析推出。
+- 检索层 99%+ 确定性（同题跨 rep evidence 逐字相同率），跨 rep σ 几乎只含答题+判分噪声。
+
+## 运行事件（均在 --resume 下零重复计分恢复）
+
+| 时刻 | 事件 |
+|---|---|
+| 01:19 / 01:49 | 两臂 Phase A 报 evidence/ 目录缺失（--resume 跳过 mkdir 的坑），补建后恢复 |
+| 06:04 | 停电断网。intent 主路径不依赖网络，**潜伏 4 小时**至 10:14 才挂起 |
+| 06:04–10:10 | intent conv-49/50 在断网下 Tier2 降级污染（51.5% / 100%），删 1200 行重跑回基线 11.7% |
+| 11:45 | 网络波动，rag_baseline retrieve 超时 300s，Phase A 中断；Phase B 曾在不完整集上启动，12:35 纠正 |
+| 13:24–14:00 | 首次真实 429（11 题退避耗尽弃题，resume 补回）；13:56 并发 16→10，吞吐仅 -7%（1.4→1.3 题/s，非线性） |
+| 14:28 | intent 退出 Phase B：中文摘要 vs 英文 query，token 重叠 2/7，意图层未生效（有效性威胁），evidence 保留可补测 |
+
+## 完成态与产物
+
+- evidence：4 臂均 5958 行（含退出的 intent；其文件在 runs/locomo-r2-n3/evidence/，不入 git）
+- answers：17874/17874（3 臂 × 5958），status=DONE
+- 原始日志（~220MB，72% 为 trace 刷屏）退出版本库，本地保留于 logs/；本文件为入库摘要
+- 完整分析报告与事件链：wafo-base/.context/memory-bench-r2n3/（report-2026-08-30.md、
+  incidents.md、analyze.py）——交接时建议随附或拷入 docs/

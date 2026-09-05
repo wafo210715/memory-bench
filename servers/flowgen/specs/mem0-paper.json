@@ -1,0 +1,63 @@
+{
+  "system": "mem0",
+  "view": "paper",
+  "title": "Mem0 — paper view",
+  "subtitle": "The mechanism as Chhikara et al. describe it. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes mean the paper defines no such step.",
+  "source": "Chhikara et al. 2025, Mem0 (arXiv:2504.19413, ECAI 2025)   ·   every anchor re-located in the paper text during verification",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "Mem0g (§2.2) is the optional graph variant — drawn dashed-teal because the paper presents it as an add-on, not the base system.",
+    "B3 EXPAND exists only through Mem0g's entity-centric traversal.",
+    "The paper never states a top-k or a retrieval algorithm for the base system — B2 is left deliberately vague, and that vagueness is the finding."
+  ],
+  "nodes": [
+    {"id": "turn",  "stage": "A1", "row": 0, "type": "io",    "seq": 1, "label": "Turn pair (m_t-1, m_t)", "cite": "§2.1"},
+    {"id": "recent","stage": "A1", "row": 1, "type": "io",    "seq": 2, "label": "Last m messages, m = 10", "cite": "§2.1"},
+    {"id": "summ",  "stage": "A2", "row": 2, "type": "llm",   "seq": null, "label": "LLM:Summarize — conversation summary S, refreshed asynchronously", "cite": "§2.1  side path"},
+    {"id": "phi",   "stage": "A2", "row": 3, "type": "llm",   "seq": 3, "label": "LLM:Extract φ(P) → candidate facts Ω", "cite": "§2.1  P = (S, last m, m_t-1, m_t)"},
+    {"id": "emb",   "stage": "A4", "row": 3, "type": "alg",   "seq": 4, "label": "Embed each candidate", "cite": "§2.1"},
+    {"id": "probe", "stage": "A3", "row": 4, "type": "alg",   "seq": 5, "label": "Dense probe: top-s similar memories, s = 10", "cite": "§2.1"},
+    {"id": "upd",   "stage": "A3", "row": 5, "type": "llm",   "seq": 6, "label": "LLM:Resolve — tool call picks ADD / UPDATE / DELETE / NOOP", "cite": "§2.1, Alg.1 (Appx B)"},
+    {"id": "db",    "stage": "A5", "row": 5, "type": "store", "seq": 7, "label": "Store:Database — NL facts + dense embedding", "cite": "§2.1"},
+
+    {"id": "gent",  "stage": "A2", "row": 6, "type": "llm",   "seq": 8,  "state": "degraded", "label": "Mem0g · LLM:NER — entity extractor", "cite": "§2.2"},
+    {"id": "grel",  "stage": "A2", "row": 7, "type": "llm",   "seq": 9,  "state": "degraded", "label": "Mem0g · LLM:RelGen — relation triples", "cite": "§2.2"},
+    {"id": "gdd",   "stage": "A3", "row": 7, "type": "alg",   "seq": 10, "state": "degraded", "label": "Mem0g · node match by embedding, threshold t", "cite": "§2.2"},
+    {"id": "gcon",  "stage": "A3", "row": 8, "type": "llm",   "seq": 11, "state": "degraded", "label": "Mem0g · LLM:Resolve — mark stale edges invalid, never delete", "cite": "§2.2, p.6"},
+    {"id": "glink", "stage": "A4", "row": 8, "type": "nlp",   "seq": 12, "state": "degraded", "label": "Mem0g · build labelled directed graph G = (V, E, L)", "cite": "§2.2"},
+    {"id": "gstore","stage": "A5", "row": 8, "type": "store", "seq": 13, "state": "degraded", "label": "Store:Graph — Neo4j", "cite": "§2.2, p.6"},
+
+    {"id": "q",     "stage": "B1", "row": 0, "type": "io",    "seq": 14, "label": "Query", "cite": "§2.1"},
+    {"id": "ret",   "stage": "B2", "row": 0, "type": "alg",   "seq": 15, "label": "Semantic retrieval over the database", "cite": "§2.1 — no top-k, no\nalgorithm given"},
+    {"id": "gq",    "stage": "B1", "row": 2, "type": "llm",   "seq": 16, "state": "degraded", "label": "Mem0g · encode query entities", "cite": "§2.2, p.6"},
+    {"id": "gret",  "stage": "B2", "row": 2, "type": "alg",   "seq": 17, "state": "degraded", "label": "Mem0g · semantic triplet search", "cite": "§2.2, p.6"},
+    {"id": "gexp",  "stage": "B3", "row": 2, "type": "alg",   "seq": 18, "state": "degraded", "label": "Mem0g · entity-centric subgraph", "cite": "§2.2, p.6"},
+    {"id": "asm",   "stage": "B6", "row": 1, "type": "io",    "seq": 19, "label": "Retrieved text blocks pasted into the QA template", "cite": "Appx A, p.20"},
+    {"id": "ans",   "stage": "B7", "row": 1, "type": "llm",   "seq": 20, "label": "LLM:Answer", "cite": "Appx A"}
+  ],
+  "edges": [
+    {"from": "turn",  "to": "recent"},
+    {"from": "recent","to": "phi"},
+    {"from": "summ",  "to": "phi", "state": "degraded", "label": "S"},
+    {"from": "phi",   "to": "emb"},
+    {"from": "emb",   "to": "probe"},
+    {"from": "probe", "to": "upd"},
+    {"from": "upd",   "to": "db"},
+    {"from": "db",    "to": "probe", "label": "top-s"},
+    {"from": "turn",  "to": "gent", "state": "degraded"},
+    {"from": "gent",  "to": "grel", "state": "degraded"},
+    {"from": "grel",  "to": "gdd",  "state": "degraded"},
+    {"from": "gdd",   "to": "gcon", "state": "degraded"},
+    {"from": "gcon",  "to": "glink","state": "degraded"},
+    {"from": "glink", "to": "gstore","state": "degraded"},
+    {"from": "q",     "to": "ret"},
+    {"from": "db",    "to": "ret"},
+    {"from": "ret",   "to": "asm"},
+    {"from": "q",     "to": "gq",   "state": "degraded"},
+    {"from": "gq",    "to": "gret", "state": "degraded"},
+    {"from": "gret",  "to": "gexp", "state": "degraded"},
+    {"from": "gstore","to": "gexp", "state": "degraded"},
+    {"from": "gexp",  "to": "asm",  "state": "degraded"},
+    {"from": "asm",   "to": "ans"}
+  ]
+}

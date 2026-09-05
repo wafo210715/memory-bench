@@ -59,3 +59,10 @@ runs/**/orchestrator.log
 runs/**/logs/
 # server 未设 MEMBENCH_RUN_ID 时落的散 trace（如裸跑 smoke）
 runs/_mcp_trace/
+
+# ---- flowgen ----
+# 渲染产物与 A/B 对比临时页面；SVG 交付物提交到 servers/<sys>/assets/
+servers/flowgen/out/
+
+# ---- macOS ----
+.DS_Store

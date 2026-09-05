@@ -4,8 +4,11 @@
 > （arXiv:2608.02515v2，`/Users/guanhongli/Documents/wafo-base/literature/papers/` 下的纯文本转写版）。
 > 证据格式为「论文 §章节 / Eq(编号) / Table / Figure」；术语第一次出现给一句话解释；
 > 不确定的地方标「未验证」。该 txt 是 PDF 抽取版，双栏排版可能导致抽取顺序与真实阅读顺序
-> 不完全一致（例如 References 和 Appendix A 在文本流里顺序有点怪），所以本文档不依赖原始
+> 不完全一致（例如 Figure 2 的图注被抽取到了 §2.2 中段、Table 2 的标题被抽取到了 §4.3
+> 中段，是图表标题错位插入正文，不是章节顺序错乱），所以本文档不依赖原始
 > 行号做主证据，只用于我自己核对，主证据一律是section/Eq/Table/Figure 编号。
+>
+> **2026-09-05 勘误**：本文已按同目录 `verification.md` 的逐条复核结论修正（共 9 处：2 处事实、1 处行号/锚点、6 处表述限定）。原始未修正版本见 git 历史。
 
 ## 1. 一句话机制
 
@@ -38,7 +41,7 @@ reconstructive inference，"重构式推理"）是两种互补但不同的机制
      `b_t∈[0,1]^{d_k}` 是擦除门；
   3. **write and read（写入与读出）**：`S_t = S̄_t + k_tρ_tᵀ`（写），`r_t = S_tᵀq_t`（读，
      `w_t∈[0,1]^{d_v}` 是写入门）；三者用同一个隐藏表示 `h_t^ℓ` 算出来，和主路 attention
-     共享输入。
+     共享输入（附录 C.1 补充：q/k/v 投影前实际还有一层宽度为 4 的短因果卷积，正文这里没提）。
 - **调不调 LLM**：论文没有提"额外调用一次 LLM 来生成摘要或压缩记忆"这种说法——写入是
   backbone 自身前向传播的一部分。Eq(4)-(6) 明确写：`a_t^ℓ=Attn^ℓ(h_≤t^ℓ;C_t)`，
   `(r_t^ℓ,S_t^ℓ)=GDN2^ℓ(h_t^ℓ,S_{t-1}^ℓ)`，`o_t^ℓ=a_t^ℓ+r_t^ℓ`——两条路吃的是同一个
@@ -49,7 +52,9 @@ reconstructive inference，"重构式推理"）是两种互补但不同的机制
   证据：§3.1（"The output projection is initialized with zeros..."）；附录 C.1 补充了
   完整几何参数：Qwen3-4B backbone 有 36 层、32 个 query head、8 个 KV head、head
   维度 128；记忆路径**每一层**都用 32 个 query/key/value head、维度 128，因此每层每个
-  请求的状态张量形状是 `32×128×128`，用 **FP32** 存储。
+  请求的状态张量形状是 `32×128×128`，用 **FP32** 存储（附录 C.1 紧接着说明这是
+  "in addition to the short-convolution state"——状态实际上还包括一份短卷积状态，
+  不只是这一块矩阵）。
 - **触发范围**：论文说"The memory module of LiveMem is attached as a side branch **to
   each attention layer**"（§3.1 开头）——每一层都装，不是只装几层。
 
@@ -66,9 +71,11 @@ reconstructive inference，"重构式推理"）是两种互补但不同的机制
   单次查询，也不是多轮 agentic 检索循环，而是**随 token 数量线性增长的、持续在跑的线性
   代数运算**，序列多长就做多少次。
 - **找到之后怎么交给模型**：`o_t^ℓ = a_t^ℓ + r_t^ℓ`（Eq(6)），两路输出在每一层**直接相加**，
-  合并后的结果按普通 decoder 层的方式送进下一层。论文没有描述任何"筛选/加权/门控是否
-  采纳记忆读出"的显式机制——图 2 的图注也写"Their outputs are combined at every decoder
-  layer"，就是简单相加。
+  合并后的结果按普通 decoder 层的方式送进下一层。**勘误**：读出 `r_t^ℓ` 在相加之前并不是
+  什么都不做——附录 C.1 明写"The readout St⊤qt passes through a **gated RMS
+  normalization** and an output projection before it is added to the softmax-attention
+  output."，也就是有一层 sigmoid 门控归一化。图 2 的图注"Their outputs are combined at
+  every decoder layer"说的是两路输出在层级上合并这件事，不代表读出本身没有任何门控。
 - **实验上如何证明这个读出真的被用到了（而不是摆设）**：§4.3 "Does the Recurrent State
   Carry Evicted Evidence?" 专门做了这件事——对比"State"（完整历史都进了记忆状态）和
   "Trunc."（历史直接截断，从零状态开始）两种设置，Table 2 显示多数数据集上 State 优于
@@ -120,7 +127,10 @@ flowchart TB
 每一层里"主路 vs 副路"这条线**：主路 `Attn^ℓ` 是预训练 backbone 自己的计算（图 2 的
 "full-attention main path"），副路 `GDN2^ℓ` 是论文新引入、专门训练的"记忆模块"
 （图 2 的"recurrent side path"）。forward pass 之外——也就是"谁来发起一次推理请求、
-历史 `H_t` 具体怎么拼进 prompt"——论文完全没有建模，这部分留给了部署方（对应
+历史 `H_t` 具体怎么拼进 prompt"——论文**正文**没有建模；不过附录 D.2/D.3 把评测协议里的
+请求组装规定得相当具体（如统一 system instruction、`[system prompt, user prompt
+(memory documents, question), assistant answer]` 的输入格式、截断规则与生成预算），
+所以准确说法是"正文没建模，附录给了评测层面的具体约定"，而非完全没有着墨（对应
 `README.md` 和代码里的评测脚本，不属于论文正文）。
 
 ## 5. 我没搞清楚的
@@ -130,12 +140,16 @@ flowchart TB
   long-text QA data"，没有给出具体去掉的百分比或数据集级别的样本量，读论文推不出确切
   配比（代码里的 yaml 有具体数字，但那是"代码怎么实现"，不代表"论文写清楚了"，所以放在
   这里而不是当成论文已回答的问题）。
-- **Table 1 里 Recurrent 方法在 Wiki QA 部分若干格是空的（"-"）**，正文没有解释这是
-  "该方法不适用于此任务而跳过"还是"没跑出结果"；附录 D.3 只是笼统描述了 Recurrent
-  baseline 的构造方式，没有点名解释这几个具体空格。
+- **勘误**：Table 1 里真正有空格（"-"）的是 **RAG** 列（2Wiki-MQ/Hotpot-MQ/MuSiQue-MQ
+  三格），不是 Recurrent 列——Recurrent 列六格都有数值（0.775/0.204/0.819/0.256/0.483/
+  0.165）。附录 D.3 也已经给出解释："Since RAG's top-k fundamentally cannot meet the
+  evidence requirements of the MQ task, we omit RAG's performance on MQ."原表述认错了
+  列名，也高估了论文的未解释程度，订正后这条不再算"我没搞清楚的"遗留问题。
 - **`in_mem(chunk(i), j)` 的判定细节（chunk 大小、驱逐阈值）在正文 Eq(10) 处没给出具体
-  数值**，要翻到附录 C.2 才有 Table 5 的完整 fixed-stride 参数表（这张表用于 RL
-  rollout 和 serving 场景）；但 SFT 训练用的长文档语料，附录只说了一句"SFT examples
+  数值**，要翻到附录 C.2 才有 Table 5 的完整 fixed-stride 参数表（表题写的是"used for RL
+  rollout serving and policy recomputation"，这里的"serving"特指 RL rollout 的 serving；
+  附录 C.2 紧接着说明 benchmark inference 会把 chunk size 覆盖为 1,024、budget 覆盖为
+  8K 或 32K，并不直接套用 Table 5 的档位）；但 SFT 训练用的长文档语料，附录只说了一句"SFT examples
   use dataset-defined semantic or fixed-token chunks"，具体怎么切（语义边界用什么规则
   判定、固定 token 切分的窗口大小是多少）没有展开，论文正文和附录都没有给出可以照抄
   复现的算法细节。
@@ -152,23 +166,25 @@ flowchart TB
 
 ## 6. 论文没写清楚的地方
 
-- **多轮/多请求之间状态是否复用，论文正文完全没提**。这是最值得强调的一条：论文附录
-  C.3 Serving 只讲了**单个 request 内部**的生命周期管理（"When generation finishes,
-  the scheduler removes the request's turnover record and the state manager releases
-  its recurrent slot."），从未讨论"如果一个 agent 要连续发好几轮请求，状态要不要、
-  能不能跨请求延续"这个问题——这恰恰是很多读者看到"state continuity"这个题目后第一反应
-  会关心的场景（多轮对话/长期运行 agent 的"记忆"）。README（不算论文正文，是配套代码
+- **多轮/多请求之间状态是否复用，论文正文基本没提**。论文附录 C.3 Serving 确实给出了一个
+  明确的设计立场——"This explicit lifecycle implements continuity within a stream while
+  **preventing accidental state leakage between requests**."——即明确禁止跨请求的状态
+  泄漏；但它没有讨论"如果一个 agent 要连续发好几轮请求，能不能主动复用状态"这种可能性，
+  也没有给这类场景一个正面设计——这恰恰是很多读者看到"state continuity"这个题目后第一
+  反应会关心的场景（多轮对话/长期运行 agent 的"记忆"）。README（不算论文正文，是配套代码
   仓库的文档）倒是补了一句"当前 OpenAI-compatible API 不会在两个独立 request 之间自动
-  复用该 state"，但论文自己没有对这一点做设计说明或未来展望，读者只看论文会以为
-  "state continuity"天然覆盖多轮场景，实际不然。
+  复用该 state"，读者只看论文正文仍容易误以为"state continuity"天然覆盖多轮主动复用场景，
+  实际不然；准确说法是"论文明确排除了跨请求泄漏，但没有讨论主动复用"，而非"完全没提"。
 - **E.1/E.2（Limitations）本身写得很清楚，不算"没写清楚"，特此说明避免误判**：论文自己
   坦承 NIAH（needle-in-a-haystack，"大海捞针"式的精确检索测试）结果显示记忆状态是有损的、
   无法可靠复原任意细粒度的信息（Table 6）；RoPE 262,144 token 的位置编码上限是硬约束，
   状态理论上能一直更新但没做超过 256K 的实验。这两条论文自己交代得很坦率，不是本节该
   收录的"缺口"，列出来只是为了不被后续读者误当作我的新发现。
-- **δ-Mem / Context2LoRA 等 baseline 的具体配置理由没有展开**：附录 D.3 提到"For δ-Mem,
-  we adopt its **TSW setting**"，但 TSW 具体是什么、为什么选它而不是δ-Mem论文里的其他
-  setting，没有解释，需要跳去δ-Mem 原论文（Lei et al. 2026）才能确认；Context2LoRA 的
+- **δ-Mem / Context2LoRA 等 baseline 的具体配置理由没有完全展开**：附录 D.3 提到"For
+  δ-Mem, we adopt its **TSW setting**"，缩写本身没有展开，但紧接着给出了它的行为语义
+  （超出上下文窗口的部分直接从头截断），所以不是完全没解释——没解释的只是"TSW 这三个
+  字母具体代表什么"；至于为什么选它而不是δ-Mem论文里的其他 setting，仍需跳去δ-Mem 原
+  论文（Lei et al. 2026）确认；Context2LoRA 的
   `rank=4, alpha=8, lr=5×10⁻⁴` 这组超参数也只是陈述配置，没有给出选择依据或消融支持。
 - **RAG baseline 的"chunk 512 token"和"top-1/top-3"切换阈值（20 个 memory document）
   为什么是这两个数字**，附录 D.3 只是直接给出配置，没有解释为何以 20 篇文档为界。

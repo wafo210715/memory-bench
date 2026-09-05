@@ -4,7 +4,9 @@
 > 核心目录：`agent_system/memory/`（存储/检索/摘要/效用引擎）、`agent_system/multi_turn_rollout/`（rollout 主循环）、
 > `agent_system/environments/`（env 与 memory 系统的粘合层）、`agent_system/reward_manager/`（format reward）、
 > `verl/trainer/config/ppo_trainer.yaml`（全部默认参数）。
-> 本文档只读源码写出，不采信 README 的表述作为结论依据（有出入处见第 6 节）。
+> 本文档只读源码写出，不采信 README 的表述作为结论依据；与论文的出入见第 6 节（本次复核未发现代码与 README 之间的出入）。
+>
+> **2026-09-05 勘误**：本文已按同目录 `verification.md` 的逐条复核结论修正（共 13 处：9 处事实、3 处行号/锚点、1 处表述限定）。原始未修正版本见 git 历史。
 
 ## 1. 一句话机制
 
@@ -14,6 +16,10 @@ MemHarness 的"记忆系统"是一个本地 Milvus-Lite 向量库 + LLM 蒸馏�
 `maybe_apply_memory_adaptor`），它把刚取回的原始记忆文本原地重写或整体丢弃，回填进下一步的观察文本，
 之后策略才做第三次（对该 episode 而言）前向生成真正的环境动作。三件事——决定要不要查、重写记忆、生成动作——
 在工程上是三次互相独立、各自 tokenize/detokenize 的模型调用，不是一次生成内部的多阶段输出。
+本文档只覆盖 RL 训练/推理阶段这个记忆系统本体；RL 之前还有一次独立的离线冷启动 SFT
+（`scripts/cold_start_sft.sh`：2 epoch、lr 1e-5，配合 `scripts/build_{alfworld,webshop,summarizer}_coldstart_data.py`
+用 GPT-5.1 从 AgentGym 造种子数据），用于把 πθ 的输出格式/协议标签先对齐，不涉及 `agent_system/memory/`
+目录，不在本文档讨论范围内（对应论文 §4.1、Appendix A.4，见 `paper-architecture.md` 第 1 节）。
 
 ## 2. 记忆是怎么存进去的
 
@@ -33,10 +39,11 @@ MemHarness 的"记忆系统"是一个本地 Milvus-Lite 向量库 + LLM 蒸馏�
 取不到时用占位符 `MEMORY_STATE_UNAVAILABLE_PLACEHOLDER`，`types.py:9`）、`action_text`、
 `memory_text`（可复用原则）、`reward`/`success`（该轨迹的结局）以及一个初始效用分。
 
-**存的过程调不调 LLM**：调用。默认 `experience_summarizer.mode=self`：复用**同一份 actor rollout 权重**，
+**存的过程调不调 LLM**：调用。`experience_summarizer.mode` 基础默认是 `none`（`ppo_trainer.yaml:419`
+`mode: none   # none | self … | teacher …`），两个训练脚本都显式覆盖成 `self`：复用**同一份 actor rollout 权重**，
 把待蒸馏轨迹批量喂给 `actor_rollout_wg.generate_sequences` 生成 JSON（`experience_summarizer.py:785` 的
 `_summarize_batch_self`）；也支持 `mode=teacher`，走独立的 OpenAI 兼容 HTTP API 做蒸馏
-（`experience_summarizer.py:659` 的 `_summarize_batch_teacher`），两个训练脚本用的都是 `self`。
+（`experience_summarizer.py:659` 的 `_summarize_batch_teacher`）。
 JSON 解析失败会在 `parse_max_attempts`（默认 3）次内重试同一条轨迹
 （`experience_summarizer.py:1154` `maybe_summarize_and_write_experiences` 内的 while 循环）。
 
@@ -46,13 +53,13 @@ JSON 解析失败会在 `parse_max_attempts`（默认 3）次内重试同一条�
   （`experience_summarizer.py:490` `_select_env_indices_balanced_success_fail`，配额不够时按 GRPO group 补齐随机样本）。
 - 写入前做最近邻探测去重：若新记录 `memory_text` 向量与库内已有条目余弦相似度 ≥
   `memory_text_insert_dedupe_similarity_threshold`（基础默认 0.85，`ppo_trainer.yaml:488`），直接跳过插入
-  （`agent_system/memory/milvus_store.py:296-317` `_neighbor_has_similar_memory_text` + `add_records` 内的判断逻辑，
-  `add_records` 定义于 `milvus_store.py:320`）。`train_alfworld.sh` 把这项显式设为 `null`（关闭），
+  （`_neighbor_has_similar_memory_text` 定义于 `agent_system/memory/milvus_store.py:199`，调用点在 `:346`，
+  判断逻辑在 `:341-349`；`add_records` 定义于 `milvus_store.py:320`）。`train_alfworld.sh` 把这项显式设为 `null`（关闭），
   `train_webshop.sh` 未覆盖、维持默认 0.85（开启）——即两个 benchmark 用的不是同一套去重策略。
 
 **存储后端**：本地单文件 Milvus-Lite（`agent_system/memory/milvus_store.py:97` `MilvusMemoryStore`，
-`db_path` 是进程本地磁盘文件），18 个标量/向量字段的 flat schema
-（`milvus_store.py:785` `_create_collection`），向量字段用 `FLAT` 索引 + `COSINE` 度量。
+`db_path` 是进程本地磁盘文件），19 个标量/向量字段的 flat schema
+（`milvus_store.py:785` `_create_collection`，字段清单在 `:793-811`），向量字段用 `FLAT` 索引 + `COSINE` 度量。
 Embedding 由远端 OpenAI 兼容接口提供（`milvus_store.py:52` `RemoteEmbeddingProvider`，默认模型
 `bge_m3`、维度 1024，`ppo_trainer.yaml:475-476`），本地进程不跑 embedding 模型本身。
 每条新记录的初始效用分是 Laplace 平滑先验 `(0+1)/(0+2)=0.5`
@@ -68,7 +75,9 @@ Embedding 由远端 OpenAI 兼容接口提供（`milvus_store.py:52` `RemoteEmbe
 下一步的观察里才会带着取回的记忆——AlfWorld 侧实现见 `agent_system/environments/env_manager.py:318` 的
 `AlfWorldEnvironmentManager.step_with_memory`（WebShop 的同名方法在同文件 `env_manager.py:734` 前后，
 逻辑一致）。默认 `count_query_as_step: True`（`ppo_trainer.yaml:465`），这一步仍会计入该 episode 的
-`max_steps` 预算。
+`max_steps` 预算。agentic 模式下检索频率还受 format reward 里 `require_memory_retrieve` 约束：基础默认
+`false`（检索 0 次也满分，`ppo_trainer.yaml:272`），两个训练脚本都覆盖成 `True`（`train_alfworld.sh:192`/
+`train_webshop.sh:181`）才真正把检索次数锁定在 `[1,5]` 次/episode。
 
 **拿什么去找**：把策略自己写的 query 文本送去 embedding，与库内 `retrieve_key` 指定字段
 （默认 `memory_text`，`ppo_trainer.yaml:478`）的历史向量做纯 cosine 相似度检索
@@ -76,7 +85,9 @@ Embedding 由远端 OpenAI 兼容接口提供（`milvus_store.py:52` `RemoteEmbe
 `top_k=3`（`ppo_trainer.yaml:480`），命中项按 `min_score`（默认 0.0）过滤，若配了
 `memory_text_retrieval_dedupe_similarity_threshold`（基础默认 0.85，`ppo_trainer.yaml:486`）还会在候选池里
 对 `memory_text` 向量做贪心去重后再截断到 `top_k`（`milvus_store.py` `retrieve` 内的去重分支，算法实现在
-`agent_system/memory/memory_text_dedupe.py` 的 `dedupe_indices_by_embedding_similarity`）。检索默认**不**限定
+`agent_system/memory/memory_text_dedupe.py` 的 `dedupe_indices_by_embedding_similarity`）。`train_alfworld.sh:135`
+也把这项显式设为 `null`（关闭），`train_webshop.sh` 未覆盖、维持默认 0.85——与写入去重一样，两个
+benchmark 的检索去重策略并不一致。检索默认**不**限定
 只查成功轨迹（`only_successful: False`，`ppo_trainer.yaml:482`；`milvus_store.py:410` 的
 `search_kwargs["filter"] = "success == true"` 只有该开关为真才会生效）。
 
@@ -93,11 +104,16 @@ Embedding 由远端 OpenAI 兼容接口提供（`milvus_store.py:52` `RemoteEmbe
    `maybe_apply_memory_adaptor(...)` → `mem_adaptor_rollout.py:732` `out_pad = wg.generate_sequences(dp_pad)`），
    专门做"批判 + 重写"：把 `<memory>` 块内容原地替换成重写后的 guidance，或判定为不适用时输出
    `<EMPTY>`、整块删掉换成兜底提示语（`mem_adaptor_rollout.py:494` `_patch_one_obs_text`，
-   触发条件 `on_memory_only`——只有真的检索到东西才会跑这一步，见 `mem_adaptor_rollout.py:192`
-   `_should_run_adaptor_for_index`）。这次调用默认**是否复用主策略权重**由
+   触发条件是 `bool(injected) or has_ret`（`mem_adaptor_rollout.py:192-207`）——即便检索零命中，
+   `MemoryManager` 也会注入一句兜底的 `empty_retrieval_message`（`memory_manager.py:432-440`）使
+   `injected` 非空，所以这一步实际上**每次检索被触发都会跑一遍**（含零命中），并不要求真的取回记忆内容。
+   这次调用默认**是否复用主策略权重**由
    `mem_adaptor.use_actor_rollout_wg` 决定，两个训练脚本都设为 `True`（`train_alfworld.sh:256`），
-   同时 `train_memory_adaptor=false`（`train_alfworld.sh:257`）表示不单独训练它——即论文实验里
-   "重构" 用的确实是同一份权重，但只是众多可配置项里被选中的一种（详见第 6 节）。
+   同时 `train_memory_adaptor=false`（`train_alfworld.sh:257`）——但这**不是**"联合训练"：因为
+   `use_actor_rollout_wg=true`，`train_memory_adaptor_enabled()` 直接 return False（`mem_adaptor_training.py:336-337`）
+   → `adaptor_train_buf=None`（`rollout_loop.py:534-539`）→ `ray_trainer.py:1890` 整段 adaptor GRPO 被跳过。
+   即论文实验里"重构"确实复用了同一份权重，但这次重写生成的 completion token **完全不进任何梯度更新**，
+   与论文 §3.4（txt:268-269）"轨迹优势同等分给重构token"的说法直接冲突（详见第 6 节）。
 4. 主策略对这个"已经被重写过"的观察做第二次真正的决策前向，生成可执行动作。
 
 检索宽度 `top_k=3`，但送进重构 prompt 的默认只取最相关的 `retrieval_top_k=1` 条（`ppo_trainer.yaml:557`），
@@ -107,7 +123,9 @@ Embedding 由远端 OpenAI 兼容接口提供（`milvus_store.py:52` `RemoteEmbe
 `utility_succ_count` +1（`agent_system/memory/experience_utility.py:39` 的 `collect_memory_ids_from_info_list`
 与 `experience_utility.py:59` 的 `episode_success_from_batch`，由 `memory_manager.py:254` 的
 `_apply_retrieval_utility_updates` / `memory_manager.py:279` 的 `_apply_episode_utility_updates` 触发写回）；效用分低于
-`prune_score_threshold`（默认 0.3）且用满 `min_uses_before_prune`（默认 3）次的记忆会被定期物理删除
+`prune_score_threshold`（基础默认 **0.35**，`ppo_trainer.yaml:462`；两个训练脚本覆盖成 0.3）且用满
+`min_uses_before_prune`（默认 3）次的记忆，会在 `prune_every_n_global_steps`（基础默认 **0**，即默认关闭
+剪枝，`ppo_trainer.yaml:461`；两个训练脚本覆盖成 20）指定的间隔被物理删除
 （`milvus_store.py:613` `prune_low_utility_memories`）。
 
 ## 4. 架构图
@@ -157,12 +175,11 @@ policy 权重做推理/训练"划分，而非按代码所在目录划分。真�
 
 ## 5. 我没搞清楚的
 
-- **outcome reward 的 0/10 具体赋值点未验证**：`agent_system/reward_manager/episode.py` 只是消费已经算好的
+- **outcome reward 的 0/10 赋值点**（已核实）：`agent_system/reward_manager/episode.py` 只是消费已经算好的
   `episode_rewards`（来自 `data_item.non_tensor_batch["episode_rewards"]`），真正把"成功=10、失败=0"写进
-  `episode_rewards` 的地方在 ALFWorld/WebShop 各自的 env 包装代码里（`env_manager.py:318` 附近调用的
-  `self._compute_reward(info, ...)`，来自 `agent_system/environments/env_package/alfworld/envs.py` 的
-  `compute_reward`），我没有深入这层确认数值是否硬编码为 10，只在论文 §3.4/A.1 里读到过这个说法（未验证，但与
-  reward_model.format_reward 配置的 `weight_outcome=1.0`、`weight_format=0.1` 是吻合的量级关系）。
+  `episode_rewards` 的地方在 `agent_system/environments/env_package/alfworld/envs.py:48-53`（文本模式下
+  `reward = 10.0 * float(info['won'])`）与 `env_package/webshop/envs.py:50/:53`（`reward = 10.0` / `reward = 0`），
+  与论文 §3.4/A.1 的说法一致，也与 `weight_outcome=1.0`、`weight_format=0.1` 的量级关系吻合。
 - **`mem_adaptor.enable=false`（未开重构）时 `retrieval_mode=fixed` 路径是否等价于论文 Table 2 的
   "RL + Raw Memory" / "w/o reconstruction" 消融行**：代码上这条路径确实是纯 replay（`MemoryManager.build_memory_message`
   直接把 `_format_memory_prompt` 结果拼进观察，不经过 adaptor），但仓库里没有找到与该消融行一一对应的独立脚本，
@@ -175,15 +192,16 @@ policy 权重做推理/训练"划分，而非按代码所在目录划分。真�
 ## 6. 与论文的冲突点
 
 1. **检索标签词序相反**：论文里出现该标签的所有位置——正文 §3.4"with `<retrieve_memory>` block"、
-   Appendix A.2"valid `<retrieve_memory>...</retrieve_memory>` blocks"、Figure 5/6（ALFWorld/WebShop 系统提示词）
+   Appendix A.1（非 A.2，A.2 是 Training Hyperparameters）"valid `<retrieve_memory>...</retrieve_memory>` blocks"、Figure 5/6（ALFWorld/WebShop 系统提示词）
    "wrapped by `<retrieve_memory>` and `</retrieve_memory>` tags"、Figure 9（轨迹摘要提示词）
    "Do not copy raw `<think>`, `<action>`, or `<retrieve_memory>` text"——统一写的是 `<retrieve_memory>`。
    但代码里唯一真正生效、且被训练时的正则解析/格式奖励/摘要提示词共同使用的常量是
    `retrieval_query_open_tag: "<memory_retrieve>"` / `close_tag: "</memory_retrieve>"`
-   （`ppo_trainer.yaml:517-518`），这个词序在 `agent_system/memory/prompt_defaults.py`、
-   `experience_summarizer.py:96` 起的 `DEFAULT_COMPACT_JSON_SYSTEM_PROMPT`里，第 `104` 行写的也是
-   "`Do not copy raw <think>, <action>, or <memory_retrieve> text.`"）、`mem_adaptor_rollout.py` 里判定"模型是否又吐出了协议标签"的正则
-   （`r"<\s*(?:redacted_thinking|action|memory_retrieve|memory)\b"`）中全部一致。
+   （`ppo_trainer.yaml:517-518`），这个词序在
+   `experience_summarizer.py:96` 起的 `DEFAULT_COMPACT_JSON_SYSTEM_PROMPT`里（第 `104` 行写的也是
+   "`Do not copy raw <think>, <action>, or <memory_retrieve> text.`"）与 `mem_adaptor_rollout.py` 里判定"模型是否又吐出了协议标签"的正则
+   （`r"<\s*(?:redacted_thinking|action|memory_retrieve|memory)\b"`）中全部一致（`agent_system/memory/prompt_defaults.py`
+   全文只有 `{open_tag}`/`{close_tag}` 占位符，没有字面标签，不能作为词序证据）。
    **以代码为准**：真实训练/评测时模型要输出、代码要解析的标签是 `<memory_retrieve>`，
    论文所有 Figure 和正文写反了词序。
 

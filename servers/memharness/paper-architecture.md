@@ -4,13 +4,15 @@
 >（全文见 `/Users/guanhongli/Documents/wafo-base/literature/papers/Wu-2026-MemHarness.txt`）。
 > 本文档只依据论文正文与 Appendix 的文字/公式/图表写出，不采信代码实现；与代码有出入处见
 > 同目录 `code-architecture.md` 第 6 节，本文件第 6 节只列"论文自己没写清楚的地方"。
+>
+> **2026-09-05 勘误**：本文已按同目录 `verification.md` 的逐条复核结论修正（共 9 处：4 处事实、4 处行号/锚点、1 处表述限定）。原始未修正版本见 git 历史。
 
 ## 1. 一句话机制
 
 人类回忆是"重构的"而非"复现的"（§1 引用认知科学 [11]）：MemHarness 让同一个策略模型 πθ 在
 "取回历史经验"和"生成当前动作"之间显式插入一次"批判并重写"，把抽象、过时的历史经验改写成
 贴合当前状态的 guidance（或判定不适用后回退到自主推理），这个批判/重写能力没有人工标注，
-完全靠 GRPO 端到端优化任务成功率隐式学会（摘要；§3.2；§3.4）。
+先经过一次基于 GPT-5.1 生成数据的冷启动 SFT 做协议格式对齐（§4.1、Appendix A.4：2×200 条数据、2 epoch、lr 1e-5），具体的批判/重构能力再完全靠 GRPO 端到端优化任务成功率隐式学会（摘要；§3.2；§3.4）。
 
 ## 2. 记忆是怎么存进去的
 
@@ -48,17 +50,18 @@ remaining quota is filled by randomly sampling from the leftover trajectories." 
    `s(p) = (c_succ(p) + 1) / (c_use(p) + 2)`，定期剪枝分数低于 `θprune`（默认 0.3）且已被检索满
    `min_uses_before_prune`（默认 3）次的条目。
 
-**向量化与后端**：用 BGE-M3（[34]）编码存入条目（§4.1："We use BGE-M3 as the embedding model to encode
-both the retrieval query qt and the stored entries"），后端是 Milvus 向量数据库（[37]，Appendix A.3：
+**向量化与后端**：用 BGE-M3（[34]）编码存入条目（Appendix A.3："We use BGE-M3 as the embedding model to encode
+both the retrieval query qt and the stored entries"——§4.1 也提 BGE-M3，但那句只讲 top-3 检索，原文见 txt:580-581），后端是 Milvus 向量数据库（[37]，Appendix A.3：
 "we implement the memory store B as a vector database using Milvus for efficient similarity search"）。
 
 ## 3. 记忆是怎么被用起来的
 
 **什么时候触发**：§3.2 Step 1（Retrieval）："At step t, the agent **decides whether to query** the
 experiential memory bank B based on `ht`. If triggered, retrieval returns relevant experiences `Et`,
-which are reconstructed rather than directly added to the action context." ——论文里检索触发的方式只描述了
-一种：由 agent 自己根据当前历史窗口 `ht` 决定是否查询，通篇没有出现"每一步都强制检索"这类替代模式的讨论
-（是否存在这种模式、论文实验是否用过，未写明，见第 5 节）。
+which are reconstructed rather than directly added to the action context." ——论文正文（§3.2）把检索触发方式
+描述为由 agent 自己根据当前历史窗口 `ht` 决定是否查询；但 Appendix A.3 另一处又说“we retrieve the top-k ...
+**at each step** based on cosine similarity”（txt:1261-1262），与正文的“决定是否查询”存在内部张力，论文没有
+明确协调这两种描述（见第 5 节）。
 
 **拿什么去找**：Eq.1 `Et = R(qt, B), |Et| = k`——用"a context-derived query `qt`"检索，检索器 `R` 返回
 top-k 条经验。§4.1 补充具体数值："we retrieve the top-3 most relevant principles"（k=3），用 BGE-M3
@@ -130,8 +133,10 @@ flowchart LR
 ```
 
 **边界说明**：论文自己划的边界很清楚——"显式、可检视的记忆库"（explicit, attributable memories，§1）
-是一侧，"参数化的状态相关重构"（parameterizing their state-conditioned critique and reconstruction within
-a single policy，§2.2）是另一侧，两者靠 `qt`（查询）与 `Et`（取回的经验+来源状态对）这两个文本对象
+是一侧，“参数化的状态相关重构”（parameterizing their state-conditioned critique and reconstruction within
+a single policy，**§1 Introduction**，非 §2.2，txt:68-70；§2.2 对应句是“retains explicit memory banks for
+traceability but parameterizes their state-conditioned reconstruction”，没有“critique”也没有“within a
+single policy”，txt:131-132）是另一侧，两者靠 `qt`（查询）与 `Et`（取回的经验+来源状态对）这两个文本对象
 交换信息。论文没有讨论重构这一步在工程上是否需要单独一次模型调用、是否和动作生成共享一次前向——
 这些属于实现细节，方法部分只用采样记号（`~`）表示了两次独立分布采样。
 
@@ -140,7 +145,7 @@ a single policy，§2.2）是另一侧，两者靠 `qt`（查询）与 `Et`（�
 - **格式奖励"三个标准"与实际列出四条准则数字对不上**：正文 §3.4 说"The format score `Rformat` ∈ [0,1]
   equally weights **three criteria**: (1) exactly one valid `<think>` and `<action>` block per step,
   (2) appropriate memory retrieval frequency ... (1 to 5 times per episode), and (3) strict English output."
-  这里其实是三条。但 Appendix A.2 复述时写成"The format score equally weights three criteria:
+  这里其实是三条。但 Appendix A.1（非 A.2，A.2 是 Training Hyperparameters）复述时写成"The format score equally weights three criteria:
   (1) each step contains exactly one valid block followed by one valid `<action>...</action>` block,
   (2) memory is retrieved through valid `<retrieve_memory>...</retrieve_memory>` blocks between one and
   five times per episode, (3) thinking contents are including by one valid `<think>...</think>` block
@@ -149,22 +154,25 @@ a single policy，§2.2）是另一侧，两者靠 `qt`（查询）与 `Et`（�
   读起来像是想说"think block"）、(3) 又单独重复了一遍 think block 的要求。两处对同一个奖励的
   criteria 数量描述不一致，本次调研判断这是论文自身的编辑/排版遗留问题，但只依据论文文本无法确定
   "三"和"四"哪个是作者的本意（未验证）。
-- **检索频率"1 到 5 次每 episode"是硬约束还是仅为奖励塑形的鼓励项**：这个数字只出现在 §3.4/A.2
+- **检索频率"1 到 5 次每 episode"是硬约束还是仅为奖励塑形的鼓励项**：这个数字只出现在 §3.4/A.1
   的 format reward 设计段落里，作为"格式奖励要不要给分"的判据之一；论文在 §3.2 描述检索机制本身
   （Step 1、Eq.1）时完全没有提到任何频率上下限，也没说超出这个范围时检索请求会不会被拒绝执行，
   还是仍然正常执行只是不给格式分。两者关系未写清楚。
 - **"批判(critique)"阶段是否有可观测的独立产物**：五阶段模型（§1）把 critique 和 reconstruction
-  列为两个独立阶段，但 §3.2 说 pipeline 里"memory critique is folded into the reconstruction stage"，
-  之后全文（包括 Eq.3-5、§3.3、§4.5 的行为分析）都只讨论 `gt`/`g̃t` 这一个输出，没有给出"批判"本身的
-  中间表示或判定量（比如一个显式的"接受/拒绝"标量或文本字段）——读者只能从最终 `gt` 是否等于 `<EMPTY>`
-  这一个二元结果反推"批判"发生过，但论文没有明确说这是不是"批判"这一子阶段唯一可观测的痕迹。
+  列为两个独立阶段，但 §3.2 说 pipeline 里"memory critique is folded into the reconstruction stage"。
+  Table 4(a) 报告了 per-memory 的拒绝率（RR），§4.6 与 Figure 3 也画了 Reject/Traj、Accepted/Traj 曲线——
+  "批判"确实留下了可统计、可观测的接受/拒绝量，但这仍是从 `gt` 是否等于 `<EMPTY>` 这一个二元结果反推、
+  聚合出来的统计量，论文没有给出比这更细粒度的"批判"中间表示（比如一个显式的判定文本字段）。
 - **Table 2"– generic LLM reconstruction"消融的具体实现未说明**：正文只写"Replacing MemHarness's
   internal reconstruction module with a generic instruction-tuned LLM (Qwen2.5-7B-Instruct)"，
-  没有说这个替代重构用的是什么 prompt、是否 zero-shot、是否与原策略共享上下文窗口/历史信息，
-  无法仅凭论文复现这一行对照实验。
+  没有说这个替代重构用的是什么 prompt、是否与原策略共享上下文窗口/历史信息（是否 zero-shot 论文别处
+  已给出答案：txt:729 明写"zero-shot text rewriting is insufficient"，不算未写清楚），无法仅凭论文
+  复现这一行对照实验。
 - **记忆蒸馏"periodically"的具体周期未给出数值**：§3.1 和 Appendix A.3 两处都只用"periodically"
-  描述蒸馏发生的频率，没有像其他超参数（learning rate、group size、θsim、θprune 等）一样给出具体数字，
-  是每个 GRPO rollout batch 结束后一次，还是别的粒度，论文没写。
+  描述蒸馏发生的频率；Appendix C（txt:1390）补了一点粒度信息——"After an episode is completed, the
+  trajectory summarization prompt extracts..."，Figure 9 标题（txt:1476）也称其为"offline trajectory
+  summarization"，即按 episode 完成后离线触发，不是逐 step。但具体是每个 GRPO rollout batch 结束后
+  一次，还是攒够若干 episode 才触发一次，论文仍未给出数字。
 - **Table 4(a) 的"Random source"消融如何构造未细说**：只写"replacing `osrc` with a mismatched state
   from a random memory"，没说这个"random memory"是从同一个 memory bank 里均匀随机采样，还是有其他约束
   （比如排除与当前任务相关的条目）；Table 4(b) 的 counterfactual probe 在 Appendix B 有详细的生成

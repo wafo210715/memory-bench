@@ -13,11 +13,14 @@
 > （self-distillation）**＝用同一个模型自己的两种不同输入方式，一个当"老师"、一个当"学生"，让学生的
 > 输出逼近老师；**prefill（预填充）**＝模型读完全部已知输入（上下文+问题）、还没开始吐第一个答案字的阶段；
 > **decode（解码）**＝模型逐个吐出答案字的阶段。
+>
+> **2026-09-05 勘误**：本文已按同目录 `verification.md` 的逐条复核结论修正（共 10 处：1 处事实、4 处引用出处/位置、5 处表述限定）。原始未修正版本见 git 历史。
 
 ## 1. 一句话机制
 
 论文的核心主张是：长上下文里那些**已经算过的、按位置分散存放**的隐状态本身就足够当"记忆"用，不需要
-另外花一次计算去重新编码整段历史——只要用一个轻量的、和主干 LLM 结构一样的小 Transformer，把几个挑选出来
+另外花一次计算去重新编码整段历史——只要用一个轻量的、和主干 LLM 结构一样的小 Transformer（严格说只在 Qwen3
+backbone 下成立：论文用 Llama3.1-8B 做主干时，TransMem block 本身仍固定沿用 Qwen3 架构，txt:387-389），把几个挑选出来
 的历史隐状态变换成一个"记忆偏移量"，配合一个学出来的门控网络决定加多少，在生成答案时叠加进当前隐状态即可；
 训练方式是"证据条件式自蒸馏"（Evidence-Conditioned Self-Distillation, ECSD）：让同一个冻结 LLM，一边
 只看"标准证据+问题"当老师，一边看"完整长上下文＋挂着 TransMem"当学生，用 KL 散度逼学生的输出分布靠近
@@ -30,7 +33,8 @@
   `C = x_{1:L}` 是长上下文，`A_{≤t}` 是已生成的答案前缀；`C` 的隐状态 `H_C` 是在 prefill 阶段算出来的，
   论文原文明确写"The context features H_C are computed during prefill, during which TransMem does
   not intervene in generation"——即 TransMem 在 context 处理阶段完全不参与、不修改任何东西，"存"这个
-  动作本质上就是冻结 backbone 正常做一次 forward 这件事本身，没有额外的"写入记忆"步骤（Eq.1、2 之后一段）。
+  动作本质上就是冻结 backbone 正常做一次 forward 这件事本身，没有额外的"写入记忆"步骤（该句在 Eq.1 之后、
+  Eq.2 之前，不是"Eq.1、2 之后"）。
 - **存的是什么**：原始的、未经压缩/摘要/向量化的隐状态本身。*Method > Inference with TransMem* 段：
   把 `H_C` 按段长 `n = L/B` 切成 `B` 段，取每段**最后一个 token** 的隐状态，组成
   `H_M = [h_n^K, h_{2n}^K, ..., h_L^K]`。论文特别强调"The size of HM remains small, with the
@@ -51,13 +55,17 @@
   correction is applied only during answer generation"——context/question 本身的 token 不受任何影响，
   这与 *Introduction* 里反复强调的"inference-time"、"without repeatedly encoding the preceding
   context"是同一个意思：TransMem 不重新处理长上下文，只在吐答案的时候起作用。
-- **拿什么去找**：论文没有用"检索（retrieval）"这个词描述这一步。做法是把 `H_M` 和答案侧隐状态 `H_A`
+- **拿什么去找**：论文其实用过"检索（retrieval）"这个词——在 Ablation Studies 段有一句"the gating
+  mechanism facilitates the retrieval and utilization of relevant memory representations"
+  （txt:432-433）。但这只是对门控作用的比喻性描述，论文实质上没有描述显式的相似度打分/排序：做法是把
+  `H_M` 和答案侧隐状态 `H_A`
   一起喂进 TransMem 自己的 Transformer block `f_m^K`，"they first undergo standard autoregressive
   attention to produce the memory feature h_m"（*Method* 段，Eq.4 前）。即：靠 block 自身的**注意力
   机制**去隐式判断该重视 `H_M` 里的哪部分，不是显式的相似度打分或排序检索。
 - **一步到位还是多步迭代**：论文没有描述任何"检索→反思→再检索"式的循环，是单次前向产出记忆偏移量
   `Δh`（Eq.4、5）。但因为 TransMem **不插在所有层**，而是"inserting memory modules into only the
-  last four layers"（*Experimental Setup > Implementation Details* 段），效果上是逐层各自发生一次
+  last four layers"（这句在 *Method* 段，不在 *Experimental Setup > Implementation Details*——后者用的是另一句
+  "inserted into the final four transformer layers"），效果上是逐层各自发生一次
   独立修正，论文称这类多层设计能让"memory corrections interact with different stages of the backbone
   computation"（*Appendix > Early Final-Hidden TransMem* 段，解释为什么从单点 final-hidden 设计改成
   多层设计）。
@@ -146,9 +154,10 @@ LLM backbone 的一次标准前向计算 + 寄生其中的 TransMem"，没有像
   "the final row [TransMem (Ours)] is included as a reference rather than a directly controlled
   comparison"——论文自己承认这两组数字不可直接比较，但没有说明当前的 Last-4 多层设计具体是从
   final-hidden 单点设计经过哪些没写出来的中间尝试演化来的。
-- **计算效率对比（Figure 3）的具体测量条件**：论文只给出定性结论（TransMem 的额外开销不随上下文长度
-  增长），没有报告测量用的 GPU 型号、batch size、是否分离 prefill/decode 计时等实验条件，这张图本身
-  能读到"是什么结论"，读不到"怎么测出来的"。
+- **计算效率对比（Figure 3）的具体测量条件**：计时口径其实已经说了——"We report the additional latency
+  introduced by the memory module, excluding the frozen backbone prefill computation"（txt:711-713），
+  且给了 10K→100K 上下文与 δ-mem 每 10k 约 100 GFLOPs 的定量描述（txt:713-722）；没有报的是 GPU 型号、
+  batch size（训练用 A100，txt:353-354，但未在 Figure 3 处重述），“只给出定性结论”这一描述也偏重了。
 
 ## 6. 论文没写清楚的地方
 
@@ -158,22 +167,26 @@ LLM backbone 的一次标准前向计算 + 寄生其中的 TransMem"，没有像
   checkpoint trained with B = 4"并"retain B = 4 as the default"，`B=5` 这个被正文称为"optimal"的值
   从未出现在任何一张实验表格里、也没有被单独验证过。这是论文自身内部的表述矛盾，不是笔者理解偏差。
 - **`n = L/B` 里 `B` 的主结果取值，Method 正文全程只用符号，没有给出具体整数**：要到 *Appendix* 里
-  Table 6/13 等零散位置才第一次看到"B=4"字样，且是作为消融对象出现（"we vary only B at inference
+  才第一次看到"B=4"字样（实际仅出现在 *Sensitivity to the Number of Memory Segments*/Table 13
+  小节，Table 6 小节本身没有 B=4 字样），且是作为消融对象出现（"we vary only B at inference
   time"），并非在方法部分或实验设置部分被正式声明为"主结果使用的固定值"。
 - **门控温度 `τ`（Eq.6）从未给出具体数值**：正文和附录的公式里都只写符号 `τ`，*Appendix > Gate
   Parameterization* 段虽然比较了三种门控参数化方式（`g=1` 固定 / `g=2σ(z)` / `g=3σ(z)-1`），但同样
   没有报告 `τ` 本身的实际取值。
 - **消融变体"w/o Transformer Block"具体怎么运作没有描述**（Table 3）：去掉 Transformer block 之后，
   `H_M` 怎么变成 `Δh`？是直接线性投影、简单平均、还是别的什么替代结构？论文只报告了这一行的分数
-  （40.79，接近纯 backbone 基线），没有描述这个消融变体的具体实现方式。
-- **是否使用了某种初始化策略（如用 backbone 权重初始化 TransMem block）完全没有提及**：*Method* 部分
-  和 *Experimental Setup* 部分都没有讨论 TransMem 的参数初始化方式，无法从论文本身判断主结果是随机
-  初始化训练还是有某种热启动。
+  （40.79，与 Table 1 里 Qwen3-4B-Instruct 基线的 40.79 **完全相等**，不是"接近"——说明这个消融相当于直接
+  关掉整个模块），没有描述这个消融变体的具体实现方式。
+- **是否使用了某种初始化策略（如用 backbone 权重初始化 TransMem block）**：*Method* 部分
+  和 *Experimental Setup* 部分确实都没有讨论 TransMem 本体的参数初始化方式；但 Appendix Table 7 图注
+  明写"All dynamic gates are initialized at g = 1"（txt:1064-1065），所以门控网络自身的初始化其实有交代，
+  只是 block 本体（非门控部分）的初始化仍无从论文本身判断。
 - **实验方差/置信区间缺失**：论文提到"All experiments are conducted with a fixed random seed of 42"
-  （*Implementation Details* 段），但所有表格看起来都是单次运行的结果，没有报告多次重复实验的标准差或
+  （该句实际落在 *Baselines* 段末尾，txt:416-417，不在 *Implementation Details* 段），但所有表格看起来都是单次运行的结果，没有报告多次重复实验的标准差或
   置信区间，无法评估 Table 1-13 里那些两位小数差异（例如 Table 4 里 53.14 vs 54.11）的统计显著性。
 - **LoCoMo（约 16K token）/HotpotQA 实验是否真的触发了 chunk-wise 溢出策略没有交代**：*Method* 部分
   描述了"当 C 超过 backbone 最大上下文窗口时"的 chunk-wise 聚合策略，但 *Experiments* 部分没有说明
   三个主评测数据集（LoCoMo、HotpotQA、MemoryAgentBench）里，哪些具体样本的上下文长度真的超过了三个
   backbone（Qwen3-4B、Qwen2.5-14B、Llama3.1-8B）各自的上下文窗口、从而实际用到了这条策略——只有
-  MemoryAgentBench 一句"many examples exceeding 256K tokens"暗示大概率会触发，LoCoMo 是否触发未提。
+  MemoryAgentBench 一句"many examples exceeding 256K tokens"暗示大概率会触发，LoCoMo 是否触发未提。（以上仅基于论文文本；代码侧
+  证据表明 LoCoMo 从不触发此策略，见 `code-architecture.md` 第 2 节“超长上下文的例外”。）

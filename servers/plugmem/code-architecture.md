@@ -2,10 +2,12 @@
 
 > 调研范围：`/Users/guanhongli/Documents/repo/PlugMem`（官方 TIMAN-group/PlugMem，克隆时 HEAD=`3b2ce75`）。
 > 仓库里其实有**两套并行实现**，读之前先说清楚，后面所有结论都会标明是哪一套：
-> - `src/memory_retrieving/` + `src/memory_structuring/` + `src/memory_reasoning/` + `src/eval/*`：原始研究代码，**三个基准（LongMemEval / HotpotQA / WebArena）的官方复现脚本全部 import 这一套**，是论文数字的直接来源。存储是纯文件（JSON）。
-> - `plugmem/`：重构后的服务化包（ChromaDB 持久化 + FastAPI HTTP 服务），核心算法（节点类型、检索/插入逻辑、value function 设计）和 `src/` 高度一致，但新增了 `confidence`/`source` 元数据和一整套"编码助手记忆晋升"机制（`plugmem/inference/promotion.py`），是论文之外的东西（README 显示这部分 2026-05 才上，晚于 2026-04 ICML 接收）。
+> - `src/memory_retrieving/` + `src/memory_structuring/` + `src/memory_reasoning/` + `src/eval/*`：原始研究代码，存储是纯文件（JSON）。**但当前 HEAD 上，三个基准脚本已经不是全都 import 这一套了**——LongMemEval（`src/eval/longmemeval/eval_longmemeval_all.py:14`）和 WebArena（`src/eval/webarena/plugmem_agent.py:9`）都**无条件**写着 `from plugmem_client import PlugMemClient as MemoryGraph`，图操作全部走 HTTP 打给 `plugmem/` 那个 FastAPI 服务（切换发生在 `95c2a8c`，2026-05-26，提交标题就是 `feat(integration): switch WebArena and LongMemEval scripts to PlugMemClient`）；只有 HotpotQA（`src/eval/hotpotqa/eval_qa_all.py:25-28`）还留着回退分支，`PLUGMEM_API_URL` 没设时才 `from memory_retrieving.memory_graph import MemoryGraph`。这两个脚本里仍然直接来自 `src/` 的，只剩结构化（`memory_structuring.memory`，`:13`）和 value function（`memory_retrieving.value_longmemeval`，`:15`）。所以"`src/` 是论文数字的直接来源"这句话得限定着说：结构化和 value function 确实一路都出自 `src/`，但检索/插入侧当前的代码状态已经换成了服务客户端，**不指定 commit 就无法只从静态代码断定"现在读到的脚本 = 产出论文数字时的脚本"**。
+> - `plugmem/`：重构后的服务化包（ChromaDB 持久化 + FastAPI HTTP 服务），核心算法（节点类型、检索/插入逻辑、value function 设计）和 `src/` 高度一致，但新增了 `confidence`/`source` 元数据和一整套"编码助手记忆晋升"机制（`plugmem/inference/promotion.py`）。**注意它并不是"论文之后才有的东西"**：`git log --reverse -- plugmem/` 的首个提交是 `e064baf`（2026-03-19，`migrate to chromdb for save/load mem graphs`），REST API 层是 `c1c19e1`（2026-04-14），都**早于** 2026-04 的 ICML 接收；README 里那条 `[2026-05]`（`README.md:29-31`）说的是**插件发布**，不是整个包。真正属于论文接收之后新增的，只有编码助手那一块（`promotion.py` 首提交 `26bca52`，2026-05-03）。
 >
-> 本文档以 `plugmem/`（更新、更完整、命名和论文标题一致）为主线举证，遇到两套实现有分歧的地方会明确指出并分别给行号。
+> 本文档以 `plugmem/`（更新、更完整、命名和论文标题一致，也正是当前两个基准脚本实际打向的那一套）为主线举证，遇到两套实现有分歧的地方会明确指出并分别给行号。
+>
+> **2026-09-05 勘误**：本文已按同目录 `verification.md` 的逐条复核结论修正（共 20 处：3 处事实、3 处行号/锚点、14 处表述限定）。原始未修正版本见 git 历史。
 
 ## 1. 一句话机制
 
@@ -31,7 +33,7 @@ PlugMem 把 agent 一步步的原始交互（observation/action）先标准化�
 
 **`Memory.close()`**（`memory.py:104-134`）：对已收集的每一步跑 `get_semantic()` 抽取"命题+标签"列表（`memory.py:115`，对应 prompt 见 `plugmem/prompts/structuring.py` 的 `GetSemanticPrompt`——明确要求"消解代词/模糊指代成具体实体名""合并去重""单条最多 4 句话"，不是原文摘录）；对每一段轨迹跑一次 `get_procedural()`（`memory.py:123`）生成 `(procedural_memory, goal, _return)` 三元组。
 
-**⚠️ 一个直接影响"质量感知复用"的实现细节**：`get_procedural()`（`plugmem/inference/structuring.py:111-125`）把返回的 `_return` **硬编码成 `0.0`**（第 124 行），仓库里确实存在一个专门给 prescription 打 1-10 分的 `get_return()` 函数（`plugmem/inference/structuring.py:96-109`，对应 `GetReturnPrompt`），但 `Memory.close()` 全程**没有调用它**。也就是说程序记忆节点的"质量分"字段从生产出来那一刻起就恒为 0，从未被真正计算过。详见第 6 节。
+**⚠️ 一个直接影响"质量感知复用"的实现细节**：`get_procedural()`（`plugmem/inference/structuring.py:111-125`）把返回的 `_return` **硬编码成 `0.0`**（第 124 行），仓库里确实存在一个专门给 prescription 打 1-10 分的 `get_return()` 函数（`plugmem/inference/structuring.py:96-109`，对应 `GetReturnPrompt`），但 `Memory.close()` 全程**没有调用它**（`src/` 那套写得更直白：`src/memory_structuring/structuring_inference.py:138` 干脆把 `# _return = get_return(...)` 整行注释掉，紧接着第 139 行写死 `_return = 0.0`）。也就是说程序记忆节点的"质量分"字段从生产出来那一刻起就恒为 0，从未被真正计算过。详见第 6 节。
 
 ### 2.3 图里怎么连边（写入侧）
 
@@ -43,7 +45,7 @@ PlugMem 把 agent 一步步的原始交互（observation/action）先标准化�
 
 ### 2.4 落盘
 
-`plugmem/` 用 ChromaDB，每个 `graph_id` 开 5 个 collection（`plugmem/storage/chroma.py:19,73-83`）。但这只是"耐久存储"：实际检索时会把全部节点 `load()` 进 Python 内存列表，再暴力遍历算 cosine 相似度（见第 3 节），完全没用 Chroma 自带的 HNSW 近邻检索——`retrieve_semantic_nodes()` 里是手写的 `for node in self.semantic_nodes: get_similarity(...)` 循环（`plugmem/core/memory_graph.py:694-701`），不是 `collection.query()`。
+`plugmem/` 用 ChromaDB，每个 `graph_id` 开 5 个 collection（节点类型表 `NODE_TYPES` 在 `plugmem/storage/chroma.py:17`，建表在 `:72-81`）。但这只是"耐久存储"：实际检索时会把全部节点 `load()` 进 Python 内存列表，再暴力遍历算 cosine 相似度（见第 3 节），完全没用 Chroma 自带的 HNSW 近邻检索——`retrieve_semantic_nodes()` 里是手写的 `for node in self.semantic_nodes: get_similarity(...)` 循环（`plugmem/core/memory_graph.py:688-696`），不是 `collection.query()`。`chroma.py` 里确实写了 4 个走 Chroma 近邻查询的方法（`query_semantic`:411 / `query_tag`:521 / `query_subgoal`:623 / `query_procedural`:750），但全仓**零调用**，是死代码——这条本次已核实结案。
 
 `src/memory_retrieving/memory_graph.py` 那一套落盘方式是纯文件（每类节点一个目录、JSON 序列化，README 里 `mkdir -p episodic_memory semantic_memory procedural_memory tag subgoal` 就是给它用的），核心算法和 `plugmem/` 一致。
 
@@ -74,19 +76,21 @@ PlugMem 把 agent 一步步的原始交互（observation/action）先标准化�
 
 **Procedural 模式**（`retrieve_procedural_nodes()`，`plugmem/core/memory_graph.py:916-987`）：
 1. 先且只找**一个**最相似的 `SubgoalNode`（`retrieve_subgoal_nodes()`，`plugmem/core/memory_graph.py:892-915`，返回类型是 `Optional[SubgoalNode]`，不是列表），相似度不够阈值（`SubgoalRelevant.value_threshold=0.1`）直接返回空列表。
-2. 只在**这一个** `SubgoalNode` 挂的 `ProceduralNode` 列表里再按 cosine 排序取 top-K。
+2. 只在**这一个** `SubgoalNode` 挂的 `ProceduralNode` 列表里再按 cosine 排序取 top-K——而这个 K 默认就是 **1**（`ProceduralRelevant(k=1)`，`plugmem/core/value_functions.py:176`，由 `plugmem/core/memory_graph.py:139` 注入），也就是说程序检索默认**最多只返回一条 prescription**，不是通常意义上的"top-K"。
 
 这一路是真正意义上"图路由"——先定位 1 个意图节点，再在它的子树里找——比 semantic 模式的"扩大候选池但不改排序"更贴近论文说的"高层节点路由、只保留低层节点"，但同样是**一轮**、不迭代。
 
 **Episodic 模式**（`retrieve_episodic_nodes()`，`plugmem/core/memory_graph.py:847-880`）：
-1. 调用的是 `retrieve_semantic_nodes_wo_tag()`——顾名思义**跳过标签路由**，纯全局 cosine，取前 30（`semantic_nodes[:30]`，`plugmem/core/memory_graph.py:855`）。
+1. 调用的是 `retrieve_semantic_nodes_wo_tag()`——顾名思义**跳过标签路由**，纯全局 cosine，取前 30（`semantic_nodes = semantic_nodes[:30]`，`plugmem/core/memory_graph.py:860`；这一刀其实是冗余的，`SemanticRelevant4Episodic(k=30)` 已经先截过一次）。
 2. 按命中语义节点的 `session_id` 分组投票，一个 session 命中 **≥3** 条才把该 session **整段原始情景记忆**（`get_session_memory()`）搬出来；没到 3 条阈值的，直接返回**那条语义节点自己的命题文本**（不是它的溯源情景原文）。
+
+**这一路的开销别漏算**：episodic 模式并不是只走 `retrieve_semantic_nodes_wo_tag()` 一条路。`retrieve_memory()` 里 `mode in ["semantic_memory", "episodic_memory"]` 会先完整跑一趟 `retrieve_semantic_nodes()`（`plugmem/core/memory_graph.py:1037-1044`），`mode in ["procedural_memory", "episodic_memory"]` 又跑一趟 `retrieve_procedural_nodes()`（`:1045-1052`）——这两趟的结果在 episodic 分支里只被写进 `_audit`（`:1097-1098`）就丢掉了，然后才第三次去调 `retrieve_episodic_nodes()`（`:1058-1063`）。也就是**一次 episodic 检索要跑三趟检索、其中两趟纯属白跑**；`retrieve_with_trace()` 同样如此（`:1186-1215`）。
 
 ### 3.4 一步到位还是多步迭代？——`MemoryGraph` 本身永远是一轮，没有通用"多跳"
 
-以上三种模式，`retrieve_memory()`/`retrieve_with_trace()`（`plugmem/core/memory_graph.py:1110-1273`）全程只跑**一轮**：没有循环、没有"再查一次"的判断、没有跳数上限参数。
+以上三种模式，`retrieve_memory()`/`retrieve_with_trace()`（`plugmem/core/memory_graph.py:1110-1273`）全程只跑**一轮**：没有循环、没有"再查一次"的判断、没有跳数上限参数（整个 `plugmem/` 包里 grep `multi_hop`/`max_hop`/`Tmax`/`t_max`/`max_rounds`/`enough` 全部**零命中**）。
 
-仓库里唯一真正实现"多跳循环 + LLM 判断够不够"的代码是 `src/eval/hotpotqa/eval_qa_all.py:122-219`（`multi_hop_retrieval_sem()` + `_llm_select_topn()`），但这是 **HotpotQA 这一个基准脚本自己在外面套的循环**：重复调用 `memgraph.retrieve_memory()`（最多 `max_rounds=3` 轮，`eval_qa_all.py:128`），每轮把上一轮 LLM 判定器（`enough`/`top_node_ids` 的 JSON 格式和论文 Listing 10 一致）选中的候选文本拼接进新 query 字符串（不是 embedding 层面的融合，是纯字符串拼接），并且**明确只对 `semantic_memory` 模式生效**——如果 `get_mode()` 判成 `procedural_memory` 或 `episodic_memory`，函数直接打日志"⚠️ memory type is NOT supported for multi-hop"并原样返回单轮结果（`eval_qa_all.py:155`）。
+仓库里唯一真正实现"多跳循环 + LLM 判断够不够"的代码是 `src/eval/hotpotqa/eval_qa_all.py:122-219`（`multi_hop_retrieval_sem()` + `_llm_select_topn()`），但这是 **HotpotQA 这一个基准脚本自己在外面套的循环**：重复调用 `memgraph.retrieve_memory()`（最多 `max_rounds=3` 轮，`eval_qa_all.py:128`），每轮把上一轮 LLM 判定器（`enough`/`top_node_ids` 的 JSON 格式和论文 Listing 10 一致）选中的候选文本拼接进新 query 字符串（不是 embedding 层面的融合，是纯字符串拼接），并且**明确只对 `semantic_memory` 模式生效**——如果 `get_mode()` 判成 `procedural_memory` 或 `episodic_memory`，函数直接打日志"⚠️ memory type is NOT supported for multi-hop"并原样返回单轮结果（`eval_qa_all.py:155`）。而且这个多跳**默认还是关着的**：`--n_round_retrieval` 的默认值就是 **1**（`eval_qa_all.py:242`），主流程里 `if n_round_retrieval <= 1:` 直接走单轮分支（`:480`），要显式传 `--n_round_retrieval 2` 或更大才会进多跳。
 
 LongMemEval（`src/eval/longmemeval/eval_longmemeval_all.py:100`）、WebArena（`src/eval/webarena/plugmem_agent.py:225`）的官方复现脚本都只调**一次** `retrieve_memory()`，从未触发多跳。详见第 6 节。
 
@@ -98,11 +102,11 @@ LongMemEval（`src/eval/longmemeval/eval_longmemeval_all.py:100`）、WebArena�
 
 ### 3.6 更新/删除（这条不是每次检索都会跑，是单独的维护操作）
 
-`update_semantic_subgraph()`（`plugmem/core/memory_graph.py:1348-`）：按标签找候选、算相似度、超过阈值（默认 `merge_threshold=0.5`）就调 `merge_semantic()`（`plugmem/core/memory_graph.py:1298`）用 LLM 合并两条语义记忆并决定软删除哪一条（`is_active=False`，物理数据不删）。这个方法**不在 `insert()` 里自动触发**，需要调用方显式调用；`eval_longmemeval_all.py:91` 里由 `--update_merge_first` 命令行开关控制，默认不开。
+`update_semantic_subgraph()`（`plugmem/core/memory_graph.py:1348-`）：按标签找候选、算相似度、超过阈值（默认 `merge_threshold=0.5`）就调 `merge_semantic()`（`plugmem/core/memory_graph.py:1298`）用 LLM 合并两条语义记忆并决定软删除哪一条（`is_active=False`，物理数据不删）。这个方法**不在 `insert()` 里自动触发**，需要调用方显式调用；`eval_longmemeval_all.py:91` 里由 `--update_merge_first` 命令行开关控制，默认不开；HotpotQA 侧也有一处同样受开关控制的调用（`eval_qa_all.py:381`，包在 `if update_merge_first_gate:` 分支里，`:380`）。
 
 ## 4. 架构图
 
-记忆系统（`plugmem/core` + `inference` + `storage`）和调用方（eval 脚本 / OpenClaw 插件 / Claude Code 插件）之间的边界非常干净：调用方喂"结构化前的原始步骤"进来，拿到"结构化好的 prompt"出去，**中间所有 LLM 调用（结构化 5 类、检索 2 类）都在记忆系统这一侧**，只有"把 prompt 变成最终答案/动作"这最后一次 LLM 调用留在调用方那一侧（官方复现脚本的默认走法；`retrieve_and_reason()` 提供了把这最后一次也收进记忆系统的选项，但没被论文复现脚本使用）。
+记忆系统（`plugmem/core` + `inference` + `storage`）和调用方（eval 脚本 / OpenClaw 插件 / Claude Code 插件）之间的边界非常干净：调用方喂"结构化前的原始步骤"进来，拿到"结构化好的 prompt"出去，**中间所有 LLM 调用都在记忆系统这一侧**（写入侧结构化 5 类，加上插入去重时的第 6 类 `get_new_subgoal()`（`plugmem/core/memory_graph.py:519`）；检索侧 2 类；再加维护操作里的 `get_new_semantic()`（`:1301`）），只有"把 prompt 变成最终答案/动作"这最后一次 LLM 调用留在调用方那一侧（官方复现脚本的默认走法；`retrieve_and_reason()` 提供了把这最后一次也收进记忆系统的选项，但没被论文复现脚本使用）。
 
 ```mermaid
 flowchart TB
@@ -139,10 +143,8 @@ HotpotQA 的多跳循环（`multi_hop_retrieval_sem`）严格来说**不属于�
 
 - `src/memory_retrieving/memory_graph.py:1444` 定义的局部变量 `max_w`，只在 `elif mode == "semantic_memory":` 分支里赋值，却在紧接着的 `elif mode == "procedural_memory":` 分支（第 1457 行）里被引用——如果一次检索直接判成纯 `procedural_memory` 模式，这行按 Python 作用域规则应该抛 `NameError`。这个路径在实际产出论文数字的跑分过程中是否真的被触发过（也许 `get_mode()` 在 HotpotQA/LongMemEval 场景下从不判成纯 procedural、或者上游有 try/except 吞掉了），**未验证**——需要真的跑一遍代码或翻当时的运行日志才知道。
 - `subgoal2node.get(subgoal_str)` 精确字符串匹配的实际去重命中率有多低，**未做统计**，只能从"LLM 自由生成的自然语言文本很难逐字重复"推断命中率接近零，不是实测数字。
-- `src/eval/longmemeval/eval_longmemeval_all.py:102,116` 把 reasoning/最终答题的模型硬编码成 `"gpt-4o"`，但论文 Table 3 + Appendix E.1 说 PlugMem 那一行用 Qwen2.5-32B（结构化/检索）+ Qwen2.5-72B（推理），且"Qwen2.5-72B-Instruct 作为所有方法的 base agent"。这处矛盾**未完全验证**——我只读了 `eval_longmemeval_all.py` 这一个变体（README Quick Start 唯一指向的入口），不确定是否存在别的命令行参数、环境变量或脚本版本（比如 `eval_longmemeval_sota.py`）覆盖了这个硬编码，也不确定这个脚本是否就是产出 Table 3 数字的确切版本。
-- `plugmem/`（重构包）本身是否被用来跑过任何论文数字，还是完全是论文接收后（README 时间线：2026-05 更新晚于 2026-04 ICML 接收）新增的产品化代码——README 的时间线支持"后加"的判断，但没有直接证据（比如 commit 历史）核实到这一点；本次调研没有跑 `git log`。
-- `openclaw-plugmem-plugin/`、`plugmem-coding-claude-code/`、`plugmem-coding-core/` 这几个编码助手集成目录只看了目录结构和 `inference/promotion.py`，具体怎么触发"记忆晋升"（什么时候判定为 `failure_delta`/`correction`）、和论文方法的关系，**未深入验证**。
-- ChromaDB 的 5 个 collection 是否在除 `retrieve_*_nodes` 之外的某些代码路径（比如 `api/routes/`）下真被用来做向量近邻检索，而不是我看到的暴力 Python 循环——只排查了核心检索路径，没有排查全部 API 路由。
+
+（原先列在本节的另外四条，2026-09-05 复核时已经结案，结论分别搬到了正文里：LongMemEval 的 `"gpt-4o"` 硬编码能不能被环境变量或别的脚本覆盖 → 见 6.7；`plugmem/` 是不是论文接收之后才新增的 → 见文首前言；编码助手"记忆晋升"的触发条件 → 见 6.5；ChromaDB 是否在别的代码路径下真做了 ANN 检索 → 见 2.4。）
 
 ## 6. 与论文的冲突点
 
@@ -154,7 +156,7 @@ HotpotQA 的多跳循环（`multi_hop_retrieval_sem`）严格来说**不属于�
 
 代码里这套循环**根本不存在于 `MemoryGraph` 类本身**——`retrieve_memory()`/`retrieve_with_trace()` 永远只跑一轮，没有 `Tmax`、没有停止判据参数。真正的多跳循环只在 `src/eval/hotpotqa/eval_qa_all.py:122-219` 这一个基准脚本里作为外部胶水代码存在，而且硬编码只处理 `semantic_memory` 模式（procedural/episodic 直接跳过多跳，见 `eval_qa_all.py:150-161` 的显式日志）。LongMemEval、WebArena 的官方复现脚本从未调用这个多跳函数。
 
-也就是说，论文三个旗舰基准里，有两个（LongMemEval、WebArena）从未实际跑过 Appendix C.3 描述的迭代多跳算法；唯一真正实现它的 HotpotQA，实现范围也比论文正文暗示的"$G_S$ 和 $G_P$ 都能多跳"要窄（只支持语义）。以代码为准：**"abstraction-specificity 交替多跳"是 HotpotQA 一个基准的评测脚本级功能，不是 PlugMem 记忆系统本身的通用能力。**
+也就是说，论文三个旗舰基准里，有两个（LongMemEval、WebArena）从未实际跑过 Appendix C.3 描述的迭代多跳算法；唯一实现了它的 HotpotQA，实现范围既比论文正文暗示的"$G_S$ 和 $G_P$ 都能多跳"要窄（只支持语义），**默认还是关着的**——`--n_round_retrieval` 默认 1（`eval_qa_all.py:242`），主流程 `if n_round_retrieval <= 1:` 走单轮分支（`:480`）。也就是说按默认参数跑，**三个基准没有任何一个会走多跳**。以代码为准：**"abstraction-specificity 交替多跳"是 HotpotQA 一个基准的评测脚本级功能，不是 PlugMem 记忆系统本身的通用能力。**
 
 ### 6.2 程序记忆的质量分（return score）从未被真正计算
 
@@ -176,12 +178,14 @@ HotpotQA 的多跳循环（`multi_hop_retrieval_sem`）严格来说**不属于�
 
 ### 6.5 附带发现：credibility 是纯代码概念，论文完全没提
 
-`SemanticNode.Credibility`（默认值 10，`graph_node.py`）和它的衰减机制（`update_semantic_subgraph()` 的 `min_credibility_to_keep_active`/`credibility_decay` 参数）在论文正文和全部附录里**一次都没出现**（已用检索工具确认 "credibility" 零命中）。同样，`confidence`/`source` 字段和整个 `inference/promotion.py` 编码助手记忆晋升机制也是论文之外、专为 Claude Code 插件加的东西（`confidence` 在论文里只出现在决策置信度/信息论分析的语境，不是记忆节点的元数据）。
+`SemanticNode.Credibility`（默认值 10，`graph_node.py`）和它的衰减机制（`update_semantic_subgraph()` 的 `min_credibility_to_keep_active`/`credibility_decay` 参数）在论文正文和全部附录里**一次都没出现**（已用检索工具确认 "credibility" 零命中）。同样，`confidence`/`source` 字段和整个 `inference/promotion.py` 编码助手记忆晋升机制也是论文之外、专为 Claude Code 插件加的东西（`confidence` 在论文里只出现在决策置信度/信息论分析的语境，不是记忆节点的元数据）。顺带两条限定：其一，这个"衰减机制"默认是空转的——`credibility_decay` 的默认值就是 **0**（`plugmem/core/memory_graph.py:1356`），而衰减循环外面套着 `if credibility_decay != 0:`（`:1374`），默认走法下它是 no-op。其二，记忆晋升的触发条件本次已查清（原列在第 5 节）：`promotion.py:24` 把候选限定成 `CandidateKind = Literal["failure_delta", "correction"]` 两种——工具调用失败后跟进成功（`:31`）、用户显式纠正（"don't/stop/actually"，`:32`）；入口是 REST API `/extract`（`plugmem/api/routes/extract.py:26-32`），产物经 `_insert_structured`（`plugmem/api/routes/memories.py:63-145`）直接入图，**完全绕开 `Memory` 那条 5 次 LLM 的结构化链路**。
 
 ### 6.6 附带发现：`plugmem/` 相比 `src/` 修掉了一个真实的 NameError 风险
 
 见第 5 节提到的 `max_w` 问题：`src/memory_retrieving/memory_graph.py:1444` 定义的 `max_w` 只在 `semantic_memory` 分支赋值却在 `procedural_memory` 分支（第 1457 行）被引用；`plugmem/core/memory_graph.py` 对应位置（约 1080 行附近）的 `procedural_memory_str` 拼接不再依赖任何跨分支变量，规避了这个问题。这不是论文-代码冲突，是仓库内部两套实现的差异，放在这里是为了提醒：**引用本仓库时要说清楚引用的是哪一套实现**，两套的行为不完全等价。
 
-### 6.7 附带发现：产出主结果的脚本，模型配置疑似和论文表头不一致
+### 6.7 附带发现：LongMemEval 复现脚本的模型配置和论文表头对不上（已确认）
 
-`eval_longmemeval_all.py:102,116` 把 reasoning/最终答题模型硬编码成 `"gpt-4o"`，论文 Table 3 + Appendix E.1 写的是 Qwen2.5-32B/72B。已在第 5 节标注为"未验证"，不作为确定结论，但从静态代码读，这处确实和论文表头对不上。
+`eval_longmemeval_all.py:102,116` 把 reasoning/最终答题模型硬编码成 `"gpt-4o"`，论文 Table 3 + Appendix E.1（行 3310-3313）写的是 Qwen2.5-32B（结构化/检索）+ Qwen2.5-72B（推理，且 base agent 也是 72B）。这条本次已经从"疑似"升为**确定**：`wrapper_call_model()` 的取值顺序是 `model_name or os.environ.get("LLM_NAME") or DEFAULT_LLM_NAME`（`src/utils.py:142`）——**显式实参优先，环境变量覆盖不掉**这个硬编码；仓库里另一个变体 `eval_longmemeval_sota.py` 也不是出路，它硬编码的是 `"gpt-5.4"`（`:92,:106`），对应 README `[2026-05]` 那条 SOTA 更新，不可能是产出 Table 3 的脚本。
+
+不过要给这条**加一个限定**：论文 §4.2（行 823-824）本身就写了实验用 `Qwen2.5-32B/72B-Instruct ... and GPT-4o`，所以冲突只落在 **LongMemEval 这一行**；WebArena 那一行（Table 5 表头 = `Q32+4o`，行 1107-1109）和代码里的 gpt-4o 是**一致的，没有冲突**。

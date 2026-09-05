@@ -6,10 +6,13 @@
 > 只留 README/AGENTS.md 等文档，指向新的闭源前端仓库 `letta-ai/letta-code`（当前会话未克隆，
 > 无法核查）。**本文档分析的是 `origin/archive` 分支**（README 原文："The retired Letta V1 server
 > source is preserved on the `archive` branch for historical reference"）——即被官方明确标注为
-> "retired / deprecated / in maintenance mode"的旧服务端（`letta/AGENTS.md`@archive 分支原文：
+> "retired / deprecated / in maintenance mode"的旧服务端（仓库根目录 `AGENTS.md`@archive 分支原文，注意路径在仓库根而非 `letta/` 子目录（`git ls-tree -r origin/archive` 仅根目录下有一个 `AGENTS.md`）：
 > "This repository is deprecated...It is in maintenance mode and is no longer where active
 > development happens"）。这仍然是本仓库里能拿到的、最接近论文原型的完整实现，但请注意：
 > **它本身已经是"退役"状态，而不是当前 Letta 产品的运行代码**。这件事本身就是本次调研第一个重要发现。
+>
+> **2026-09-05 勘误**：本文已按同目录 `verification.md` 的逐条复核结论修正（共 24 处：8 处事实、8 处行号/锚点、
+> 8 处表述限定）。原始未修正版本见 git 历史。
 
 ## 1. 一句话机制
 
@@ -31,8 +34,11 @@ Letta 没有单一的"写入"路径，三层记忆各自有不同的触发方式
   （`letta/schemas/block.py:20`）。
 - **工具演化了三代，同时并存在代码里**：
   - 旧式整段替换：`core_memory_append`（原值后拼接换行+新内容）、`core_memory_replace`
-    （要求 `old_content` 在原文里精确出现一次再整体 `str.replace`）——
-    `letta/services/tool_executor/core_tool_executor.py`（`core_memory_append`/`core_memory_replace` 方法）。
+    （**不要求唯一匹配**——只检查 `old_content` 是否在原文里出现过（`core_tool_executor.py:339-340`
+    `if old_content not in current_value`），确认存在后用 `current_value.replace(old_content, new_content)`
+    一次性替换**所有**出现（`:341`）——`old_content` 在原文里出现两次就会同时改掉两处，唯一性校验
+    是下面新式 `memory_replace` 才有的能力）——
+    `letta/services/tool_executor/core_tool_executor.py:319-345`（`core_memory_append`/`core_memory_replace` 方法）。
   - 新式 str_replace-editor 风格：`memory_replace`/`memory_insert`，仿 Anthropic
     computer-use 的编辑工具（代码注释直接引用了 anthropic-quickstarts 的 edit.py），要求
     `old_string` 在块内唯一匹配，附带行号提示防止 LLM 把展示用的行号当正文写回
@@ -51,23 +57,31 @@ Letta 没有单一的"写入"路径，三层记忆各自有不同的触发方式
   （`core_tool_executor.py`）。
 - **新增机制（论文完全没有）：memory_repo 把 Block 镜像成 git 仓库**。
   `Memory` 有 `git_enabled` 字段（`letta/schemas/memory.py`），开启后每个 Block 会被序列化成
-  `{label}.md`（YAML frontmatter 存 description/limit/read_only 等元数据），提交进一个 per-agent
-  的 git 仓库——本地默认 `~/.letta/memfs/`，云端版本连一个 memfs HTTP 服务
+  `{label}.md`（YAML frontmatter 存 description/read_only 等元数据：`limit` 字段特意被排除在
+  frontmatter 之外，`block_markdown.py` 注释明写 "deprecated for git-base memory"），提交进一个
+  per-agent 的 git 仓库——本地默认 `~/.letta/memfs/`，云端版本连一个 memfs HTTP 服务
   （`letta/services/memory_repo/memfs_client_base.py:1-60`，`letta/services/memory_repo/__init__.py`）。
-  这给核心记忆加上了版本历史/可回滚能力，但**这条路径怎么与上面的工具调用同步触发、是否每次编辑都
-  提交一次 commit，代码里没有跟到底（见第5节）**。
+  这给核心记忆加上了版本历史/可回滚能力——**这条路径已经接进了主编辑流程**：`server.py:155-161`
+  只要检测到 memfs 配置，就会把 `block_manager` 换成 `GitEnabledBlockManager` 并注入 `AgentManager`；
+  主编辑路径（`agent_manager.py:1777` 内调 `block_manager.update_block_async`）会走到
+  `block_manager_git.py:188-238`，先 commit git“commits to git first”再同步回 Postgres，逐次编辑
+  逐次 commit，门槛是该 agent 带 `git-memory-enabled` tag（`_is_git_enabled_for_agent`）。
 
 ### 2.2 归档记忆（Archival Memory / Passage）——向量库，语义检索用
 
 - **触发**：agent 主动调用 `archival_memory_insert(content, tags)`。
 - **存的是什么**：原文文本（"self-contained facts or summaries"，工具描述建议存"会议纪要/项目更新/
   对话摘要"而非碎片对话），是否精炼完全取决于 LLM 自觉，代码不做任何摘要处理。
-- **过程**：`PassageManager.insert_passage` 先调 embedding 模型把文本转成向量、pad 到
-  `MAX_EMBEDDING_DIM=4096`（Postgres pgvector 场景），写一行 `ArchivalPassage`，tags 同时写入
-  JSON 列和 `PassageTag` 关联表两份存储；写完后**强制**重建一次系统提示词
+- **过程**：`PassageManager.insert_passage` 先调 embedding 模型把文本转成向量，写一行 `ArchivalPassage`；
+  pad 到 `MAX_EMBEDDING_DIM=4096` 这一步**不在 `insert_passage` 本身里**，而是在下游的
+  `create_agent_passage_async`/`create_agent_passages_async` 里才做，且只在写入 PostgreSQL/pgvector
+  时才 pad（Turbopuffer/Pinecone 不 pad）；tags 同时写入 JSON 列和 `PassageTag` 关联表两份存储；
+  写完后**强制**重建一次系统提示词
   （`core_tool_executor.py` 的 `archival_memory_insert` 方法：
   `passage_manager.insert_passage(...)` → `agent_manager.rebuild_system_prompt_async(force=True)`）——
-  猜测是因为系统提示词里的 `external_memory_summary` 要显示归档条目计数，**未在代码里逐行确认，标未验证**。
+  原因可以坐实：`prompts/prompt_generator.py:26-58 compile_memory_metadata_block` 的入参包含
+  `archival_memory_size`（docstring："Number of items in archival memory (long-term storage)"）与
+  `archive_tags`，渲染进 `<memory_metadata>` 块——rebuild 就是为了让这两项跟着最新一次归档写入更新。
   这一步会调用 embedding 模型（不是对话用的主 LLM），除此之外没有额外 LLM 调用。
 - **可跨 agent 共享**：`ArchivalPassage` 按 `archive_id` 归属一个 `Archive` 对象，`Archive` 通过
   `ArchivesAgents` 关联表可以挂在多个 agent 下——ORM 注释原文："An archive represents a collection
@@ -79,34 +93,45 @@ Letta 没有单一的"写入"路径，三层记忆各自有不同的触发方式
 
 - **触发**：不需要 agent 决定，每条进出的消息都由系统自动写入 `messages` 表
   （`letta/services/message_manager.py`），无论它是否还留在当前 context 窗口里。
-- **存的是什么**：原文，逐条 Message 对象（role/content/tool_calls 等），**从不物理删除**——
-  上下文溢出被驱逐（evict）只是把消息从"当前送进 LLM 的窗口"里踢出去，DB 行照样在，可以被
-  `conversation_search` 查到。
+- **存的是什么**：原文，逐条 Message 对象（role/content/tool_calls 等）。**需要分清"上下文驱逐"和
+  "物理删除"是两回事**——上下文溢出被驱逐（evict）确实只是把消息从"当前送进 LLM 的窗口"里踢出去，
+  DB 行不动，可以被 `conversation_search` 查到；但 Message 表并非"从不物理删除"——
+  `message_manager.py` 另外提供三个硬删除入口：单条删除（`:822 delete_message_by_id_async`）、
+  按 agent 整体删除（`:1045-1067 delete_all_messages_for_agent_async`，`DELETE` 语句在 `:1060`）、
+  按 id 批量删除（`:1094-1121 delete_messages_by_ids_async`，`DELETE` 语句在 `:1119`）——
+  这几个是显式调用的管理 API，不会被自动驱逐流程触发。
 - **不调 LLM**。纯 DB 写入。
 
 ### 2.4 后台"睡眠"整理（论文没有的角色）
 
-`enable_sleeptime=True` 时，每隔 `sleeptime_agent_frequency` 轮（server 端默认建组时设为 5，
-`letta/server/server.py:784`）主循环结束后会**另起一个独立的 LettaAgent 实例**（"参与者" agent），
-把刚才几条消息喂给它，让它用 `memory_replace`/`memory_insert`/`memory_rethink`/`memory_finish_edits`
-工具去整理 Block（`letta/groups/sleeptime_multi_agent.py:192-238`：`bump_turns_counter` 计数，
-达到频率就 `_issue_background_task` 异步起一个新 run）。这是一次**独立的、用户不可见的 LLM 调用**，
-和主对话的写入路径完全分开——论文里只有单一 agent loop，没有这种后台协整理角色。
+`enable_sleeptime=True` 且 agent 已挂 `multi_agent_group` 时，每隔 `sleeptime_agent_frequency` 轮
+（server 端默认建组时设为 5，`letta/server/server.py:784`）主循环结束后会**另起一个独立的
+`LettaAgentV3` 实例**（"参与者" agent，构造处在 `sleeptime_multi_agent_v4.py:257`），把刚才几条
+消息喂给它，让它用 `memory_replace`/`memory_insert`/`memory_rethink`/`memory_finish_edits`
+工具去整理 Block（`letta/groups/sleeptime_multi_agent_v4.py:141 bump_turns_counter` 计数，达到频率
+就在 `:157` 调 `_issue_background_task`（定义在 `:171`）异步起一个新 run）。**这才是默认路由实际
+会走到的文件**——旧版 `letta/groups/sleeptime_multi_agent.py`（v1）同名机制仍在，但它唯一的构造
+入口 `groups/helpers.py:15 load_multi_agent` 全仓零调用者，不可达（见第5节）。这是一次**独立的、
+用户不可见的 LLM 调用**，和主对话的写入路径完全分开——论文里只有单一 agent loop，没有这种后台
+协整理角色。
 
 ## 3. 记忆是怎么被用起来的
 
 ### 3.1 核心记忆：不用"检索"，直接常驻
 
-每次组织 prompt，`Memory.compile()`（`letta/schemas/memory.py`）把所有 Block 渲染成
-`<memory_blocks>` XML 直接塞进 system prompt——没有"要不要用/搜不搜得到"的问题，只要没超字符上限就
-100% 在场。渲染有三种模式：标准 XML、行号版（仅 Anthropic 模型 + 特定 agent 类型，方便 str_replace
+每次组织 prompt，`Memory.compile()`（`letta/schemas/memory.py:688`，不是这里曾引用的 `:143`——那行是
+`_render_memory_blocks_standard`）把 Block 渲染进 system prompt——**标准/行号模式下**没有"要不要
+用/搜不搜得到"的问题，只要没超字符上限就 100% 在场；**但 git-enabled 模式下不是这样**：
+`_get_renderable_blocks`（`memory.py:122-130`）明写 "For git-memory-enabled agents, only system/
+blocks are rendered"，其余 Block 只会以 `<external>` 文件树形式出现（`_render_memory_blocks_git`，
+`memory.py:205-236`），正文不进 context。渲染有三种模式：标准 XML、行号版（仅 Anthropic 模型 + 特定 agent 类型，方便 str_replace
 工具精确定位行号）、git-enabled 版（渲染成 `<self>`+`<memory>` 嵌套文件树，路径来自 Block 的
 `label`）（`memory.py` 内 `_render_memory_blocks_standard`/`_render_memory_blocks_line_numbered`/
 `_render_memory_blocks_git`）。
 
 ### 3.2 归档记忆：一次性向量检索，两条后端路径不一样
 
-`archival_memory_search(query, tags, top_k, start_datetime, end_datetime)` →
+`archival_memory_search(query, tags, tag_match_mode, top_k, start_datetime, end_datetime)` →
 `agent_manager.search_agent_archival_memory_async` → `query_agent_passages_async`
 （`letta/services/agent_manager.py:2416-2480`）：
 
@@ -140,21 +165,36 @@ dispatch 到的是 `core_tool_executor.py` 的同名方法 → `message_manager.
 
 ### 3.4 上下文超限时的"换页"（对应论文的 queue eviction）
 
-默认模式 `SummarizationMode.PARTIAL_EVICT_MESSAGE_BUFFER`（`letta/settings.py:78`，代码注释自称
-"as implemented in the original MemGPT loop, but using message count instead of token count"——
-**这是少数明确向论文致敬且保持一致的机制**）：驱逐 `partial_evict_summarizer_percentage`
-比例的消息，**同步**调用一次独立的 LLM 请求生成 recursive summary（`simple_summary()`，
-`letta/services/summarizer/summarizer.py`），插到 system message 之后、剩余消息之前。
+**先要分清"全局默认设置"和"默认建号实际走的路径"不是一回事**——这是这份文档最容易读错的一处。
+
+`SummarizationMode.PARTIAL_EVICT_MESSAGE_BUFFER`（`letta/settings.py:78`，`partial_evict_summarizer_percentage`
+默认 0.30）确实是全局默认值，驱逐时**同步**调用一次独立的 LLM 请求生成 recursive summary
+（`simple_summary()`，`letta/services/summarizer/summarizer.py:136-203`，"as implemented in the original
+MemGPT loop, but using message count instead of token count" 这句注释在 `:145`的 docstring 里，
+不在 `settings.py`），插到 system message 之后、剩余消息之前。**但这套 `Summarizer` 类只被
+`LettaAgentV2`（`letta_agent_v2.py:124`）和 legacy `letta_agent.py:141` 构造，默认建号真正跑的
+`letta_v1_agent` 走的是 `LettaAgentV3`，全文没有一处 `Summarizer(` 调用**——它走的是完全不同的
+`compact_messages`（`letta_agent_v3.py:72` 导入 → `:2109` 调用），触发阈值来自
+`get_compaction_trigger_threshold`（`:75` 导入 → `:938` 调用，`thresholds.py:27-41`：GPT-5 系列 90%、
+其余模型 100% 上下文窗口），摘要模型还可以被 `compact.py:42-131 build_summarizer_llm_config` 换成
+比对话模型更便宜的模型。也就是说，本文原来当成"向论文致敬且保持一致"的那条路径，在默认
+新建的 agent 上根本走不到。
 另一种模式 `STATIC_MESSAGE_BUFFER`（当前非默认）只做固定条数窗口裁剪，摘要交给一个后台
-`EphemeralSummaryAgent` 异步生成，不阻塞主循环。触发点有两处：
-1. 旧版 `letta/agent.py`（同步 Agent 类）在 token 数超过 `memory_warning_threshold * context_window`
-   时先给 LLM 发一条文字警告，让它自己决定要不要主动搬东西到 Block/Archival（对应论文的
-   memory pressure warning），真正硬触发是捕获到 provider 抛出的 `ContextWindowExceededError`
-   后调用 `summarize_messages_inplace()`，最多重试 `max_summarizer_retries` 次
-   （`letta/agent.py:948-1055`）。
-2. 新版 `letta_agent.py`/v2/v3 用 `_rebuild_context_window`：token 超限就 `force=True` 硬清空，
-   否则走非强制的 summarizer 判断（各版本行号见第5节的未验证项）。
-被驱逐的消息**只是离开 in-context 窗口，DB 里的 Message 行不删**，之后仍可被 `conversation_search`
+`EphemeralSummaryAgent` 异步生成，不阻塞主循环。
+
+旧循环的触发方式仍保留在代码里：
+`letta/agent.py`（同步 Agent 类）在 token 数超过 `memory_warning_threshold * context_window` 时先给
+LLM 发一条文字警告（对应论文的 memory pressure warning），真正硬触发是捕获到 provider 抛出的
+`ContextWindowExceededError` 后调用 `summarize_messages_inplace()`，最多重试 `max_summarizer_retries`
+次（`letta/agent.py:948-1055`）——但这个 `letta/agent.py:Agent` 类本身在当前路由下**无法被实例化**
+（见第5节），只是"曾经的设计"。`_rebuild_context_window` 这个方法也不是"新版
+letta_agent.py/v2/v3 通用"——它只存在于 `agents/letta_agent.py:1576`（一个既非 legacy 也非默认的
+中间版本）与 `voice_agent.py:293`；v2 用的是 `summarize_conversation_history()`
+（`letta_agent_v2.py:277/412/1352`），v3（默认路径）用的就是上面提到的 `compact_messages()`，两者都没有
+`_rebuild_context_window` 方法。
+
+被驱逐的消息**只是离开 in-context 窗口，DB 里的 Message 行不删**（上下文驱逐本身不做 DB 删除，
+Message 表另有独立的硬删除 API，见 2.3 节），之后仍可被 `conversation_search`
 捞回——这点和论文的 recall storage 设计一致。
 
 ### 3.5 "继续执行"的判据：从心跳变成了"有没有调工具"
@@ -187,13 +227,13 @@ flowchart TB
         direction TB
         Compile["Memory.compile()<br/>渲染 memory_blocks XML<br/>letta/schemas/memory.py"]
         Loop["LettaAgentV3 主循环<br/>_decide_continuation：<br/>调了工具就继续，没调就停<br/>letta_agent_v3.py:1967"]
-        Exec["LettaCoreToolExecutor<br/>函数名到方法的 dispatch 表<br/>core_tool_executor.py:38"]
+        Exec["LettaCoreToolExecutor<br/>函数名到方法的 dispatch 表<br/>core_tool_executor.py:41"]
         Blocks[("Core Memory<br/>Block 表：human/persona/自定义<br/>letta/orm/block.py")]
         MemRepo[("可选 memory_repo<br/>Block 镜像成 label.md 的 git 仓库<br/>services/memory_repo/")]
         Passages[("Archival Memory<br/>ArchivalPassage + 向量<br/>默认工具集里已移除<br/>constants.py:116")]
         Messages[("Recall Memory<br/>Message 表，永久保存<br/>默认走 ILIKE 子串匹配<br/>message_manager.py:895")]
         Summarizer["Summarizer<br/>上下文超限时同步再调一次 LLM<br/>生成 recursive summary<br/>services/summarizer/summarizer.py"]
-        Sleeptime["Sleeptime 后台 agent<br/>每 N 轮独立起一次 LettaAgent<br/>用 memory_replace/rethink 整理 Block<br/>sleeptime_multi_agent.py:230"]
+        Sleeptime["Sleeptime 后台 agent（默认路径）<br/>每 N 轮独立起一次 LettaAgentV3<br/>用 memory_replace/rethink 整理 Block<br/>sleeptime_multi_agent_v4.py:141,157"]
         AutoPersist["每条消息自动落库<br/>agent 无需主动调用"]
     end
 
@@ -216,26 +256,29 @@ flowchart TB
 
 ## 5. 我没搞清楚的
 
-- **memory_repo 的提交时机**：Block 被 `memory_replace`/`core_memory_append` 等工具改动后，
-  是否每次都同步 commit 进 git 仓库、还是攒批/异步提交？只看到 `MemfsClient` 提供
-  `create_repo_async` 等原语，没找到主编辑路径（`core_tool_executor.py` 里的
-  `core_memory_append`/`memory_replace`）里显式调用它的地方——**不确定 memory_repo 是否已经在主
-  编辑路径接好，还是仍是一条独立/半接入的功能**。标"未验证"。
-- **archival_memory_insert 后为什么要强制 rebuild 系统提示词**：代码里确实调用了
-  `rebuild_system_prompt_async(force=True)`，但没找到系统提示词里到底展示了 archival 条目的
-  什么信息（是计数还是别的），只在 `ContextWindowOverview` schema 里看到
-  `num_archival_memory`/`external_memory_summary` 字段定义，没跟到渲染这些字段的具体模板。
-- **`letta/agent.py`（legacy 同步 Agent 类）在当前 server 路由里是否还会被实际实例化**：
-  `agent_loop.py` 的工厂函数只会产出 `LettaAgentV2`/`LettaAgentV3`/两种 SleeptimeMultiAgent，
-  没看到分支返回旧的 `letta/agent.py:Agent` 类——不确定它是否只是给 `memgpt_agent`（"OG"类型）
-  留的历史兼容代码、有没有实际路由能触发到它。若无路由能达到，第 3.4/3.5 节里引用它的部分就只是
-  "曾经的设计"而非"现在能跑到的代码路径"，需要跑一次真实创建 `memgpt_agent` 类型的 agent 才能确认。
-- **`memgpt_v2_agent` 类型走的 `letta_agent.py`（既读 `request_heartbeat` 又跑
-  `_decide_continuation` 覆盖规则）具体权重关系**：读到了两者共存（心跳是基础信号，工具规则可以
+- **（已确认，原判断有误）memory_repo 的提交时机**：已接入主编辑路径，且是同步逐次提交——
+  `server.py:155-161` 检测到 memfs 配置就把 `block_manager` 换成 `GitEnabledBlockManager` 并注入
+  `AgentManager`；主编辑路径 `agent_manager.py:1777`（`update_memory_if_changed_async` 内）调的正是
+  `block_manager.update_block_async`，其内部 `block_manager_git.py:188-238` 先 commit git 再同步
+  Postgres，门槛是该 agent 带 `git-memory-enabled` tag。原文标"未验证"是核查不到位，不是代码本身
+  有歧义。
+- **（已确认，原判断有误）archival_memory_insert 后为什么要强制 rebuild 系统提示词**：
+  `prompts/prompt_generator.py:26-58 compile_memory_metadata_block` 的参数明确包含
+  `archival_memory_size`/`archive_tags` 并渲染进 `<memory_metadata>` 块——rebuild 就是为了让这两项
+  跟随最新写入更新，原文"没跟到渲染模板"是核查不到位。
+- **（已确认，原判断有误）`letta/agent.py`（legacy 同步 Agent 类）在当前 server 路由里根本无法
+  实例化**：生产代码里唯一的构造点是 `chat_completions.py:8` 导入、`:51` 调用的
+  `server.load_agent(agent_id=..., actor=...)`，但全仓 `git grep "def load_agent"` **零命中**——
+  这个 REST 路由本身就是坏的，不存在能跑到 `letta/agent.py:Agent` 的路径。第 3.4/3.5 节里引用它的
+  部分只是"曾经的设计"，不是"现在能跑到的代码路径"。
+- **`memgpt_v2_agent` 类型走的 `letta_agent_v2.py`（LettaAgentV2，原文误写作
+  `letta_agent.py`）具体权重关系**：读到了两者共存（心跳是基础信号，工具规则可以
   override），但没有逐条测试所有组合，心跳到底在多少比例的真实场景里还起作用，需要跑起来才知道。
-- **Turbopuffer 在自托管默认配置里是否会被启用**：`should_use_tpuf()`/`should_use_tpuf_for_messages()`
-  的判定条件（大概率是环境变量/配置项）没有细读，只确认了"没配置时走 SQL 子串匹配"这个 fallback
-  分支，没有精确定位"配置"的触发条件本身。
+- **（已确认，原判断有误）Turbopuffer 在自托管默认配置里是否会被启用**：
+  `tpuf_client.py:208-210 should_use_tpuf()` 需要同时满足 `settings.use_tpuf`、
+  `settings.tpuf_api_key`、`model_settings.openai_api_key` 三者都为真，`:213-215
+  should_use_tpuf_for_messages()` 额外要求 `settings.embed_all_messages`——默认全部关闭，
+  "没配置时走 SQL 子串匹配"这个 fallback 因此就是默认路径本身，不只是兜底分支。
 - **sleeptime 参与者 agent 具体用什么 system prompt / 是否共享同一个 Memory 对象实例**：
   只读了触发逻辑（`sleeptime_multi_agent.py`），没有跟进 `personas/examples/sleeptime_memory_persona.txt`
   与实际 prompt 组装代码，不确定它编辑的 Block 是否与主 agent 完全共享（同一行 DB 记录）还是
@@ -245,15 +288,19 @@ flowchart TB
 
 按影响从大到小排序，**均以代码为准**：
 
-1. **归档记忆（论文的核心机制）在默认工具集里被移除**。`letta/constants.py:116` 定义
-   `DEPRECATED_LETTA_TOOLS = ["archival_memory_insert", "archival_memory_search"]`；
-   `letta/services/helpers/agent_manager_helper.py:1298-1302` 的 `calculate_base_tools()`
-   无论 `is_v2` 真假都会从 `BASE_TOOLS` 里减掉这两个工具；`letta/services/agent_manager.py:407-425`
-   证实**所有**自动创建的 agent 类型（包括论文对应的"OG" `memgpt_agent` 类型本身）走的都是这个函数。
-   也就是说：论文里"agent 主动把数据搬进外部向量库、再语义检索回来"这个标志性设计，在当前代码的
-   默认建号流程下**根本不会被挂载**——除非调用方手动在建号请求里显式加上这两个工具名（工具实现本身
-   还在，没被物理删除，只是不再默认可用）。默认工具集换成了 `memory_replace`/`memory_insert`
-   这类核心记忆编辑工具——即"删掉外存，只留内存编辑"。
+1. **归档记忆（论文的核心机制）在多数默认工具集里被移除，但有一个不减反加的反例**。
+   `letta/constants.py:116` 定义 `DEPRECATED_LETTA_TOOLS = ["archival_memory_insert",
+   "archival_memory_search"]`；`letta/services/helpers/agent_manager_helper.py:1298-1302` 的
+   `calculate_base_tools()` 无论 `is_v2` 真假都会从 `BASE_TOOLS` 里减掉这两个工具；
+   `letta/services/agent_manager.py:404-425` 的 `else` 分支（覆盖 `memgpt_agent`"OG"类型本身）确实
+   调用这个函数，但**并非所有自动建号分支都会**：`react_agent`/`workflow_agent` 两个分支是
+   `pass  # no default tools`（不挂任何默认工具，包括 archival）；更重要的是
+   `elif agent_create.enable_sleeptime:`（`:404-405`）排在 `letta_v1_agent` 分支（`:410-413`）
+   **之前**，命中时挂的是 `BASE_SLEEPTIME_CHAT_TOOLS = [send_message, conversation_search,
+   archival_memory_search]`（`constants.py:133`），既不减 `archival_memory_search`，也不
+   discard `send_message`——这是"默认建号一定没有归档工具"这条判断唯一站不住的反例。
+   除此之外，默认工具集换成了 `memory_replace`/`memory_insert` 这类核心记忆编辑工具——即
+   "删掉外存，只留内存编辑"。
 2. **"心跳"驱动的函数链式调用被替换成"有没有调工具"**。论文 §2.4 的核心设计是 LLM 在函数参数里
    显式传 `request_heartbeat=true` 来请求立即再来一轮推理（"function chaining"），这是整篇论文
    实现"多步检索/多跳查询"能力的关键机制（对应 Figure 7/8 的嵌套 KV 检索）。当前默认 Agent 类型
@@ -265,7 +312,9 @@ flowchart TB
    但已经不是新建 agent 的默认路径。
 3. **`send_message` 本身被移除，靠隐式判定替代**。论文里"回复用户"和"操作记忆"都是同等地位的
    函数调用（`send_message` 是众多函数之一）。当前默认 `letta_v1_agent` 建号时会显式
-   `tool_names.discard("send_message")`（`letta/services/agent_manager.py:412`），改用"纯文字输出=回复用户"
+   `tool_names.discard("send_message")`（`letta/services/agent_manager.py:413`，上一行 `:412`
+   是注释；但如上条所说，若被 `enable_sleeptime` 分支抢先命中就不会执行到这里），改用
+   "纯文字输出=回复用户"
    的隐式判定（`letta/server/server.py:968` `text_is_assistant_message = agent_state.agent_type ==
    AgentType.letta_v1_agent`）。这与论文"回复也是一次函数调用"的设计不同，但和第2点是同一次
    架构简化的两个侧面，不单独计权重。

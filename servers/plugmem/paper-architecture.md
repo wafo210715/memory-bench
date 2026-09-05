@@ -1,6 +1,8 @@
 # PlugMem 论文架构
 
-> 调研范围：`Yang-2026-PlugMem-A-Task-Agnostic-Plugin-Memory-Module-for-LLM-Agents.txt`（arXiv:2603.03296，ICML 2026，UIUC+清华+MSR）。本文档只依据论文正文与附录文字，不引用代码；章节号（§/Appendix/Table/Listing）以论文自己的编号为准，是最可靠的定位方式。行号指向纯文本提取版论文（正文共 3953 行）里**能用检索精确定位到原文那句话**的位置，已逐条核对；但这份 txt 是双栏 PDF 抽取出来的，**物理行序会把左右两栏的文字交错排列**，同一段的行号不一定连续递增，行号只用来“精确定位这句话在哪行”，不代表阅读顺序，不要根据行号大小推断前后因果。图片本身（Figure 2/3/4）没有被读到，只读到了图注文字，见第 5 节说明。
+> 调研范围：`Yang-2026-PlugMem-A-Task-Agnostic-Plugin-Memory-Module-for-LLM-Agents.txt`（arXiv:2603.03296，ICML 2026，UIUC+清华+MSR）。本文档只依据论文正文与附录文字，不引用代码；章节号（§/Appendix/Table/Listing）以论文自己的编号为准，是最可靠的定位方式。行号指向纯文本提取版论文（正文共 3953 行）里**能用检索精确定位到原文那句话**的位置（2026-09-05 复核抽检了约 45 个锚点，其中 9 处偏移已在本次勘误里逐条改正）；但这份 txt 是双栏 PDF 抽取出来的，**物理行序会把左右两栏的文字交错排列**，同一段的行号不一定连续递增，行号只用来“精确定位这句话在哪行”，不代表阅读顺序，不要根据行号大小推断前后因果。图片本身（Figure 2/3/4）没有被读到，只读到了图注文字，见第 5 节说明。
+>
+> **2026-09-05 勘误**：本文已按同目录 `verification.md` 的逐条复核结论修正（共 19 处：1 处事实、10 处行号/锚点、8 处表述限定）。原始未修正版本见 git 历史。
 
 ## 1. 一句话机制
 
@@ -18,29 +20,29 @@
 
 $$e_t = (o_t, s_t, a_t, r_t, g_t)$$
 
-其中 $s_t$（agent 状态）由上一状态 $s_{t-1}$、上一动作 $a_{t-1}$、当前观测 $o_t$ 经 **LLM 信息抽取**推导（"The state st is derived from (st−1 , at−1 , ot ) via LLM-based information extraction"，行 482-483）；$g_t$（子目标）和 $r_t$（奖励）也都由 LLM 在给定任务指令和局部交互上下文的条件下标注（"Both gt and rt are annotated by an LLM conditioned on the task instruction and local interaction context"，行 483-484）。所有标准化步骤汇总成情景记忆序列 $M_{epi} = [e_t]_{t=1}^{T}$。
+其中 $s_t$（agent 状态）由上一状态 $s_{t-1}$、上一动作 $a_{t-1}$、当前观测 $o_t$ 经 **LLM 信息抽取**推导（"The state st is derived from (st−1 , at−1 , ot ) via LLM-based information extraction"，行 482-483；**主文只写了这三元，附录 C.1 行 2154-2155 补充说 Get_State 还额外喂了初始目标 $G$**）；$g_t$（子目标）和 $r_t$（奖励）也都由 LLM 在给定任务指令和局部交互上下文的条件下标注（"Both gt and rt are annotated by an LLM conditioned on the task instruction and local interaction context"，行 483-484）。所有标准化步骤汇总成情景记忆序列 $M_{epi} = [e_t]_{t=1}^{T}$。
 
 **这一步存的是什么**：只有 $o_t/a_t$ 是原文，$s_t/g_t/r_t$ 三个字段都是 **LLM 生成**的结构化标注，不是纯粹的"原文照抄"。
 
-证据：§3.1.1 Standardize 标题在行 430（因双栏抽取，这个标题在物理行序上甚至早于它自己的上级标题"3. Methodology"行 434，确认为双栏交错所致），五元组定义 $e_t=(o_t,s_t,a_t,r_t,g_t)$ 在行 469，本小节在行 487 指向 Appendix C.1；Appendix C.1（标题行 2151，含 Get_State/Get_Subgoal/Get_Reward 三个 prompt 模板 Listing 1/2/4）。
+证据：§3.1.1 Standardize 标题在行 430（因双栏抽取，这个标题在物理行序上甚至早于它自己的上级标题"3. Methodology"行 432，确认为双栏交错所致），五元组定义 $e_t=(o_t,s_t,a_t,r_t,g_t)$ 在行 470，本小节在行 487 指向 Appendix C.1；Appendix C.1（标题行 2151，含 Get_State/Get_Subgoal/Get_Reward 三个 prompt 模板 Listing 1/2/4）。
 
 ### 2.2 Extract Knowledge（抽取知识）：从情景记忆里提炼语义与程序知识
 
-**语义记忆（Semantic，存进语义图 $G_S$）**：给定一个标准化 episodic 单元 $e_t$，用 LLM 抽取一组"原子命题"（proposition），每条命题配一组"概念"（concept，当索引/标签用）。论文举例："Tam Sventon, known in Swedish as Ture Sventon, is a fictional private detective based in Stockholm."，关联概念集合 {Tam Sventon, fictional private detective, Stockholm}（§3.1.2，行 630-634）。为保证抽取质量，明确要求三条约束：**指代消解**（coreference resolution）、**命题去重**（proposition deduplication）、**长度控制**（length control，行 634-637）。
+**语义记忆（Semantic，存进语义图 $G_S$）**：给定一个标准化 episodic 单元 $e_t$，用 LLM 抽取一组"原子命题"（proposition），每条命题配一组"概念"（concept，当索引/标签用）。论文举例："Tam Sventon, known in Swedish as Ture Sventon, is a fictional private detective based in Stockholm."，关联概念集合 {Tam Sventon, fictional private detective, Stockholm}（§3.1.2，行 630-634）。为保证抽取质量，明确要求三条约束：**指代消解**（coreference resolution）、**命题去重**（proposition deduplication）、**长度控制**（length control）——这三条约束的正文因双栏交错落在行 606-608，行 634 只是句首 "To ensure extraction" 那半句。
 
 存进 $G_S$ 的节点：每条命题、每个概念各自是一个节点，都缓存 dense embedding。两类边：
 - **membership 边**：命题 → 关联概念（"Concept ←mentions— Proposition"，Table 2）
 - **provenance 边**：命题 → 源 episodic 单元（可回溯验证）
 
-Appendix C.2 补充：一次 LLM 调用最多返回 $N_{max}=10$ 条命题；多条命题若来自同一个 episodic 单元，还会额外连"sibling 边"保留局部共现结构（行 2340-2344）。
+Appendix C.2 补充：一次 LLM 调用最多返回 $N_{max}=10$ 条命题；多条命题若来自同一个 episodic 单元，还会额外连"sibling 边"保留局部共现结构（$N_{max}=10$ 在行 2321，sibling 边在行 2328；行 2340-2344 是 Get_Semantic prompt 正文，不是这两句）。
 
-**程序记忆（Procedural，存进程序图 $G_P$）**：给定完整 episodic 序列 $M_{epi}$，先按"相邻子目标 $g_{t-1}, g_t$ 的相似度低于预定阈值就切一段"做轨迹分段（§3.1.2，"the module first segments the trajectory into coherent sub-trajectories"，行 638；Appendix C.2 说这个阈值就是计算相邻子目标 embedding 相似度，行 2437-2438）。每段轨迹被线性化成一段紧凑的过程描述（状态-动作-奖励），丢给 LLM 生成一对 **(intent, prescription)**：intent 是这段的目标抽象，prescription 是"环境无关、可复用的动作工作流"。论文举例："To identify the lowest price of an item, search for the item using the search bar, sort the results by price, and verify the minimum across variants."（行 724）。
+**程序记忆（Procedural，存进程序图 $G_P$）**：给定完整 episodic 序列 $M_{epi}$，先按"相邻子目标 $g_{t-1}, g_t$ 的相似度低于预定阈值就切一段"做轨迹分段（§3.1.2，"the module first segments the trajectory into coherent sub-trajectories"，行 638；Appendix C.2 说这个阈值就是计算相邻子目标 embedding 相似度，行 2420-2422；行 2437-2438 是 Listing 6 的标题行与分隔线，不是这句话）。每段轨迹被线性化成一段紧凑的过程描述（状态-动作-奖励），丢给 LLM 生成一对 **(intent, prescription)**：intent 是这段的目标抽象，prescription 是"环境无关、可复用的动作工作流"。论文举例："To identify the lowest price of an item, search for the item using the search bar, sort the results by price, and verify the minimum across variants."（行 724）。
 
 **质量感知复用**：论文明确强调"每条 prescription 会被赋一个标量 return 分数 $ρ^{(i)} ∈ [1,10]$，用一个**单独的 LLM 评委**打分，条件是 intent 和该段轨迹"（正文行 728 ，"assigned a scalar return score. The score is obtained using an LLM-based evaluator that assesses whether the intent is achieved"；Appendix C.2 行 2426-2428 给出精确表述与评分范围，并配了专门的 Get_Return prompt）。这是论文里除了"抽取 (intent, prescription)"之外，明确交代的**第三次独立 LLM 调用**。
 
 **意图去重**：新 intent 的 embedding $φ(u)$ 去和已有 intent 节点算 **cosine 相似度**；若最高相似度超过阈值 $θ_{equal}$，用 LLM 把两个 intent 字符串合并改写、刷新该节点 embedding；否则新建一个 intent 节点（Appendix C.2，行 2429-2431）。
 
-存进 $G_P$ 的边（行 743-747，"Edges in GP encode two types of relations. First, hierarchical edges link each high-level intent node to its associated low-level prescription nodes. Second, provenance edges link prescription nodes to their originating episodic units"）：**hierarchical 边**（intent → 其下的 prescription，单向，"Intent —solves→ Prescription"）+ **provenance 边**（prescription → 其所有源 episodic 单元）。
+存进 $G_P$ 的边（行 743-747，"Edges in GP encode two types of relations. First, hierarchical edges link each high-level intent node to its associated low-level prescription nodes. Second, provenance edges link prescription nodes to their originating episodic units"）：**hierarchical 边**（intent → 其下的 prescription，单向；注意 Table 2 原文的渲染方向是反的，写作 "Intent ←solves— Prescription"，行 597-599，语义方向"intent 指向 prescription、单向"由行 2431-2433 确认）+ **provenance 边**（prescription → 其所有源 episodic 单元）。
 
 证据：§3.1.2 Extract Knowledge（标题在行 592，本节内容一直延伸到 GP 边定义的行 743-747）；Table 2（Memory Type → Graph Structure 映射表）；Figure 3 图注（结构化模块的可视化流程）；Appendix C.2（标题行 2319，含 Get_Semantic / Get_Procedural / Get_Return / Get_New_Subgoal 四个 prompt，Listing 5-7）。
 
@@ -61,11 +63,11 @@ Appendix C.2 补充：一次 LLM 调用最多返回 $N_{max}=10$ 条命题；多
 - **GET PLAN**（Table 9/Listing 9）：为下一跳生成"抽象查询信号"——对 $G_S$ 是一组概念（concept tags），对 $G_P$ 是一组意图/子目标。
 - **MULTI HOP CTRL**（Listing 10）：检索控制器，判断当前证据是否足够停止，或者该优先深挖哪些低层节点。
 
-检索主要在 $G_S$/$G_P$ 上进行，论文称这套策略为"**abstraction-specificity interleaving**"（抽象层-具体层交替，§3.2 行 782）。当 episodic 记忆被优先选中时，"同样的检索流程会被套用，但系统最终返回的是带溯源关系（provenance-linked）的情景节点"（§3.2 行 782-784）。
+检索主要在 $G_S$/$G_P$ 上进行，论文称这套策略为"**abstraction-specificity interleaving**"（抽象层-具体层交替，§3.2 行 782）。当 episodic 记忆被优先选中时，"同样的检索流程会被套用，但系统最终返回的是带溯源关系（provenance-linked）的情景节点"（完整句在行 732-734；§3.2 行 782-783 只有前半句 "When episodic memory is prioritized,"，因双栏交错与后半句被拆开）。
 
 ### 3.3 一步到位还是多步迭代？——论文明确是"迭代直到够了或到跳数上限"
 
-Appendix C.3（行 2524-2538）+ Table 14 伪代码给出的算法：
+Appendix C.3（算法正文行 2520-2542）+ Table 14 伪代码给出的算法（下面第 1 步的候选初始化其实出自主文 §3.2 行 735-739，不在 C.3 内；主文 §3.2 行 750-757 本身也已经把两条通道、只保留低层节点、rerank/prune、迭代到 $T_{max}$ 完整写出，C.3 只是更细的实现级展开）：
 
 1. **初始化候选**：把查询 $Q$ 编码成向量 $q$，直接对全部低层节点（命题/处方）算相似度打分，取一批构成候选集 $C_0$。
 2. **每一跳 $t$**（$t = 1$ 到 $T_{max}$）：
@@ -76,19 +78,19 @@ Appendix C.3（行 2524-2538）+ Table 14 伪代码给出的算法：
    - 两路候选**取并集**，按预算 $K$ 重排剪枝（`RerankPrune`，主要用 relevance，可选叠加 importance/recency 等元数据，行 2530-2531）。
    - 高层节点全程只当"中间路由信号"，从不进入候选集 $C_t$（行 2531-2532）。
 3. **停止判断**：调 MULTI HOP CTRL，输入是问题 $Q$ + 当前可用节点 ID + 已检索事实文本，输出严格 JSON：`{"enough": true/false, "top_node_ids": [...]}`（Listing 10）。若 `enough=true`，检索提前终止，返回当前候选（若这次要的是 episodic，就把命题/处方节点**沿 provenance 边映射回**对应的 episodic 节点）；否则只保留被选中的候选节点（"focus set"，受 `n_facts_new_query` 上限约束）并入下一跳查询 $Q_{t+1}$。
-4. **下一跳查询怎么构造**：论文说"可以用 LLM 改写来融合 $Q_t$ 和选中事实，但我们发现简单拼接效果相当且更省，默认用拼接"（行 2536-2538）。
-5. 循环直到 MULTI HOP CTRL 判定足够，或达到跳数上限 $T_{max}$（行 2538-2539）。
+4. **下一跳查询怎么构造**：论文说"可以用 LLM 改写来融合 $Q_t$ 和选中事实，但我们发现简单拼接效果相当且更省，默认用拼接"（行 2538-2540）。
+5. 循环直到 MULTI HOP CTRL 判定足够，或达到跳数上限 $T_{max}$（行 2541；主文 §3.2 行 755-757 已有同义句）。
 
 论文把这套多跳能力当作 Retrieval Module 的**默认设计**，同时适用于 $G_S$ 和 $G_P$（Table 14 里 `F ← TaskAdapter(Q)` 显式包含 $\{E, S, P\}$ 三种，`ExpandLowLevel(q^a, \{G_S, G_P\})` 也是两张图并列）。Appendix F.2 的"Test-time Scaling"实验专门验证了 $T_{max}$ 是核心可调超参：在 HotpotQA 子集上把 $T_{max}$ 从 2 调到 4，EM/F1 从 66.00/74.73 涨到 69.00/78.11（行 3879），并类比"reasoning-centric 方法里的 test-time scaling"。Appendix F.2 还提到这套检索设计"受 HippoRAG2 启发"——借鉴其"识别（recognition，过滤/挑选相关结构化单元）与扩展（expansion，图上传播找支撑证据）分离"的思路（"Our retrieval design is partly inspired by HippoRAG2"，行 3867），泛化到带类型的 agent 记忆上。
 
 ### 3.4 找到之后怎么交给模型——Reasoning Module 做压缩，不做检索
 
 Reasoning Module 是一个"**test-time running module**"（§3.3，行 768）：检索到的多条知识可能彼此重叠、冗长但各自相关，该模块用 LLM 把这些信息聚合压缩成一段紧凑、任务对齐的可执行指导。论文针对三种记忆类型设计了不同的推理 prompt（Appendix C.4，行 2660-2766，Listing 11-13）：
-- **Reason_Episodic**：情景记忆通常长且非结构化，论文发现直接让 LLM"逐条推理并回答问题"比先抽取信息再回答更有效，整段推理过程本身就当作抽取出的信息保留下来（行 2672-2678）。
+- **Reason_Episodic**：情景记忆通常长且非结构化，论文发现直接让 LLM"逐条推理并回答问题"比先抽取信息再回答更有效，整段推理过程本身就当作抽取出的信息保留下来（行 2665-2669；行 2672-2678 落在 Table 14 伪代码区，不是这段说明）。
 - **Reason_Semantic**：要求"尽量用原话，不要替换成近义词"，抽取出和问题相关的信息（Listing 12）。
-- **Reason_Procedural**：要求整合"成功和失败经验"，生成"连贯、可执行"的下一步指导（行 2679-2683，Listing 13）。
+- **Reason_Procedural**：要求整合"成功和失败经验"，生成"连贯、可执行"的下一步指导（行 2704-2705，Listing 13；行 2679-2683 是伪代码）。
 
-消融实验支持"Reasoning 模块主要影响效率，不是任务是否成功的主因"这一定位：去掉 reasoning，准确率几乎不掉，但记忆 token 用量涨 1-2 个数量级（§4.4，Table 6/7/8，例如 LongMemEval 从 362.58 涨到 9478.59 token）。
+消融实验支持"Reasoning 模块主要影响效率，不是任务是否成功的主因"这一定位：去掉 reasoning，准确率小幅下降（LongMemEval 75.1 → 72.4，-2.7 个百分点），但记忆 token 用量涨约 26 倍（362.58 → 9478.59 token，约 1.4 个数量级）（§4.4，Table 6/7/8；数字在 Table 6 行 1294/1297 与 1299/1302）。
 
 ### 3.5 图操作总览（论文 §3.4 给出的四个通用 API）
 
@@ -121,7 +123,7 @@ flowchart LR
             direction LR
             GE["Episodic Graph G_E<br/>Source Trace，可验证证据"]
             GS["Semantic Graph G_S<br/>Concept —mentions→ Proposition"]
-            GP["Procedural Graph G_P<br/>Intent —solves→ Prescription"]
+            GP["Procedural Graph G_P<br/>Intent ←solves— Prescription（Table 2 原文渲染）"]
         end
 
         RM["Retrieval Module<br/>GET MODE 选类型<br/>GET PLAN 生成抽象信号<br/>MULTI HOP CTRL 迭代到 Tmax 或足够"]
@@ -152,7 +154,7 @@ flowchart LR
 - Intent 合并阈值 $θ_{equal}$ 的具体取值，正文和附录都没给数字（Appendix C.5 给了**语义节点** update 消融的两个阈值 $τ∈\{0.6, 0.7\}$，但那是另一个操作的另一个阈值，不是插入时的 intent 去重阈值）。
 - Episodic 检索模式下"map via provenance"（Table 14 最后一步 `ToEpisodic(C, G_E)`）具体规则没写：是每个命中的命题/处方各自跳回它唯一的 source，还是有类似"多条命题指向同一 session 才聚合返回整段"的规则？§3.2 正文只有一句"the system ultimately returns provenance-linked episodic nodes"，没有展开。
 - GET MODE / GET PLAN / MULTI HOP CTRL 三个检索侧 LLM 具体用哪个底座模型、什么解码参数，论文 Appendix E.1 只笼统说"structuring and retrieval modules"整体用 Qwen2.5-32B-Instruct，没有把 MULTI HOP CTRL 单独拎出来确认。
-- §3.4 承诺"update 和 delete 操作的效果实验都在 Appendix C.5"，但通读 C.5 全文（行 2767-2867），内容全部是**语义节点 update（合并）**的消融（合并阈值、图紧凑度、候选可控性），**没有看到任何独立的 delete/decay 实验数据**——Table 13 描述 delete 操作时提到的"compress old episodic nodes"，具体压缩机制正文和附录都没有进一步展开。
+- §3.4 承诺"update 和 delete 操作的效果实验都在 Appendix C.5"，但通读 C.5 全文（行 2767-2867），内容全部是**语义节点 update（合并）**的消融（合并阈值、图紧凑度、候选可控性），**没有看到任何独立的 delete/decay 实验数据**（唯一沾边的是 merge 决策本身包含"是否 deactivate 原节点"这一步软删除，行 2781-2782、2792，可算 delete 被间接评测过，但仍不是独立的 delete 实验）——Table 13 描述 delete 操作时提到的"compress old episodic nodes"，具体压缩机制正文和附录都没有进一步展开。
 - Figure 2/3/4 本身没有被读到（本次读的是纯文本提取版论文，图片内容缺失），只读到了图注和正文引用图的文字；图中具体的视觉布局、是否有本文字段没提到的细节，无法核实。
 - 论文没有交代 base agent 一侧具体怎么把 refined memory tokens 用进自己的决策 prompt（"6 行代码接入"是仓库 README 的表述，不是论文正文的表述）；这属于集成细节，论文只交代了模块边界，没交代边界另一侧的实现。
 - Appendix F 的"任务适配"实验（为 LongMemEval 换抽取 prompt/更新策略、为 HotpotQA 调高 $T_{max}$）和 Abstract 强调的"unchanged across three heterogeneous benchmarks"之间是什么关系，论文没有明确划界——不确定 Table 3/4/5 的主结果本身是否已经包含了部分基准特定的超参数选择（比如不同基准用不同底座模型规格），还是完全共享同一套超参。这一点需要更细致地比对 Table 3/4/5 表头和 Appendix E 各节的设置才能确认，本次只读到了表面的不一致（见第 6 节 c）。
@@ -161,7 +163,7 @@ flowchart LR
 
 区别于上面第 5 节"具体查不到答案的空白点"，这里列的是论文**表述本身**容易让人误解、内部不完全自洽、或者"承诺了但没兑现"的地方：
 
-**a. Delete 操作"说了要有实验，实际没有独立实验"**。§3.4/§4.2（行 816-817左右）明确写"Additional experiments evaluating the effectiveness of the update **and delete** operations are provided in Appendix C.5"，但 C.5 全文（行 2767-2867）只有 update（语义合并）的消融，delete/衰减机制没有任何量化实验支撑。读者按这句措辞会预期在 C.5 里同时看到两种操作的效果数据，实际只看到一种。
+**a. Delete 操作"说了要有实验，实际没有独立实验"**。§3.4/§4.2（行 816-817左右）明确写"Additional experiments evaluating the effectiveness of the update **and delete** operations are provided in Appendix C.5"，但 C.5 全文（行 2767-2867）只有 update（语义合并）的消融——合并决策里确实带一步"是否 deactivate 原节点"的软删除判断（行 2781-2782、2792），算是间接碰到了 delete，但没有任何针对 delete/衰减机制的独立量化实验。读者按这句措辞会预期在 C.5 里同时看到两种操作的效果数据，实际只看到一种。
 
 **b. "importance" 被反复提及但从未定义**。这个词在全文只在两处实质性出现（§3.2 行 754-755、Appendix C.3 行 2531），且两次都只是"重排时可选叠加的信号"这种插入语式的一笔带过，没有给出计算方式、消融实验或哪怕一个具体例子。读者读完全文也无法知道"importance"在实际实验里是不是真的被启用过、权重多大。
 

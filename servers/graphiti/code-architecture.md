@@ -5,6 +5,8 @@
 > **范围提醒**：论文标题是《Zep》，Zep 是商业记忆服务，Graphiti 是驱动它的开源图引擎——不是同一份代码。我们只克隆了 Graphiti（开源部分）。代码里有直接证据表明 Zep 商业后端还有一块不在这个仓库里的东西：`prompts/extract_nodes.py:540` 一条注释写着"This prompt is semantically mirrored in the Go async summary worker at `src/lib/graphsummary/processor.go`"——一个 Go 异步摘要 worker，路径明显不属于这个 Python 仓库。也就是说生产版 Zep 比这个开源仓库更大，本文档的一切结论只对 Graphiti 负责。
 >
 > 论文发表于 2025-01-20（arXiv:2501.13956v1），本仓库 HEAD 提交于 2026-09-03——中间隔了约 19.5 个月的独立演化。第 6 节会具体点出哪些论文描述已经不是当前代码的样子。
+>
+> **2026-09-05 勘误**：本文已按同目录 `verification.md` 的逐条复核结论修正（共 16 处：8 处事实、2 处行号/锚点、6 处表述限定）。原始未修正版本见 git 历史。
 
 ## 1. 一句话机制
 
@@ -21,10 +23,10 @@ Graphiti 用 LLM 把每条输入（episode：一条消息 / 一段文本 / 一�
 | 层 | 存储对象 | 内容形态 | 证据 |
 |---|---|---|---|
 | Episode（原始层） | `EpisodicNode` | 原文一字不丢（`content: str`），另存 `source`/`source_description`，`valid_at` 字段其实就是这条 episode 自己的参考时间戳（调用方传入的 `reference_time`） | `graphiti_core/nodes.py:318-332` |
-| Semantic Entity（实体关系层） | `EntityNode` + `EntityEdge` | 节点：`name` + `name_embedding`（向量）+ `summary`（**LLM 生成的摘要，不是原文**）；边：`fact`（**LLM 生成的单句事实描述，不是原文**）+ `fact_embedding`（向量）+ **4 个时间戳** | `graphiti_core/nodes.py:499-504`；`graphiti_core/edges.py:49-54`（基类 `created_at`）、`:264-280`（`name`/`fact`/`fact_embedding`/`episodes`/`expired_at`/`valid_at`/`invalid_at`/`reference_time`） |
-| Community（社区摘要层） | `CommunityNode` | 一批强连通实体的 map-reduce 式摘要 + 关键词社区名（`name`），**无时间戳字段** | `graphiti_core/nodes.py:687-690` |
+| Semantic Entity（实体关系层） | `EntityNode` + `EntityEdge` | 节点：`name` + `name_embedding`（向量）+ `summary`（**LLM 生成的摘要，不是原文**）；边：`fact`（**LLM 生成的单句事实描述，不是原文**）+ `fact_embedding`（向量）+ **4 个时间戳** | `graphiti_core/nodes.py:499-504`（`name` 不在这个区间里，它在基类 `Node`，`graphiti_core/nodes.py:95`）；`graphiti_core/edges.py:49-54`（基类 `created_at`）、`:264-280`（`name`/`fact`/`fact_embedding`/`episodes`/`expired_at`/`valid_at`/`invalid_at`/`reference_time`） |
+| Community（社区摘要层） | `CommunityNode` | 一批强连通实体的 map-reduce 式摘要 + 关键词社区名（`name`），**无双时间轴字段**（没有 `valid_at`/`invalid_at`/`expired_at`；`created_at` 仍从基类 `Node` 继承，`graphiti_core/nodes.py:98`） | `graphiti_core/nodes.py:687-690` |
 
-**一句话：原文只在 Episode 层保留一份；实体关系层和社区层存的都是 LLM 生成的摘要/事实句，不是原文的压缩或摘录。** 这意味着"回原文找答案"必须经由 episode 反查（`Graphiti.get_nodes_and_edges_by_episode()`），检索管线本身（第 3 节）默认并不会把 episode 内容返回给调用方——第 6 节会说明这是论文自己也承认"留给未来工作"的部分。
+**一句话：原文只在 Episode 层保留一份；实体关系层和社区层存的都是 LLM 生成的摘要/事实句，不是原文的压缩或摘录。** 这意味着"回原文找答案"必须经由 episode 反查（`Graphiti.get_nodes_and_edges_by_episode()`），检索管线**在我们的封装下**默认不会把 episode 内容返回给调用方（`server.py:114` 显式 `episode_config=None`，见第 7 节）；但这不是 `graphiti_core` 的默认——上游 `search_()` 不传 config 时走的 `COMBINED_HYBRID_SEARCH_CROSS_ENCODER` 配方是**带** `episode_config` 的（`graphiti_core/search/search_config_recipes.py:98-103`），`SearchResults.episodes` 里会有 episode 原文。第 6 节会说明"从事实回溯原文"这条链路是论文自己也承认"留给未来工作"的部分。
 
 四个时间戳的精确定义（`EntityEdge`，都在 `edges.py`）：
 
@@ -51,10 +53,23 @@ add_episode(episode_body, reference_time, ...)
   │     喂给 LLM，speaker 自动抽成第一个实体节点。
   │     调用点：graphiti.py:1122
   │
-  ├─ ③ resolve_extracted_nodes                    [LLM 调用，按候选实体数量]
-  │     每个新抽的实体：先 embedding 做 cosine 找相似节点 + 全文检索找候选，
-  │     候选连同 episode 上下文一起丢给 LLM 判断是否为重复实体（prompts/dedupe_nodes.py）；
-  │     判重复则合并/改写 name+summary。
+  ├─ ③ resolve_extracted_nodes                    [LLM 调用：整批 0 或 1 次，与实体数无关]
+  │     每个新抽的实体先 embedding 做 cosine 找相似节点 + 全文检索找候选
+  │     （_collect_candidate_nodes，node_operations.py:637），然后**逐层省 LLM**：
+  │     · 零候选的实体直接跳过，根本不进 LLM（node_operations.py:652-653
+  │       `if not candidates: continue`）
+  │     · 有候选的先过一层**不调 LLM** 的确定性消解 _resolve_with_similarity
+  │       （node_operations.py:659），命中即合并、也不进 LLM
+  │     · 只有剩下的 unresolved_indices 才在最后**统一发一次批量调用** _resolve_with_llm
+  │       （node_operations.py:672-689 → :552 单次 generate_response，prompt 是
+  │       dedupe_nodes.nodes，一次返回整张 NodeResolutions 列表）
+  │     所以这一步是 0 次或 1 次 LLM 调用，不随实体数量增长。节点侧这套省 LLM 优化其实
+  │     比第④步边侧的零候选快速路径**更强**：边侧只是零候选时跳过去重，节点侧还多一层
+  │     不调 LLM 的相似度直判（原第 5 节把"节点侧有没有对称优化"列为没搞清楚的一条，
+  │     本次已核实结案）。
+  │     ⚠️ 判重复只改写 name，**不产出 summary**（prompts/dedupe_nodes.py:25-34 的
+  │       NodeDuplicate 只有 id/name/duplicate_candidate_id）——论文 §2.2.1 写的
+  │       "生成更新后的 name 和 summary"里那半个 summary，在代码里由第⑤步单独重生成
   │     调用点：graphiti.py:1131
   │
   ├─ ④ _extract_and_resolve_edges                 [LLM 调用 #2 起]
@@ -74,10 +89,26 @@ add_episode(episode_body, reference_time, ...)
   │     ⚠️ 零候选快速路径：related_edges 和 existing_edges 都为空时仍会走时间戳抽取，
   │       但跳过去重/矛盾判断逻辑（edge_operations.py:653 附近的分支）
   │
-  ├─ ⑤ extract_attributes_from_nodes              [LLM 调用，按新增/更新实体数量]
-  │     为节点生成/更新摘要与自定义属性：extract_attributes（prompts/extract_nodes.py:383）、
-  │     extract_summary（:467）、extract_entity_summaries_from_episodes（:613，
-  │     :540 处注释显式承认这份 prompt 与 Zep 闭源 Go worker 语义镜像）
+  ├─ ⑤ extract_attributes_from_nodes              [LLM 调用：按 30 节点一批，常见 0 或 1 次]
+  │     为节点生成/更新自定义属性与摘要，两条子路各自的触发条件不同：
+  │     · 自定义属性 extract_attributes（prompts/extract_nodes.py:383）只在调用方传了
+  │       带字段的 entity_type 时才调；没有自定义类型时直接返回节点原属性、**零 LLM**
+  │       （node_operations.py:790-794）。本仓库不传 entity_types → 这一路恒为 0 次。
+  │     · 摘要走 _extract_entity_summaries_batch（node_operations.py:836）：节点已有
+  │       summary 拼上它的 edge fact 之后长度 ≤ MAX_SUMMARY_CHARS*2（=2000）的，
+  │       **直接拼接落库、不调 LLM**（node_operations.py:879-882）；剩下真需要 LLM 的
+  │       节点按 MAX_NODES=30（node_operations.py:63）切成 flight，每个 flight 一次调用
+  │       （:896-913 → _process_summary_flight，:979 单次 generate_response）。
+  │       实际次数 = ⌈需摘要节点数 / 30⌉，不是"按实体数"。
+  │     ⚠️ 默认路径真正用到的摘要 prompt 是 extract_summaries_batch
+  │       （prompts/extract_nodes.py:509，选择分支在 node_operations.py:976-977）。
+  │       另外两份摘要 prompt 在 add_episode 这条路径上**不会被调用**：
+  │       extract_summary（:467）全仓库（含 tests）零调用点，是死代码；
+  │       extract_entity_summaries_from_episodes（:613，:540-541 处注释显式承认这份
+  │       prompt 与 Zep 闭源 Go worker 语义镜像）只在 use_episode_prompt=True
+  │       （即 skip_fact_appending=True）时才走（node_operations.py:972-974），
+  │       而全仓库没有任何调用方把这个参数传成 True。照 prompt 行号去读这两份文本，
+  │       读到的是系统实际不用的内容。
   │     调用点：graphiti.py:1160
   │
   ├─ ⑥ 写库：预先写好的 Cypher（不是 LLM 生成的查询）
@@ -93,7 +124,7 @@ add_episode(episode_body, reference_time, ...)
         （**默认 False，不执行**）
 ```
 
-调不调 LLM：调，②④⑤三步都各自触发（②固定 1 次，③④⑤的调用次数随抽出的实体数/边数线性增长）。本仓库自己的封装曾统计过极小 episode（1-3 轮对话、`body_chars` 只有 30-80）下的真实调用数：`llm_calls=3`、`embed_calls=8~12`（`.state/graphiti/mcp_trace/graphiti-20260829.jsonl` 抽样；⚠️ 这是冒烟测试的极小样本，不代表真实 LoCoMo session 规模，见第 5 节）。`WEEKEND-PLAN.md:357` 给出的经验估算是"2 + (1~2)×边数"次 LLM 调用，本次调研没有独立重新推导精确值，按经验估算值处理。
+调不调 LLM：调，②③④⑤四步都各自触发，但**只有第④步随规模线性增长**：②固定 1 次；③整批 0 或 1 次，与实体数无关；⑤按 30 个节点一批、常见 0 或 1 次；只有④是每条新边各一次（去重+矛盾合并调用，加上新边的时间戳抽取）。本仓库自己的封装曾统计过极小 episode（1-3 轮对话、`body_chars` 只有 30-80）下的真实调用数：`llm_calls=3`、`embed_calls=8~12`（`.state/graphiti/mcp_trace/graphiti-20260829.jsonl` 抽样；⚠️ 这是冒烟测试的极小样本，不代表真实 LoCoMo session 规模，见第 5 节）。`WEEKEND-PLAN.md:357` 给出的经验估算是"2 + (1~2)×边数"次 LLM 调用，本次调研没有独立重新推导精确值，按经验估算值处理。
 
 **社区层不是"写入流程"的一部分，是独立操作**：`Graphiti.build_communities()`（`graphiti_core/graphiti.py:1490`）需要调用方显式调用，内部先 `remove_communities()` 清空指定 group 的旧社区，再用 label propagation 重新聚类（`graphiti_core/utils/maintenance/community_operations.py:93`；Neo4j 驱动实际走的是逻辑完全相同的另一份重复实现 `driver/operations/graph_utils.py`，二者均为同步双缓冲、无迭代上限的实现，见第 5 节第二条），对每个簇做 map-reduce 式两两摘要合并（`community_operations.py` 内 `build_community()`/`summarize_pair()`，各触发一次 LLM 调用）。
 
@@ -103,7 +134,7 @@ add_episode(episode_body, reference_time, ...)
 
 调用方传入查询字符串 `α`，触发 `Graphiti.search_()`（进阶，`graphiti_core/graphiti.py:1603`）或 `Graphiti.search()`（基础，`graphiti_core/graphiti.py:1527`，官方 docstring 原话自称 "our basic out-of-the-box search"，`graphiti_core/graphiti.py:1542`）。两者最终都走同一个内部函数 `search()`（`search/search.py:98`），区别在于传入的 `SearchConfig` 不同：
 
-- `search()`：固定用 `EDGE_HYBRID_SEARCH_RRF` 配方（`graphiti_core/search/search_config_recipes.py:111-116`）——**只查边，只用 BM25+cosine 两路，不含 BFS**，返回 `list[EntityEdge]`（不含节点/社区）。调用方不传 `search_filter` 时默认落到空的 `SearchFilters()`（`graphiti_core/graphiti.py:1580`）。
+- `search()`：在两个"只查边"的配方之间二选一——调用方不传 `center_node_uuid` 时用 `EDGE_HYBRID_SEARCH_RRF`（`graphiti_core/search/search_config_recipes.py:111-116`），传了就换成 `EDGE_HYBRID_SEARCH_NODE_DISTANCE`（选择逻辑在 `graphiti_core/graphiti.py:1569-1571`）。两个配方都是**只查边，只用 BM25+cosine 两路，不含 BFS**，返回 `list[EntityEdge]`（不含节点/社区），差别只在重排方式（RRF vs 按到中心节点的图距离）。调用方不传 `search_filter` 时默认落到空的 `SearchFilters()`（`graphiti_core/graphiti.py:1580`）。
 - `search_()`：调用方不传 `config` 时，默认走 `COMBINED_HYBRID_SEARCH_CROSS_ENCODER` 配方（`graphiti_core/search/search_config_recipes.py:81-108`，边 BM25+cosine+BFS 全开、cross-encoder 重排）；`search_filter` 同样默认空 `SearchFilters()`（`graphiti_core/graphiti.py:1625`）。
 
 ### 3.2 拿什么去找、找几路
@@ -134,19 +165,25 @@ edge_search(query, query_vector, config, ...)
        mmr              → 需要重新拉 embedding 算最大边际相关
        episode_mentions → 先 RRF 出候选，再按 edge.episodes 列表长度（提及次数）重排
        node_distance    → 先 RRF，再按到 center_node_uuid 的图距离重排（需调用方提供中心节点）
-       cross_encoder    → 先 RRF 出 2×limit 候选，再用 LLM 对每条 fact 文本打相关性分
-     只有 cross_encoder 这一种重排会在检索阶段触发 LLM 调用；其余 4 种都是纯算法/图计算。
+       cross_encoder    → 先 RRF 出 2×limit 候选，再用 cross-encoder 对每条 fact 文本打相关性分
+     只有 cross_encoder 这一种重排会在检索阶段**外调模型**（search.py:405 是唯一一处
+     `await cross_encoder.rank`）；其余 4 种都是纯算法/图计算。但"外调模型"不等于"调 LLM"：
+     cross-encoder 客户端有三份实现，`openai_reranker_client.py`/`gemini_reranker_client.py`
+     才是让 LLM 打分，`bge_reranker_client.py` 跑的是本地 BGE 模型——论文 §4.1 用的正是
+     BGE-m3，也就是说论文那条路上这一步并不走 LLM。
 ```
 
 `node_search`（`graphiti_core/search/search.py:464`）逻辑同构，5 种重排全支持（`NodeReranker`，`graphiti_core/search/search_config.py:61`）。`community_search`（`graphiti_core/search/search.py:764`）少一路——**community 没有 BFS 检索**，只有 bm25+cosine 两路（`CommunitySearchMethod` 枚举只定义这两个值，`graphiti_core/search/search_config.py:48`），重排也只支持 rrf/mmr/cross_encoder 三种，**没有 episode_mentions、没有 node_distance**（`CommunityReranker`，`graphiti_core/search/search_config.py:74`）。`episode_search`（`graphiti_core/search/search.py:664`）更少，只有 bm25 一路检索方法、rrf/cross_encoder 两种重排（`EpisodeReranker`，`graphiti_core/search/search_config.py:69`）。论文 §3.2 说"Zep supports [5 种重排]"是笼统说法，没有按对象类型区分适用范围；代码里 5 种重排只对 edge/node 全量适用，community 少 2 种，episode 少 3 种。
 
 ### 3.3 一步到位还是多步迭代
 
-**单轮，不迭代**。`f(α) = χ(ρ(φ(α)))` 是一次函数复合，`search()`（`graphiti_core/search/search.py:98`）从进到出就是"并行发四类检索请求 → 各自内部重排 → 直接返回"，没有循环、没有基于结果内容判断"要不要再搜一轮"的分支重试逻辑。
+**单轮，没有 LLM 驱动的多跳循环——但不是完全没有结果依赖**。`f(α) = χ(ρ(φ(α)))` 是一次函数复合，`search()`（`graphiti_core/search/search.py:98`）从进到出就是"并行发四类检索请求 → 各自内部重排 → 直接返回"，没有任何"把结果喂回 LLM、由 LLM 判断要不要再搜一轮"的分支重试逻辑，轮数不随查询内容变化。唯一的例外是 3.2 节已经讲过的自动播种 BFS（`graphiti_core/search/search.py:332-353`）：配了 bfs 又没给种子时，会拿第一轮 bm25/cosine 的命中结果当种子再跑一次 BFS——这是一次**固定的、结果依赖的**二次检索，说"没有循环"要把它排除在外才准确。
 
 ### 3.4 找到之后怎么交给模型
 
-`search_()`/`search()` 返回的是 Python 对象（`EntityEdge`/`EntityNode`/`CommunityNode` 列表 + 各自的重排分数，`SearchResults` 类），**graphiti_core 本身不做"渲染成文本"这一步**——那是调用方的责任。论文 §3 定义的 χ（Constructor）在代码里没有一个统一函数与之对应：调用方必须自己把 `edge.fact`/`edge.valid_at`/`edge.invalid_at`/`node.name`/`node.summary`/`community.summary` 拼进自己的 prompt 模板。也就是说论文的 χ 步骤实际上是**每个接入方各自实现一遍**，不是 Graphiti 引擎内置能力——第 7 节会具体讲我们的封装是怎么实现这一步的。
+`search_()`/`search()` 返回的是 Python 对象（`EntityEdge`/`EntityNode`/`CommunityNode` 列表 + 各自的重排分数，`SearchResults` 类）。但**论文 §3 定义的 χ（Constructor）在 graphiti_core 里是有一个统一实现的**：`graphiti_core/search/search_helpers.py:27` 的 `search_results_to_context_string(search_results: SearchResults) -> str`，docstring 原话就是 "Reformats a set of SearchResults into a single string to pass directly to an LLM as context"（`:28`）。它逐条渲染 `fact`+`valid_at`+`invalid_at`（`:29-36`）、`entity_name`+`summary`（`:37-39`）、`community_name`+`summary`（`:47-50`），再拼进 `<FACTS>`/`<ENTITIES>`/`<EPISODES>`/`<COMMUNITIES>` 四个区块的模板（`:52-70`）——比论文 §3 那份只有 `<FACTS>`/`<ENTITIES>` 两块的示例模板还多两块；同一个文件 `:22` 还有一个专门格式化日期区间的 `format_edge_date_range()`。
+
+真正成立的是更弱的一句：**`search_()`/`search()` 不会自动调用它**。检索接口返回的仍然是对象而不是文本，`search_results_to_context_string` 在全仓库唯一的调用点是 `tests/test_graphiti_int.py:77`——渲染这一步要不要用引擎自带的这一份，由接入方自己决定。换句话说 χ 的归属是**可移动的**：引擎两边都能做，我们的封装选了自己重写一份（第 7 节；顺带一提 `server.py:348` 的注释引的正是同一个文件里的 `format_edge_date_range`）。
 
 ## 4. 架构图
 
@@ -205,7 +242,6 @@ flowchart LR
 
 - **真实 LoCoMo 规模下一次 `add_episode()` 精确调几次 LLM**：本仓库自己的实测样本（`.state/graphiti/mcp_trace/graphiti-20260829.jsonl`）body 只有 30-80 字符，是冒烟测试量级，不是真实一个 LoCoMo session（约 20 turns、上千 token）的量级；`WEEKEND-PLAN.md:357` 给的"2+(1~2)×边数"是经验估算，本次调研没有对着一次真实规模的 ingest 逐行核对调用图（`node_operations.py`/`attribute_utils.py` 内部具体按什么粒度批量调 LLM，没有逐行读完）。
 - **label propagation 在 Neo4j 大图上是否真的会在本仓库当前版本（`a6e026f`）触发不收敛**：逐行比对确认了当前代码（`graphiti_core/utils/maintenance/community_operations.py:93` 起、Neo4j 实际调用路径 `driver/operations/graph_utils.py`）与 memory-bench 此前在 pip 包 `graphiti-core==0.29.3` 上实测触发死循环（4 分钟烧约 1200 万轮，见 `patches/graphiti/community_operations.py` 注释）的版本逻辑完全一致（仍是同步双缓冲、`while True` 无迭代上限），但**没有在本次调研里对着当前这份克隆重新跑一次触发它**，只是静态代码比对，不是重新实测。
-- **`resolve_extracted_nodes` 有没有类似 `resolve_extracted_edge` 的"零候选就跳过 LLM"快速路径**：`graphiti_core/utils/maintenance/edge_operations.py:653` 附近明确写了"候选边为空时仍会抽时间戳但跳过去重逻辑"这类特判，但没有把 `node_operations.py` 全文读完去确认节点侧是否有对称优化，不确定"完全没有相似实体的新节点"是否真的能省掉一次 LLM 调用。
 - **`saga`/`SagaNode`（`graphiti_core/graphiti.py:980` 附近 `add_episode()` 签名里的 `saga`/`saga_previous_episode_uuid` 参数，配套 `HAS_EPISODE`/`NEXT_EPISODE` 边）具体是干什么的**：这是论文完全没提过的新组织单元，看起来是给 episode 排序分组用的，但没有专门去读它的实现，只确认它存在、我们的封装没用到它。
 - **Neo4j Lucene 全文索引对中文/多语种查询的实际召回质量**：论文和代码都假设 BM25/全文检索对英语语料有效（LoCoMo 数据集也是英文），中文场景下默认分词器的表现没有在本次调研范围内验证。
 
@@ -213,7 +249,7 @@ flowchart LR
 
 > 只收录**读代码能坐实、不是靠猜**的点，尽量说明"论文原话 vs 代码原话"。
 
-1. **论文说的"reflexion 式自我反思"步骤，当前代码里找不到**。论文 §2.2.1 原话："Following initial entity extraction, we employ a reflection technique inspired by reflexion[12] to minimize hallucinations and enhance extraction coverage." 对整个 `graphiti_core`（HEAD `a6e026f`）搜索 `reflexion`/`reflect` 关键词，只命中两处与本功能无关的注释字符串（`graphiti_core/graphiti.py:361`、`models/edges/edge_db_queries.py:197`，都是"reflects"这个动词的其他用法）。可能是这个技术后来被移除、被合并进别的 prompt、或者从未在开源部分实现——三种可能都没法从当前代码单独证实，只能确认"现在找不到"。
+1. **论文说的"reflexion 式自我反思"步骤，当前代码里找不到**。论文 §2.2.1 原话："Following initial entity extraction, we employ a reflection technique inspired by reflexion[12] to minimize hallucinations and enhance extraction coverage." 对整个 `graphiti_core`（HEAD `a6e026f`）搜 `reflexion` **零命中**；搜 `reflect` 命中三处与本功能无关的注释字符串（`graphiti_core/graphiti.py:361`、`graphiti_core/graphiti.py:1415`、`models/edges/edge_db_queries.py:197`，都是"reflects"这个动词的其他用法）。可能是这个技术后来被移除、被合并进别的 prompt、或者从未在开源部分实现——三种可能都没法从当前代码单独证实，只能确认"现在找不到"。
 2. **论文附录 6.1.1 给的实体抽取 prompt 和当前代码相差很大，不能拿论文附录当作当前系统的真实 prompt**。论文附录的 prompt 只有 6 条简短 guideline（且第 6 条被截断），核心指令是"extract entity nodes ... that are **explicitly or implicitly** mentioned"；当前代码 `extract_message()`（`prompts/extract_nodes.py:83`）是一份长得多的 prompt——列了近 10 类"绝不要抽取"的名单（代词、抽象概念、未加限定的亲属称谓、通用名词等）、6 组带正反例的示例，且反复强调"**explicitly** mentioned"（去掉了"implicitly"）。这更像是发表后 19 个月生产打磨出来的版本，读论文附录不能了解当前系统实际抽取行为的严格程度。
 3. **社区子图默认不参与写入循环**。论文 §2.3 把"新实体加入时找邻居社区、加入多数所在社区"描述成随数据流入自然发生的动态扩展；代码里这一步只在调用方显式传 `update_communities=True` 时才执行（默认值 `graphiti_core/graphiti.py:989`，判断分支 `graphiti_core/graphiti.py:1184`），且构建整棵社区树还需要另外单独调用、从未在写入路径里自动出现的 `build_communities()`（`graphiti_core/graphiti.py:1490`）。只读论文容易以为"数据一直在流，社区摘要就会一直在更新"，但代码默认路径下社区图完全不会自动出现。
 4. **检索时不排除已失效（`invalid_at`/`expired_at` 已设）的边——但这不是代码违反论文，是论文没规定，代码选了最宽松的默认**。`SearchFilters` 类确实支持按 `expired_at` 过滤（`graphiti_core/search/search_filters.py:65` 字段定义，`:242-271` 构造 Cypher 过滤条件），但 `search()`（`graphiti_core/graphiti.py:1580`）和 `search_()`（`graphiti_core/graphiti.py:1625`）在调用方不传 `search_filter` 时都默认落到空的 `SearchFilters()`——没有任何默认路径会自动把失效边挡在检索结果之外。论文 §3 对 χ 的描述是"把 `tvalid`/`tinvalid` 连同 fact 一起交给模型"，从未讨论检索该不该主动排除已失效事实，所以这属于论文留白、代码选了"全部返回、让下游模型自己看日期判断"这个最宽松的默认，不构成对论文的直接违反。
@@ -240,9 +276,9 @@ flowchart LR
 
 ### 7.4 Community 子图默认参与检索配置，但长期是空气
 
-`_search_knobs()` 默认 `triple=True`，`_build_search_config()` 因此会把 `CommunitySearchConfig` 塞进查询——但 `add_conversation()` 只调用 `g.add_episode(...)`，从不传 `update_communities=True`，也从不额外调用 `build_communities()`。实测：`runs/graphiti-align-shakeout/mcp_trace/graphiti.jsonl` 里全部 105 次 `retrieve` 调用的 `raw_counts.communities` **无一例外全部是 0**。也就是说论文的"三层子图"架构，在日常 ingest→retrieve 循环里实际只有两层在起作用（episode 层不参与检索、社区层参与检索配置但没有内容可查），真正贡献分数的只有实体关系层。
+`_search_knobs()` 默认 `triple=True`，`_build_search_config()` 因此会把 `CommunitySearchConfig` 塞进查询——但 `add_conversation()` 只调用 `g.add_episode(...)`，从不传 `update_communities=True`，ingest 路径也从不触发 `build_communities()`——需要限定的是"ingest 路径不触发"而不是"从不调用"：同一份 `server.py` 确实把它暴露成了一个独立的 MCP 维护工具（`servers/graphiti/server.py:539` 起，`:549` `nodes, edges = await g.build_communities(group_ids=group_ids)`），要建社区得人工调这个工具（下一段的消融就是这么跑出来的）。实测：`runs/graphiti-align-shakeout/mcp_trace/graphiti.jsonl` 里全部 105 次 `retrieve` 调用的 `raw_counts.communities` **无一例外全部是 0**。也就是说论文的"三层子图"架构，在日常 ingest→retrieve 循环里实际只有两层在起作用（episode 层不参与检索、社区层参与检索配置但没有内容可查），真正贡献分数的只有实体关系层。
 
-后续用户单独跑过一轮 community 开/关消融（`runs/zep-full-comm` 手动 `build_communities()` 之后 vs `runs/zep-full-nocomm`）——LoCoMo 1976 题、top_k=20、glm-5.3：开启后 38 题错转对、36 题对转错，净增益 +0.10 个百分点，McNemar 精确检验 p=0.908，与"证据完全不变、只是重跑一遍答题+判分"产生的题级噪声（约 2.5%）同量级，统计上不可区分（数据出自 `research-vault/1-project/26-AgentOS-FanJiaming/08-29-记忆系统文献综述.md`）。也就是说，即使手动把 community 建起来，在这个 benchmark 上也测不出它带来的检索增益。
+后续用户单独跑过一轮 community 开/关消融（`runs/zep-full-comm` 手动 `build_communities()` 之后 vs `runs/zep-full-nocomm`）——LoCoMo 1976 题、top_k=20、glm-5.3：开启后 38 题错转对、36 题对转错，净增益 +0.10 个百分点，McNemar 精确检验 p=0.908，与"证据完全不变、只是重跑一遍答题+判分"产生的题级噪声（约 2.5%）同量级，统计上不可区分（数据出自 `research-vault/1-project/26-AgentOS-FanJiaming/08-29-记忆系统文献综述.md`；⚠️ 该路径不在 2026-09-05 复核可见的挂载范围内，这组数字**未能重新核实**，按"引自既有报告"处理，与 7.7 节同一性质）。也就是说，即使手动把 community 建起来，在这个 benchmark 上也测不出它带来的检索增益。
 
 ### 7.5 BFS 从不显式传种子节点，实际是"扩大已命中邻域"而非论文举例的"用最近事件当种子"
 

@@ -9,6 +9,9 @@
 > Berkeley），发表于 2023 年 10 月（首版）。**这篇论文本身不叫"Letta"**——Letta 是后来的产品化
 > 名称，论文全文没有出现过"Letta"这个词（vault 笔记标题把两者并列，是笔记作者自己做的桥接，
 > 论文原文并不这样称呼自己）。
+>
+> **2026-09-05 勘误**：本文已按同目录 `verification.md` 的逐条复核结论修正（共 7 处：3 处事实、2 处行号/锚点、
+> 2 处表述限定）。原始未修正版本见 git 历史。
 
 ## 1. 一句话机制
 
@@ -27,7 +30,8 @@ queue）与 external context（外存，两库：archival storage / recall stora
 - **触发**：论文原文只说它是"a fixed-size read/write block of unstructured text, writeable only
   via MemGPT function calls"（§2.1）——即完全由 LLM 自己决定何时调用函数写入，论文没有给出这些
   函数在正文里的确切名字（只在图注的伪代码里出现 `working_context.append(...)`、
-  `working_context.replace(...)`，见 Figure 1/2/4）。
+  `working_context.replace(...)`，见 Figure 1/4；Figure 2 图注里出现的是 `recall_storage.search(...)`，
+  不含 working_context 相关调用）。
 - **存的是什么**：不是原文摘录，是 LLM 自己提炼的关键事实/偏好，例子如 `"Birthday is February 7"`、
   `"Boyfriend named James"`（Figure 1）、以及事实更新场景下的 `working_context.replace("Boyfriend
   named James", "Ex-boyfriend named James")`（Figure 4）——论文用这个例子专门展示"信息发生变化时
@@ -100,9 +104,10 @@ processor 做下一轮推理，不等待任何外部事件；若不带这个 fla
 - **翻页式检索**：`archival_storage.search("nobel physics", page=2)`（Figure 6）——单次检索结果
   太多时，agent 自己连续发起分页请求。
 - **多跳查找**：Nested KV retrieval 任务（§3.2.2）里，agent 需要连续查询
-  `831...ea5 → 5b8...4c3 → f37...617` 三层嵌套 key-value，每一跳都是一次独立的
+  `831...ea5 → 5b8...4c3 → f37...617`——论文原文写的是**两层嵌套**（"the key-value pair has two
+  nesting levels"），对应三个 UUID，每一跳都是一次独立的
   `archival_storage.search(...)` 调用，靠心跳链在一次"回合"内不经用户打断地连续执行完
-  （Figure 7/8）。论文强调"MemGPT with GPT-4...is unaffected with the number of nesting levels"，
+  （示例轨迹见 **Figure 8**；Figure 7 是该任务的准确率曲线，不含具体轨迹示例）。论文强调"MemGPT with GPT-4...is unaffected with the number of nesting levels"，
   把这个能力直接归因于"accessing the key-value pairs stored in main context repeatedly via
   function queries"（§3.2.2 结尾）。
 
@@ -161,8 +166,10 @@ flowchart TB
     Infer -->|completion tokens 含函数调用| FE
     FE -->|working_context.append/replace| WorkCtx
     FE -->|archival_storage.insert/search| Archival
+    %% archival_storage.insert 为示意：论文正文与图注实际只出现 archival_storage.search，
+    %% 写入能力仅见于 §2.2 的散文描述，论文没有给它起过函数名
     FE -->|recall_storage.search| Recall
-    FE -->|函数返回值/报错写回| SysInstr
+    FE -->|函数返回值/报错追加进 main context| FIFO
     FE -.->|"request_heartbeat=true：立即触发下一次推理，不等外部事件"| Infer
     FE -.->|"不带该flag（yield）：等待下一次外部事件"| Wait["暂停，等用户消息/<br/>系统提醒/定时事件"]
 ```
@@ -170,8 +177,11 @@ flowchart TB
 **边界说明**：main context（system instructions + working context + FIFO queue）是双方共享的
 "接口区"——由 MemGPT 一侧组装、喂给 LLM Processor 消费；completion tokens 是另一方向的接口——
 由 LLM Processor 产出、被 MemGPT 一侧的 Function Executor 消费。LLM Processor 本身不直接接触
-Archival/Recall Storage，也不知道"心跳"这件事的存在——心跳完全是 MemGPT 侧（Function Executor）
-读取函数参数后决定"要不要再喂一次"的控制逻辑，对 Processor 而言只是"又被调用了一次"。
+Archival/Recall Storage；但"心跳"并不是 Processor 不知道的秘密——`request_heartbeat=true` 恰恰是
+LLM 自己在这一步 completion 里生成的关键字参数（Figure 3 图注："generating a special keyword
+argument (request_heartbeat=true) in its output"），LLM 必须从 system instructions/函数 schema
+里知道这个参数才能生成它。真正"无状态、不实现调度语义"的是底层 LLM 推理 API 本身——它只是把
+带 flag 的这次输出当成一次普通 completion，是否"再喂一次"的决定权在 MemGPT 侧的 Function Executor。
 
 ## 5. 我没搞清楚的
 
@@ -195,7 +205,10 @@ Archival/Recall Storage，也不知道"心跳"这件事的存在——心跳完�
 - **working context 的初始状态从哪来**：DMR/Conversation opener 实验里 agent 的 persona/human
   信息是实验开始前预置进 working context，还是完全靠 agent 在对话过程中自己观察、自己写入——
   论文没有明确交代实验的初始化流程，图1/2/4的示例看起来像是运行时动态写入的展示案例，不代表
-  正式评测协议里的初始化方式。
+  正式评测协议里的初始化方式（附录 §6.1.1 的 MemGPT instructions/DMR prompt 片段给出一点线索——
+  其中含"The following is information about myself. My task is to completely immerse myself in
+  this role"这类 persona 注入文本，说明至少部分初始化信息是预置进 prompt 的，但仍未交代 working
+  context 与 system instructions 之间具体如何分工）。
 
 ## 6. 论文没写清楚的地方
 

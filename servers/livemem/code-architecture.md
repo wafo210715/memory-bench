@@ -3,6 +3,8 @@
 > 读的是 `/Users/guanhongli/Documents/repo/LiveMem`（remote `origin` = `https://github.com/cafeii/LiveMem`，
 > 克隆时单一提交 `71a6a8b "Initialize repository"`，作者 `Chen <12011125@mail.sustech.edu.cn>`）。
 > 术语在第一次出现处用括号给一句话解释；不确定的地方标「未验证」。
+>
+> **2026-09-05 勘误**：本文已按同目录 `verification.md` 的逐条复核结论修正（共 12 处：1 处事实、6 处行号/锚点、5 处表述限定）。原始未修正版本见 git 历史。
 
 ## 1. 一句话机制
 
@@ -28,27 +30,33 @@ attention 用来算相似度和取值的缓存）该丢，副路的状态矩阵�
 - **存的是什么**：不是原文文本，不是摘要，也不是向量数据库里的一条条记录，而是**一块
   形状固定的浮点矩阵** `S`（GDN2 的"recurrent state"，可以理解成一个不断被加权更新的
   键值联想表）。默认几何是 32 个 head × 128（key 维度）× 128（value 维度），每一层、
-  每一个请求各自维护一份，全程用 FP32 精度。
-  证据：`models/configuration_memory_qwen3.py:20-38`（`mem_num_heads`/`mem_head_dim`
-  等默认值：无覆盖时等于 backbone 的 32 头、128 维）、`models/vllm/memory_qwen3/gdn2_side.py`
-  里 `get_state_shape()`（`ssm_state_shape = (num_v_heads/tp, head_k_dim, head_v_dim)`，
-  并显式要求 FP32：`get_state_dtype()` 返回 `torch.float32`）。
+  每一个请求各自维护一份 SSM 状态，用 **FP32** 精度；另外还有一份分页的 `conv_state`，
+  dtype 由 vLLM 的 dtype 计算器给出，不是固定 FP32。
+  证据：`models/configuration_memory_qwen3.py:28-30`（`mem_num_heads`/`mem_head_dim`
+  等字段声明为 `None`）、`:58-64`（无覆盖时解析为等于 backbone 的 32 头、128 维的实际
+  逻辑，原引用的 `20-38` 只包含声明，解析逻辑在范围之外）、
+  `models/vllm/memory_qwen3/gdn2_side.py:202-209`（`get_state_shape()`：
+  `ssm_state_shape = (num_v_heads/tp, head_k_dim, head_v_dim)`，另有独立的 `conv_state`）、
+  `:193-200`（`get_state_dtype()` 实际返回的是 `(conv_dtype, torch.float32)` 二元组，
+  FP32 只覆盖 SSM 状态）。
 - **更新的具体步骤**（GDN2 的 delta-rule，即"用当前输入去修正一个联想记忆矩阵"的更新规则）：
   遗忘（decay gate `g`，逐步衰减旧状态）→ 擦除（erase gate `b`，把和新 key 冲突的旧
   关联抹掉）→ 写入（write gate `w`，把新的 key-value 写进去）→ 读出（`r = Sᵀq`，用当前
   token 的 query 去读状态），四步在同一次矩阵运算里完成。
   证据：`models/memory_gdn2.py:6-9`（文件头注释给出完整数学形式
   `S_t = (I − k_t(b_t·k_t)ᵀ) Diag(exp(g_t)) S_{t-1} + k_t(w_t·v_t)ᵀ`，
-  `o_t = q_t·S_t`）、`models/memory_gdn2.py:104-138`（`g/b/w` 三个门的实际计算，
-  `chunk_gdn2`/`fused_recurrent_gdn2` 两个 kernel 分别用于训练/短序列推理）。
+  `o_t = q_t·S_t`）、`models/memory_gdn2.py:116-156`（`g/b/w` 三个门的实际计算在 `:116-118`，
+  `chunk_gdn2`/`fused_recurrent_gdn2` 两个 kernel 在 `:146-156`，分别用于训练/短序列推理；
+  原引用的 `104-138` 行号有偏移）。
 - **存的过程调不调 LLM**：不调。这不是"另起一次 LLM 调用做摘要再塞回去"，写状态和生成
   下一个 token 是**同一次 forward、同一次矩阵运算**的一部分，没有额外的模型调用、没有
   额外的 API 往返。
 - **参数从哪来**：侧支路的 q/k/v 投影从主干 attention 的对应权重复制初始化，输出投影
   `o_proj` 用**零初始化**（意味着刚接上时整个模型的行为和没装记忆分支的原始 Qwen3
   完全一样，训练过程中才逐渐把这条支路"打开"）。
-  证据：`models/modeling_memory_qwen3.py:395-450`（`copy_init_side_branch` 函数）、
-  `configuration_memory_qwen3.py` 的 `mem_o_proj_zero_init: bool = True`。
+  证据：`models/modeling_memory_qwen3.py:529-590`（`copy_init_side_branch` 函数；原引用的
+  `395-450` 其实是 `MemoryQwen3ForCausalLM.forward` 的函数签名与函数体，不是这个函数）、
+  `configuration_memory_qwen3.py:36` 的 `mem_o_proj_zero_init: bool = True`。
 - **旁注（未在发布模型里用到，但代码里确实存在）**：`train/sft/data.py` 里有一个
   `SyntheticPackDataset`（合成的关联记忆玩具任务：写入若干 key→value 对，再问多轮
   问题），它会显式生成 `write_mask`（1 对应"写入"的 M 段，0 对应"只读"的 QA 段），
@@ -68,17 +76,22 @@ attention 用来算相似度和取值的缓存）该丢，副路的状态矩阵�
   证据：`models/memory_gdn2.py:167-169`（GDN2 输出经过 `o_norm`/`o_proj` 后返回）。
 - **找到之后怎么交给模型**：副支路输出 `o_side`（也就是读出结果，过一层 gated RMSNorm
   和输出投影后）直接和主路 attention 输出 `o_main` 相加，构成该层最终输出，和普通残差流
-  一样往下传给下一层——模型自己在训练里学会要不要"信"这个信号，代码层面没有额外的门控
-  或过滤。
-  证据：`models/modeling_memory_qwen3.py:120-138`（`MemoryAttention.forward`）。
+  一样往下传给下一层。**勘误**：`gated RMSNorm` 本身就是一层由 `g_proj(hidden_states)`
+  驱动的 sigmoid 门控（`third_party/flash-linear-attention/fla/layers/gdn2.py:197` 的
+  `FusedRMSNormGated`），这层门控已经在读出内部发生了；只是在 `o_side` 与 `o_main`
+  **相加这一步**，代码确实没有再加第二重门控或过滤，是直接相加。
+  证据：`models/modeling_memory_qwen3.py:115-138`（`MemoryAttention.forward`，函数从 `:115`
+  开始，`o_main`/`o_side`/`o_total` 分别在 `:123,131,137`；原引用的 `120-138` 起点有小幅
+  偏移）。
 - **客户端侧也不用"取记忆"**：评测/使用时，是把**全部历史文本和问题拼在同一个 user
   turn 里一次性发过去**，不像其他 baseline（δ-Mem、Context2LoRA、RAG、Recurrent）需要
   先把"memory 部分"和"query 部分"切开单独处理。
   证据：`eval/prompt.py:1-20`（文件头注释"Memory and query share one user turn, matching
   tokenize_train.py:110"）、`eval/prompt.py` 的 `_messages()` 函数（`f"{mem}{MEM_SEP}{user_text}"`
-  拼进一条 user 消息）、`eval/pipeline.py:64-65`
+  拼进一条 user 消息）、`eval/pipeline.py:60`
   （`PREFIX_MODELS = {"delta", "c2l", "rag", "recurrent"}`，**不含 `livemem`**，说明
-  只有这四个 baseline 需要客户端侧的 memory/query 切分协议，LiveMem 不需要）。
+  只有这四个 baseline 需要客户端侧的 memory/query 切分协议，LiveMem 不需要；原引用的
+  `:64` 实际上是另一个集合 `HF_MODELS = {"delta","c2l"}`）。
 - **服务端怎么撑住超长输入**：vLLM 插件用 paged KV 管理（"paged"指 KV 缓存按固定大小的
   page 分块管理，可以按块回收），一边处理输入一边把中间的、已经"过期"的 KV 块物理释放
   掉（只保留 attention sink——通常是 system prompt——和最近窗口），GDN2 的状态槽位是
@@ -90,8 +103,11 @@ attention 用来算相似度和取值的缓存）该丢，副路的状态矩阵�
   之间自动复用该 state"，请求结束状态就释放。这意味着 LiveMem 的"记忆"不是传统意义上
   跨会话保留的用户记忆，而是"**单次超长输入内**，突破物理 attention 窗口限制"的机制。
   证据：`README.md`（`### state and truncate` 一节）、
-  `models/vllm/memory_qwen3/evict_registry.py`（`finish_requests` 时 `pop_request`/
-  `EVICT_REG.clear()`）。
+  `models/vllm/memory_qwen3/evict_registry.py:266-275`（`finish_requests` 时 `pop_request`/
+  `EVICT_REG.clear()`）。**勘误**：这里释放的是**驱逐记录表**（chunk span 表），不是 GDN2
+  状态槽本身；状态槽的实际回收由上游 vLLM 的 mamba/GDN 状态管理器负责，本仓库没有
+  对应代码（论文附录 C.3，txt:1712，把这两件事分开写成“scheduler 删 turnover record”和
+  “state manager 释放 recurrent slot”两步）。
 
 ## 4. 架构图
 
@@ -105,13 +121,14 @@ flowchart TB
     subgraph SRV["模型服务进程内，一次 request 的生命周期 —— forward pass 之内"]
         TOK["tokenizer 编码成 input_ids（可能几十万 token）"]
 
-        subgraph L["MemoryQwen3 的每一个 decoder layer（36 层全装，mem_layers=None）<br/>modeling_memory_qwen3.py:159-168"]
+        subgraph L["MemoryQwen3 的每一个 decoder layer（训练/HF 路径 mem_layers=None 时 36 层全装，
+modeling_memory_qwen3.py:165-168；vLLM 服务路径不读 mem_layers，无条件每层挂载，见下方边界说明）"]
             H["共享隐藏态 h"]
             subgraph MAIN["主路 MemoryAttention.attn = 原生 Qwen3Attention<br/>backbone 自己的，训练时权重冻结<br/>modeling_memory_qwen3.py:80"]
                 ATT["因果 attention，只能看到 sink + 活跃窗口<br/>训练侧 mask: make_memory_and_mask<br/>服务侧: ChunkEvictManager 物理释放 KV 页"]
             end
             subgraph SIDE["副路 MemoryAttention.mem = MemoryGatedDeltaNet2<br/>记忆系统本体，唯一被训练的参数<br/>modeling_memory_qwen3.py:92 / memory_gdn2.py:35"]
-                GDN["GDN2 delta-rule：遗忘→擦除→写入→读出<br/>r = S的转置 · q，每个 token 都做一次<br/>不管这个 token 有没有被主路驱逐<br/>memory_gdn2.py:104-149"]
+                GDN["GDN2 delta-rule：遗忘→擦除→写入→读出<br/>r = S的转置 · q，每个 token 都做一次<br/>不管这个 token 有没有被主路驱逐<br/>memory_gdn2.py:116-156"]
                 ST[("状态矩阵 S<br/>32头×128×128，每层每请求一份，FP32<br/>请求结束即释放，不跨请求持久化")]
                 GDN <--> ST
             end
@@ -156,13 +173,19 @@ flowchart TB
   且不显式传 `memory_design` 参数，就会**默默拿到 Design Y**——因为 `from_qwen3`
   的默认参数（`models/modeling_memory_qwen3.py:460` 附近）同样是 `"Y"`。这是一个潜在的复现坑，
   但没有实际跑一遍去验证会不会真的踩上。
-- **vLLM 侧两种驱逐策略（`message` vs `stride`）的选用边界没有交叉验证**：
-  `evict_registry.py` 里 `MEM_EVICT_MODE` 默认 `"message"`（按 `<|im_start|>` 边界切块，
-  评测用的 `scripts/serve_livemem.sh` 走的就是这条路径：固定 `chunk_size=1024`，
-  `token_limit=WINDOW_SIZE`），另一种 `"stride"` 模式是给 RL rollout 用的、按
-  `train/sft/eviction_policy.py` 的 `RULE_TABLE` 自适应选参数。两者在数值上于
-  8k/32k 这两个评测档位"恰好"重合，但代码里没有断言二者一致，真实行为是否完全等价
-  只读代码看不出来，需要实跑对拍。
+- **勘误**：`evict_registry.py` 里 `MEM_EVICT_MODE` 默认 `"message"`（按 `<|im_start|>`
+  边界切块，评测用的 `scripts/serve_livemem.sh` 走的就是这条路径：固定
+  `chunk_size=1024`，`token_limit=WINDOW_SIZE`），另一种 `"stride"` 模式给 RL rollout
+  用（`scripts/rl/run_grpo_dev.sh:124` 只设 `MEM_EVICT_MODE=stride`），按
+  `train/sft/eviction_policy.py` 的 `RULE_TABLE` 自适应选参数。但 `RULE_TABLE` 五行的
+  最大 window 只有 **8192**，没有 32768 这一档，chunk 也是 **512**（不是 1024）——
+  两条路径的参数**不是**"恰好重合"，而是明确不同（`evict_registry.py:151-152` 里
+  stride 模式下环境变量还会覆盖规则表，进一步说明二者本来就没打算重合）。这条还牵出
+  一个两份文档都没抓到的论文↔代码分歧：论文附录 C.2（txt:1641-1642, 1683-1685）说
+  serving 和 RL recomputation 都用"deterministic fixed-stride chunks"，且 benchmark
+  inference 会覆盖为 chunk 1,024/budget 8K 或 32K；但实际评测服务走的是上面说的
+  **message 模式**，不是 fixed-stride——只有 RL rollout 才真的是 fixed-stride，论文
+  这句话与评测服务的实际行为不完全一致。
 - **GDN2 kernel（`chunk_gdn2`/`fused_recurrent_gdn2`）内部数值实现没有细读**：
   只确认了调用方式（`third_party/flash-linear-attention` 是 vendor 进来的分支），
   kernel 内部的具体数值算法、和 fla 上游版本相比有没有改动，没有做单测复核，
@@ -207,10 +230,14 @@ flowchart TB
   唯一没有验证到的是"cafeii 这个 GitHub 账号具体对应哪位署名作者的真实身份"（GitHub
   用户名和论文作者姓名之间没有仓库内文档做显式绑定），但这不影响"官方发布仓库"这个
   结论本身，已列入第 5 节。
-- **README 的架构描述文字（"parallel GDN2 branch to every attention layer"）和代码默认值
-  字面一致**：`mem_layers=None` → `memory_layer_indices` 覆盖全部层
-  （`models/configuration_memory_qwen3.py:75-77`），没有发现文字层面的冲突，这条只是列出来
-  证明确实核对过，不是漏检。
+- **勘误**：README 的架构描述（`README.md:21` 原文："LiveMem adds a parallel Gated
+  DeltaNet-2 (GDN2) recurrent memory branch to every attention layer of a pretrained
+  Qwen3 model"，之前引用是压缩转述而非逐字原文）**和代码默认值一致，但只对训练/HF
+  路径成立**：`mem_layers=None` → `memory_layer_indices` 覆盖全部层
+  （`models/configuration_memory_qwen3.py:75-77`）；vLLM 服务路径压根不读 `mem_layers`
+  这个字段（`grep -rn 'mem_layers|memory_layer_indices' models/vllm/` 零命中），
+  `vllm/modeling_memory_qwen3.py:92-94` 是无条件每层挂载，效果上碰巧和 README 的
+  "every attention layer"一致，但不是通过读这个配置字段实现的。
 
 ## 相关
 

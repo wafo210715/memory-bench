@@ -3,6 +3,8 @@
 > 写于 2026-09-04。证据范围：仅论文原文 Rasmussen et al., "Zep: A Temporal Knowledge Graph Architecture for Agent Memory"（arXiv:2501.13956v1，2025-01-20，正文 12 页 + 附录，本地文本 `/Users/guanhongli/Documents/wafo-base/literature/papers/Rasmussen-2025-Zep-Temporal-Knowledge-Graph-Architecture-for-Agent-Memory.txt`，已通读全文）。本文档只回答"论文怎么写"，不读代码；论文↔代码的逐条对照见同目录 `code-architecture.md` 第 6 节。
 >
 > 论文标题是《Zep》，但正文明确把系统拆成两层讲：**Zep** 是生产级 "memory layer service"，**Graphiti** 是驱动 Zep 的 "temporally-aware knowledge graph engine"（§1）——论文里几乎所有架构细节（三层子图、双时间轴、φρχ 检索）讲的都是 Graphiti 这个引擎，Zep 服务层本身"由什么组成"论文没有展开。
+>
+> **2026-09-05 勘误**：本文已按同目录 `verification.md` 的逐条复核结论修正（共 6 处：2 处事实、1 处行号/锚点、3 处表述限定）。原始未修正版本见 git 历史。
 
 ## 1. 一句话机制
 
@@ -24,7 +26,7 @@ Zep 靠内部组件 Graphiti——一个用 LLM 动态构建的时间感知知�
 | **Semantic Entity 子图** `Gs` | 实体节点 + 语义边（事实） | 从 episode 抽出并与已有图实体消解合并的实体；实体边表示实体之间抽取出的关系（事实） | §2 第二个要点 |
 | **Community 子图** `Gc` | 社区节点 | 强连通实体簇的高层摘要，代表 `Gs` 结构更综合、互联的全局视图；community edges 连接社区到其成员实体 | §2 第三个要点 |
 
-论文把这个三层设计类比人类记忆的双重模型——episodic memory（具体事件）与 semantic memory（概念间关联），并说这个类比启发自心理学文献 [8]；episodic/semantic 两层子图的分离设计直接借鉴 AriGraph [9]；community 层借鉴 GraphRAG [4]（§2 倒数第二段）。
+论文把这个三层设计类比人类记忆的双重模型——episodic memory（具体事件）与 semantic memory（概念间关联），并说这个类比启发自心理学文献 [8]；episodic/semantic 两层子图的分离设计"取法于 AriGraph [9] 的类似做法"（原文 "our implementation of distinct episodic and semantic subgraphs draws from similar approaches in AriGraph"，是路数相近，不是直接照搬）；community 层借鉴 GraphRAG [4]（这一段是 §2 前言的**最后**一段，紧接着就是 §2.1）。
 
 **存的不是原文的压缩，而是分层的不同粒度**：Episode 层原文不丢；Semantic Entity 层是 LLM 抽出的实体和事实（不是原文摘录）；Community 层是更高层的 LLM 摘要。episodic edges 与其对应的语义边之间维护"双向索引"，理论上可以从事实追溯回原始 episode 做引用/引证，反向也可以从 episode 快速取到它抽出的实体和事实——但论文原话明确写"这些连接在本文实验中没有被直接检验，留待未来工作"（§2.1："While these connections are not directly examined in this paper's experiments, they will be explored in future work."）。
 
@@ -32,7 +34,7 @@ Zep 靠内部组件 Graphiti——一个用 LLM 动态构建的时间感知知�
 
 **实体（§2.2.1）**：处理当前消息内容 + 最近 n 条消息（论文取 n=4，即两个完整对话轮次）作为命名实体识别的上下文；说话人自动抽成一个实体。抽取之后，论文说会"采用受 reflexion [12] 启发的自我反思技术来减少幻觉、提升抽取覆盖率"。系统还会从 episode 里抽一个实体摘要，供后续实体消解与检索使用。之后把每个实体名嵌入 1024 维向量空间做 cosine 检索找相似节点，另外单独对已有实体名和摘要做全文检索找候选，两路候选连同 episode 上下文一起交给 LLM 用"实体消解 prompt"判断——如果判定是重复实体，LLM 会生成更新后的名字和摘要。最后写库用**预先定义好的 Cypher 查询**（不是 LLM 生成查询），理由是保证 schema 一致、减少幻觉。
 
-**事实/边（§2.2.2）**：为每个事实抽取其关键谓词；重要的是同一个事实可以在不同实体对之间被抽取多次，用普通边模拟出超边（hyper-edge），从而表达涉及多个实体的复杂事实。抽完生成事实的 embedding，边去重走类似实体消解的流程，但**混合检索被限定在与新边相同的实体对之间已存在的边**——既防止不同实体对间相似边被错误合并，又通过缩小搜索空间大幅降低去重的计算复杂度。
+**事实/边（§2.2.2）**：为每个事实抽取其关键谓词——⚠️ 这一句在本地文本里是**残句**：§2.2.2 正文首句只剩 "or each fact containing its key predicate."，句首丢字（与第 5 节说的附录 6.1.1 第 6 条截断同属 PDF 转文本损伤），所以"抽关键谓词"只能照残句字面转述，前半句原本怎么限定的无法还原；重要的是同一个事实可以在不同实体对之间被抽取多次，用普通边模拟出超边（hyper-edge），从而表达涉及多个实体的复杂事实。抽完生成事实的 embedding，边去重走类似实体消解的流程，但**混合检索被限定在与新边相同的实体对之间已存在的边**——既防止不同实体对间相似边被错误合并，又通过缩小搜索空间大幅降低去重的计算复杂度。
 
 **时序抽取与边失效（§2.2.3，论文自称"与其他知识图谱引擎相比的关键差异化特征"）**：用 `t_ref` 从 episode 语境里抽取事实的时序信息，既能处理绝对时间戳（"Alan Turing was born on June 23, 1912"）也能处理相对时间戳（"I started my new job two weeks ago"）。遵循双时间轴建模，系统在边上维护 4 个时间戳：`t'_created`、`t'_expired` ∈ T′（系统何时创建 / 使某条事实失效），`t_valid`、`t_invalid` ∈ T（事实在现实中何时成立 / 不再成立）。**新边的引入可能使已有边失效**：系统用 LLM 把新边与语义相关的已有边做比较找矛盾；一旦发现时序上重叠的矛盾，就把受影响旧边的 `t_invalid` 设成新边的 `t_valid`——按事务时间轴 T′，Graphiti 始终优先采信新信息。论文强调这套机制既能维护"当前关系状态"又能维护"关系随时间演化的历史记录"。
 
@@ -95,7 +97,7 @@ ENTITY_NAME: entity summary
 flowchart LR
     subgraph AGENT["Agent 侧"]
         U["查询 α（用户问题 / 待回答请求）"]
-        CHAT["Chat Agent LLM<br/>论文实验用 gpt-4o-mini / gpt-4o"]
+        CHAT["Chat Agent LLM<br/>论文实验用 gpt-4o-mini / gpt-4o<br/>DMR 另用 gpt-4-turbo-2024-04-09"]
         U --> CHAT
     end
 
@@ -129,7 +131,7 @@ flowchart LR
     CHI --> API -->|"β：格式化上下文字符串"| CHAT
 ```
 
-边界说明：论文把"构建图谱用的 LLM"（实验里是 gpt-4o-mini）和"最终回答用户问题的 Chat Agent LLM"（实验里是 gpt-4o-mini / gpt-4o）明确分成两个角色——前者活在 Zep API 边界**里面**（属于记忆系统自己的内部机制），后者活在边界**外面**（属于 Agent 侧，只消费 Zep 吐出来的 β 字符串）。检索阶段的重排如果选了 cross-encoder，也会在边界内部触发一次模型调用（论文用的是 BAAI 的 BGE-m3，§4.1），同样不算 Agent 侧的"思考"。
+边界说明：论文把"构建图谱用的 LLM"（实验里是 gpt-4o-mini）和"最终回答用户问题的 Chat Agent LLM"（实验里是 gpt-4o-mini-2024-07-18 与 gpt-4o-2024-11-20；另外为了与 MemGPT 的 DMR 结果直接可比，DMR 实验还单独跑了一版 gpt-4-turbo-2024-04-09，§4.1，对应 Table 1 里 Zep+gpt-4-turbo 那一行）明确分成两个角色——前者活在 Zep API 边界**里面**（属于记忆系统自己的内部机制），后者活在边界**外面**（属于 Agent 侧，只消费 Zep 吐出来的 β 字符串）。检索阶段的重排如果选了 cross-encoder，也会在边界内部触发一次模型调用（论文用的是 BAAI 的 BGE-m3，§4.1），同样不算 Agent 侧的"思考"。
 
 ## 5. 我没搞清楚的
 
@@ -150,4 +152,4 @@ flowchart LR
 - **BFS 的默认跳数 `n` 论文没给具体数字**。§3.1 只说"identifies additional nodes and edges within n-hops"，反复用符号 `n` 指代跳数，但没有给出实验里实际使用的数值，也没有讨论跳数大小对结果的敏感度。
 - **五种重排方法"什么场景该用哪种"，论文只描述了各自是什么，没给选择准则**。§3.2 逐一介绍 RRF/MMR/episode-mentions/node-distance/cross-encoder 的机制，但没有一句话讲"延迟敏感场景该选哪个""精度优先场景该选哪个"这类工程取舍建议——五种方法之间也没有互相的效果对比数据。
 - **论文用同一个希腊字母 `φ` 表示两个不同概念，容易造成误读**：§2 开头定义图 `G = (N, E, φ)` 里的 `φ: E → N × N` 是"关联函数"（哪条边连哪两个节点），§3 里的 `φ: S → Esn × Nsn × Ncn` 是"Search 检索函数"——二者定义域/值域完全不同，论文没有在符号上做区分（比如加下标），只能靠读者根据上下文自行分辨。
-- **论文完全没有报告"图构建"阶段的成本/延迟**。Table 2 只报告了检索阶段的 latency（Zep 3.20s/2.58s vs full-context 31.3s/28.9s），"latency 降低 90%"这个核心卖点只覆盖检索侧；构建一个 episode 平均要调几次 LLM、花多少钱/多少延迟，论文正文和附录都没有给数字。
+- **论文完全没有报告"图构建"阶段的成本/延迟**。Table 2 报告的那组 latency（Zep 3.20s/2.58s vs full-context 31.3s/28.9s）**论文自己对它是什么口径表述不一**：摘要（§1）叫 "response latency"、§4.2.1 正文叫 "response times"，只有 §5 才称它为 "latency benchmarks for our retrieval mechanisms"——而 full-context 那 31.3s 显然含了在 115k token 上下文上的生成时间，所以"这是纯检索阶段耗时"只是其中一种读法，论文没有澄清这处歧义。无论取哪种读法，"latency 降低 90%"这个核心卖点都只覆盖检索/应答侧；构建一个 episode 平均要调几次 LLM、花多少钱/多少延迟，论文正文和附录都没有给数字。

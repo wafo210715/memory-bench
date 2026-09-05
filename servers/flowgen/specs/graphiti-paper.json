@@ -1,0 +1,89 @@
+{
+  "system": "graphiti",
+  "view": "paper",
+  "title": "Zep / Graphiti — paper view",
+  "subtitle": "The mechanism as Rasmussen et al. describe it. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes mean the paper defines no such step.",
+  "source": "Rasmussen et al. 2025, Zep (arXiv:2501.13956v1)   ·   every anchor re-located in the paper text during verification (52 paper-side assertions, 48 ✓ / 4 ◐ / 0 ✗)",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "The paper's whole write path is LLM-bound: eight of the fifteen steps are separate model calls, and the paper never reports how many calls an episode costs.",
+    "B4 shows all five rerankers Zep offers. They are mutually exclusive — one runs per query — so only RRF is wired; the other four sit in the same lane as alternatives.",
+    "B5 SELECT is empty on purpose: the paper has no quota or combinatorial selection, only a top-k cut. B8 LOOP is empty because §3 is a single function composition, not an iterative search."
+  ],
+  "nodes": [
+    {"id": "ep",       "stage": "A1", "row": 0,  "type": "io",    "seq": 1,  "label": "IO:Episode — one message + speaker + t_ref", "cite": "§2.1  txt:102-109"},
+
+    {"id": "ext",      "stage": "A2", "row": 1,  "type": "llm",   "seq": 2,  "label": "LLM:Extract — entities, context = last n = 4 messages", "cite": "§2.2.1  txt:130-133"},
+    {"id": "reflect",  "stage": "A2", "row": 2,  "type": "llm",   "seq": 3,  "label": "LLM:Reflect — reflexion-style self-check", "cite": "§2.2.1  txt:133-134\nno prompt or pseudocode given"},
+    {"id": "esum",     "stage": "A2", "row": 3,  "type": "llm",   "seq": 4,  "label": "LLM:Summarize — entity summary from the episode", "cite": "§2.2.1  txt:135-136"},
+
+    {"id": "nemb",     "stage": "A4", "row": 3,  "type": "alg",   "seq": 5,  "label": "Embed entity name — 1024-d", "cite": "§2.2.1  txt:137"},
+
+    {"id": "candcos",  "stage": "A3", "row": 4,  "type": "alg",   "seq": 6,  "label": "Retrieval:Emb — cosine over existing entities", "cite": "§2.2.1  txt:137-139"},
+    {"id": "candbm",   "stage": "A3", "row": 5,  "type": "alg",   "seq": 7,  "label": "Retrieval:BM25 — separate full-text over names & summaries", "cite": "§2.2.1  txt:137-139"},
+    {"id": "eres",     "stage": "A3", "row": 6,  "type": "llm",   "seq": 8,  "label": "LLM:Dedup — entity resolution → updated name + summary", "cite": "§2.2.1  txt:139-141"},
+
+    {"id": "fext",     "stage": "A2", "row": 7,  "type": "llm",   "seq": 9,  "label": "LLM:Extract — facts as edges, each with a key predicate", "cite": "§2.2.2  txt:146-149\nsame fact repeated across pairs\nsimulates a hyper-edge"},
+    {"id": "femb",     "stage": "A4", "row": 7,  "type": "alg",   "seq": 10, "label": "Embed fact", "cite": "§2.2.2"},
+
+    {"id": "edup",     "stage": "A3", "row": 8,  "type": "llm",   "seq": 11, "label": "LLM:Dedup — edges, restricted to the same entity pair", "cite": "§2.2.2  txt:150-155"},
+
+    {"id": "tex",      "stage": "A2", "row": 9,  "type": "llm",   "seq": 12, "label": "LLM:TimeExtract — t_valid / t_invalid anchored on t_ref", "cite": "§2.2.3  txt:162-165"},
+    {"id": "inval",    "stage": "A3", "row": 9,  "type": "llm",   "seq": 13, "label": "LLM:Judge — edge invalidation, old t_invalid ← new t_valid", "cite": "§2.2.3  txt:166-170\nstale edges are flagged, never deleted"},
+
+    {"id": "graph",    "stage": "A5", "row": 10, "type": "store", "seq": 14, "label": "Store:Graph — Neo4j via predefined Cypher, no LLM-written queries", "cite": "§2.2.4  txt:142-144"},
+
+    {"id": "cdyn",     "stage": "A2", "row": 11, "type": "llm",   "seq": 15, "label": "LLM:Summarize — community dynamic extension, one label-propagation step", "cite": "§2.3  txt:180-187\nnew node joins the neighbours' majority community"},
+    {"id": "crefresh", "stage": "A2", "row": 12, "type": "llm",   "seq": 16, "label": "LLM:Summarize — periodic full refresh, map-reduce + community name", "cite": "§2.3  txt:187-194\nperiod never specified"},
+    {"id": "cemb",     "stage": "A4", "row": 12, "type": "alg",   "seq": 17, "label": "Embed community name", "cite": "§2.3  txt:191-194"},
+    {"id": "cstore",   "stage": "A5", "row": 12, "type": "store", "seq": 18, "label": "Store:Graph — community subgraph Gc", "cite": "§2.2  txt:85-88"},
+
+    {"id": "q",        "stage": "B1", "row": 0,  "type": "io",    "seq": 19, "label": "IO:Query α", "cite": "§3.1  txt:197-200\nno query parsing described"},
+
+    {"id": "cos",      "stage": "B2", "row": 0,  "type": "alg",   "seq": 20, "label": "Retrieval:Emb — φ_cos, cosine", "cite": "§3.2  txt:229-230"},
+    {"id": "bm25",     "stage": "B2", "row": 1,  "type": "alg",   "seq": 21, "label": "Retrieval:BM25 — φ_bm25, Neo4j Lucene", "cite": "§3.2  txt:229-230"},
+    {"id": "bfs",      "stage": "B3", "row": 0,  "type": "alg",   "seq": 22, "label": "Retrieval:Graph — φ_bfs, n-hop BFS, recent episodes as seeds", "cite": "§3.2  txt:244-248\nn never given a value"},
+
+    {"id": "rrf",      "stage": "B4", "row": 0,  "type": "fusion","seq": 23, "label": "Fusion:RRF", "cite": "§3.4  txt:256-264  [20]"},
+    {"id": "mmr",      "stage": "B4", "row": 1,  "type": "fusion","seq": null, "label": "Fusion:MMR", "cite": "alternative — one of five"},
+    {"id": "epment",   "stage": "B4", "row": 2,  "type": "alg",   "seq": null, "label": "Fusion:EpisodeMentions", "cite": "alternative — Zep's own"},
+    {"id": "nodedist", "stage": "B4", "row": 3,  "type": "alg",   "seq": null, "label": "Fusion:NodeDistance", "cite": "alternative — needs a centre node"},
+    {"id": "xenc",     "stage": "B4", "row": 4,  "type": "alg",   "seq": null, "label": "Fusion:CrossEncoder", "cite": "alternative — BGE-m3, §4.1\n\"most sophisticated\", highest cost"},
+
+    {"id": "chi",      "stage": "B6", "row": 0,  "type": "io",    "seq": 24, "label": "χ constructor → context string β", "cite": "§3  txt:208-213\ntemplate has <FACTS> and <ENTITIES> only"},
+    {"id": "ans",      "stage": "B7", "row": 0,  "type": "llm",   "seq": 25, "label": "LLM:Answer — chat agent, outside the boundary", "cite": "§4  gpt-4o-mini / gpt-4o /\ngpt-4-turbo-2024-04-09"}
+  ],
+  "edges": [
+    {"from": "ep",       "to": "ext"},
+    {"from": "ext",      "to": "reflect"},
+    {"from": "reflect",  "to": "esum"},
+    {"from": "esum",     "to": "nemb"},
+    {"from": "nemb",     "to": "candcos"},
+    {"from": "esum",     "to": "candbm"},
+    {"from": "candcos",  "to": "eres"},
+    {"from": "candbm",   "to": "eres"},
+    {"from": "eres",     "to": "fext"},
+    {"from": "fext",     "to": "femb"},
+    {"from": "femb",     "to": "edup"},
+    {"from": "edup",     "to": "tex"},
+    {"from": "tex",      "to": "inval"},
+    {"from": "inval",    "to": "graph"},
+    {"from": "graph",    "to": "cdyn", "label": "new entity node"},
+    {"from": "cdyn",     "to": "crefresh", "label": "periodic"},
+    {"from": "crefresh", "to": "cemb"},
+    {"from": "cemb",     "to": "cstore"},
+
+    {"from": "q",        "to": "cos"},
+    {"from": "q",        "to": "bm25"},
+    {"from": "q",        "to": "bfs"},
+    {"from": "graph",    "to": "cos"},
+    {"from": "graph",    "to": "bm25"},
+    {"from": "graph",    "to": "bfs"},
+    {"from": "cstore",   "to": "cos"},
+    {"from": "cos",      "to": "rrf"},
+    {"from": "bm25",     "to": "rrf"},
+    {"from": "bfs",      "to": "rrf"},
+    {"from": "rrf",      "to": "chi"},
+    {"from": "chi",      "to": "ans"}
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "system": "graphiti",
+  "view": "diff",
+  "title": "Zep / Graphiti — where the paper and the code part ways",
+  "subtitle": "Only the divergent steps are drawn. Each node states both sides; the lane says which stage of the pipeline the divergence sits in.",
+  "source": "paper arXiv:2501.13956v1  ×  getzep/graphiti @ a6e026f  ×  servers/graphiti/server.py   ·   servers/graphiti/verification.md, 119 assertions checked (98 ✓ / 4 ✗ / 15 ◐ / 2 ?)",
+  "footer": "memory-bench · methodology flow · paper ↔ code divergence",
+  "legend_notes": [
+    "The headline: the paper's write path reads as a per-entity, per-edge LLM loop. The engine batches it. Entity resolution is one call, summaries go 30 at a time — cost is flat in the number of entities, not linear.",
+    "The single paper-only step is the reflexion self-check. It is the paper's stated defence against hallucinated entities, and the string 'reflexion' appears nowhere in the repo.",
+    "Everything the code added sits downstream: a fourth retrieval channel, a second auto-seeded BFS, a quota allocator and a hand-written χ — all in stages the paper leaves vague.",
+    "Two divergences are introduced by this repo's wrapper, not by the engine: session-sized episodes (D17) and the binary cross-encoder downgrade (D18)."
+  ],
+  "nodes": [
+    {"id": "d17", "stage": "A1", "row": 0, "type": "io", "state": "differs",
+     "label": "Episode granularity",
+     "cite": "paper: episode = one message,\nextraction window = last 4\ncode: this repo joins a whole\nsession into one episode\nserver.py:414-417 → the last-10\nwindow becomes last 10 sessions"},
+
+    {"id": "d1",  "stage": "A2", "row": 0, "type": "llm", "state": "paper_only",
+     "label": "Reflexion-style self-check",
+     "cite": "paper: §2.2.1 txt:133-134\n\"to minimize hallucinations and\nenhance extraction coverage\"\ncode: grep -i reflexion → 0 hits;\nextraction returns after one call"},
+
+    {"id": "d14", "stage": "A2", "row": 1, "type": "llm", "state": "differs",
+     "label": "How strict the extraction prompt is",
+     "cite": "paper: appendix txt:461\n\"explicitly or implicitly\",\n6 short guidelines (6th truncated)\ncode: 11 NEVER-extract rules,\n6 worked examples, implicitly\ndropped  extract_nodes.py:90-203"},
+
+    {"id": "d2",  "stage": "A3", "row": 0, "type": "llm", "state": "differs",
+     "label": "Entity resolution granularity",
+     "cite": "paper: txt:139-141 reads per\nentity — candidates + context\nthrough the resolution prompt\ncode: zero candidates skipped\n(:652), similarity resolves the\nrest without an LLM (:659), one\nbatch call for leftovers (:681)"},
+
+    {"id": "d3",  "stage": "A3", "row": 1, "type": "llm", "state": "differs",
+     "label": "What resolution returns",
+     "cite": "paper: txt:141 \"an updated name\nand summary\"\ncode: NodeDuplicate carries no\nsummary field at all\ndedupe_nodes.py:25-34 — summary\nis regenerated later, separately"},
+
+    {"id": "d6",  "stage": "A3", "row": 2, "type": "nlp", "state": "code_only",
+     "label": "A new edge can be born invalid",
+     "cite": "paper: txt:166-170 only ever\ngoes one way — new invalidates old\ncode: if the contradicting edge is\nnewer, the new edge gets\ninvalid_at + expired_at on arrival\nedge_operations.py:826-839"},
+
+    {"id": "d22", "stage": "A2", "row": 2, "type": "llm", "state": "differs",
+     "label": "Summary generation cost",
+     "cite": "paper: an entity summary per\nepisode, no batching described\ncode: short ones are concatenated\nwith zero LLM (:879-882); the rest\ngo 30 per call (MAX_NODES = 30)\nmeasured llm_calls = 3, flat"},
+
+    {"id": "d16", "stage": "A5", "row": 3, "type": "store", "state": "code_only",
+     "label": "A fifth timestamp",
+     "cite": "paper: txt:162-165 \"tracks four\ntimestamps\"\ncode: reference_time is a fifth,\nedges.py:280, and it is really\npersisted — edges.py:355"},
+
+    {"id": "d15", "stage": "A5", "row": 4, "type": "store", "state": "code_only",
+     "label": "A saga dimension",
+     "cite": "paper: the word never appears\ncode: SagaNode, HAS_EPISODE,\nNEXT_EPISODE all exist\nnodes.py:867 — unused by this repo"},
+
+    {"id": "d4",  "stage": "A2", "row": 3, "type": "llm", "state": "differs",
+     "label": "When communities are maintained",
+     "cite": "paper: txt:184-187 reads as if it\nhappens as data flows in\ncode: update_communities defaults\nto False (graphiti.py:989); the\nfull build is a manual MCP tool.\n105/105 retrieves saw 0 communities"},
+
+    {"id": "d5",  "stage": "A2", "row": 4, "type": "sched", "state": "differs",
+     "label": "Does label propagation terminate",
+     "cite": "paper: txt:181-183 cites Zhu &\nGhahramani — LP is defined as\niterating to convergence\ncode: while True, no cap, in both\nimplementations; measured 12M\nrounds in 4 minutes without\nconverging on the LoCoMo graph"},
+
+    {"id": "d7",  "stage": "B2", "row": 0, "type": "alg", "state": "code_only",
+     "label": "A fourth retrieval channel",
+     "cite": "paper: φ has three components\ntxt:202-205\ncode: episode_search, BM25 only,\nand it is in the engine's default\nrecipe  search.py:664\n(this repo switches it off)"},
+
+    {"id": "d13", "stage": "B2", "row": 1, "type": "alg", "state": "differs",
+     "label": "Do invalidated facts still come back",
+     "cite": "paper: never discusses it\ncode: the filter exists\n(search_filters.py:65, :242-271)\nbut every caller passes an empty\nSearchFilters — so yes, they do"},
+
+    {"id": "d11", "stage": "B3", "row": 0, "type": "alg", "state": "differs",
+     "label": "Where BFS seeds come from",
+     "cite": "paper: txt:246-248 suggests using\nrecent episodes as seeds\ncode: no seed is ever passed, so\nthe first BFS returns nothing and\na second one is auto-seeded from\nthis round's own hits\nsearch.py:332-353, [0, 40]"},
+
+    {"id": "d12", "stage": "B4", "row": 0, "type": "fusion", "state": "differs",
+     "label": "Which rerankers apply where",
+     "cite": "paper: txt:256-264 lists five,\nno object-type distinction\ncode: edges and nodes get all 5,\ncommunities 3, episodes 2\nsearch_config.py:53/61/69/74"},
+
+    {"id": "d18", "stage": "B4", "row": 1, "type": "alg", "state": "differs",
+     "label": "The cross-encoder",
+     "cite": "paper: BGE-m3, continuous scores\ntxt:284\ncode: this repo swaps in glm-5.3\nemitting True/False → 1.0 / 0.0\nserver.py:157-208 — and it is off\nby default anyway"},
+
+    {"id": "dsel", "stage": "B5", "row": 0, "type": "fusion", "state": "code_only",
+     "label": "Quota allocation across object types",
+     "cite": "paper: no selection rule anywhere,\nonly a top-k cut\ncode: largest-remainder split at\n3:1:1 with backfill decides what\nthe answerer actually sees\nserver.py:387-409"},
+
+    {"id": "d9",  "stage": "B5", "row": 1, "type": "alg", "state": "differs",
+     "label": "top-k",
+     "cite": "paper: contradicts itself —\n20 at txt:275, 10 at txt:323-324\ncode: DEFAULT_SEARCH_LIMIT = 10,\nthis repo over-fetches max(top_k,\n20) then cuts back"},
+
+    {"id": "d19", "stage": "B6", "row": 0, "type": "io", "state": "differs",
+     "label": "Who owns χ",
+     "cite": "paper: txt:208-213 makes χ part\nof f — an engine capability\ncode: the engine has it\n(search_helpers.py:28) but\nsearch_() never calls it; the\nwrapper wrote its own instead"},
+
+    {"id": "d8",  "stage": "B6", "row": 1, "type": "io", "state": "code_only",
+     "label": "Two extra context blocks",
+     "cite": "paper: the example template has\n<FACTS> and <ENTITIES> only\ntxt:214-226\ncode: the engine's template also\nrenders <EPISODES> and\n<COMMUNITIES>  search_helpers.py:52-71"}
+  ],
+  "edges": []
+}

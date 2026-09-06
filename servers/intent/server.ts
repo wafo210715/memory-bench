@@ -404,19 +404,29 @@ function renderEnvelopeFact(e: IntentEntry, idx: number, fact: string, score: nu
   };
 }
 
-// baseline：session 粒度——意图概要 + 命中事实 + 原文摘录；timestamp 用事实时间
+// baseline：session 粒度——命中事实 + 意图概要兑底 + 原文摘录；timestamp 用事实时间
+// S1 envelope v2（2026-09-07，阶梯预注册单变量）：事实位 2→4；选择门控 kw→max(kw, dense cos≥0.30)；
+// gist 仅在命中事实<2 时兑底。S0 诊断：枚举型 hop 题的答案词与 query 零重叠，
+// 纯关键词门控使库内事实永不上台面（cat1 错题 68% 证据缺答案）。
+const DENSE_FACT_FLOOR = 0.30;
 function renderEnvelopeFull(e: IntentEntry, score: number, scopeId: string, qTokens: Set<string>,
-  tier2Quotes?: string[]) {
+  qVec: number[] | null, factVecs: number[][] | undefined, tier2Quotes?: string[]) {
   const day = (e.startedAt || "").slice(0, 10);
   const head = `- ${day} · ${e.title} (session:${e.sessionId})`;
-  const gist = `intent: ${e.abstract.intent}; conclusion: ${e.abstract.conclusion}`.slice(0, 140);
   const matched = e.facts
-    .map((f) => ({ f, s: overlapScore(f, qTokens) }))
+    .map((f, i) => {
+      const kw = overlapScore(f, qTokens);
+      const dv = qVec && factVecs && factVecs[i] ? cosine(qVec, factVecs[i]) : 0;
+      return { f, s: Math.max(kw, dv >= DENSE_FACT_FLOOR ? dv : 0) };
+    })
     .filter((x) => x.s > 0)
-    .sort((a, b) => b.s - a.s)
-    .slice(0, 2)
-    .map((x) => (x.f.length > 118 ? x.f.slice(0, 117) + "…" : x.f));
+    .sort((a, b) => b.s - a.s || (a.f < b.f ? -1 : 1))
+    .slice(0, 4)
+    .map((x) => (x.f.length > 110 ? x.f.slice(0, 109) + "…" : x.f));
   const factLine = matched.length ? `facts: ${matched.join(" | ")}` : "";
+  const gist = matched.length < 2
+    ? `intent: ${e.abstract.intent}; conclusion: ${e.abstract.conclusion}`.slice(0, 100)
+    : "";
   const fixed = head.length + gist.length + factLine.length + 30;
   const budget = Math.max(600 - fixed, 80);
   let excerpt = "";
@@ -437,7 +447,7 @@ function renderEnvelopeFull(e: IntentEntry, score: number, scopeId: string, qTok
     excerpt = p.text;
     range = p.range;
   }
-  let text = [head, `  ${gist}`, factLine ? `  ${factLine}` : "", excerpt ? `  src: ${excerpt}` : ""]
+  let text = [head, gist ? `  ${gist}` : "", factLine ? `  ${factLine}` : "", excerpt ? `  src: ${excerpt}` : ""]
     .filter(Boolean).join("\n");
   if (text.length > 600) text = text.slice(0, 599) + "…";
   return {
@@ -726,7 +736,8 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
           .map((x) => ({ e: byId.get(x.id)!, s: x.s }))
           .filter((x) => Boolean(x.e))
           .sort((x, y) => ((x.e.startedAt || "") < (y.e.startedAt || "") ? -1 : 1));
-        results = ordered.map((x) => renderEnvelopeFull(x.e, x.s, scopeId, qTokens, tier2.get(x.e.sessionId)));
+        results = ordered.map((x) => renderEnvelopeFull(x.e, x.s, scopeId, qTokens,
+          qVec, vmap[x.e.sessionId]?.facts, tier2.get(x.e.sessionId)));
       }
 
       parts.push(`MODE: ${MODE}${TIER2 ? "+tier2" : ""}${OFF.size ? " ablate=" + [...OFF].join("/") : ""}`);

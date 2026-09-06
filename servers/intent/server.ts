@@ -41,7 +41,8 @@ import { join } from "path";
 
 const REPO_ROOT = join(import.meta.dir, "..", "..");
 const STATE_DIR = process.env.MEMBENCH_STATE_DIR || join(REPO_ROOT, ".state", "intent");
-const SNAP_ROOT = join(STATE_DIR, "..", "__snapshots__", "intent");
+// 快照随 state 目录走（S6 用独立 state 目录时天然隔离，不与 v1 快照碰撞；旧路径 .state/__snapshots__/intent 孤儿化无害）
+const SNAP_ROOT = join(STATE_DIR, "__snapshots__");
 
 const LLM_KEY = process.env.MEMBENCH_LLM_API_KEY || "";
 const LLM_BASE = (process.env.MEMBENCH_LLM_BASE_URL || "").replace(/\/$/, "");
@@ -57,6 +58,16 @@ const MODE = (process.env.MEMBENCH_INTENT_MODE || "full") as "full" | "facts";
 const TIER2 = process.env.MEMBENCH_INTENT_TIER2 === "on";
 const OFF = new Set((process.env.MEMBENCH_INTENT_ABLATE || "").split(",").map((s) => s.trim()).filter(Boolean));
 const on = (k: string) => !OFF.has(k);
+
+// ===== 阶梯开关（EXPERIMENT-LADDER.md 预注册；监工只切 env 不改码）=====
+const PRF = process.env.MEMBENCH_INTENT_PRF === "on";          // S2：伪相关反馈二跳查询扩展（零 LLM，确定性）
+const NUMTOK = process.env.MEMBENCH_INTENT_NUMTOK === "on";    // S3：数字 token 进分词（审查 MAJOR-5）
+const MIX = (() => {                                            // S5：混合粒度 "nS,nF"
+  const m = (process.env.MEMBENCH_INTENT_MIX || "").match(/^(\d+),(\d+)$/);
+  return m ? { nS: parseInt(m[1], 10), nF: parseInt(m[2], 10) } : null;
+})();
+const DISTILL_V2 = process.env.MEMBENCH_INTENT_DISTILL === "v2"; // S6：蒸馏 v2（需配合独立 MEMBENCH_STATE_DIR 重灌）
+const PRF_TOP_SESS = 3, PRF_TOP_FACTS = 2, PRF_MAX_TOKENS = 10;
 
 const RRF_K = 60;
 const CHAIN_MIN_COS = 0.60;
@@ -230,7 +241,7 @@ function entryFromParsed(sessionId: string, parsed: any, turns: Array<{ role?: s
   const facts = (Array.isArray(parsed?.facts) ? parsed.facts : [])
     .filter((f: unknown) => typeof f === "string" && (f as string).trim().length > 0)
     .map((f: string) => f.trim())
-    .slice(0, 10);
+    .slice(0, DISTILL_V2 ? 15 : 10);
   return {
     sessionId,
     title: parsed?.title || (turns[0]?.content || "").slice(0, 40),
@@ -263,15 +274,20 @@ async function distill(sessionId: string, turns: Array<{ role?: string; content?
   const transcript = transcriptOf(turns);
   // facts 规则压缩自 mem0 核心四条 + mandol L0 自包含改写 + atommem 第三人称规则；
   // 绝对日期依据 loader 注入的 [YYYY-MM-DD] turn 前缀（bench-design §3.2）
+  // S6 v2：枚举汇总事实 + 关系事实 + 逐事实日期前缀（攻 cat1 枚举型题 containment 天花板）
+  const v2Rules = DISTILL_V2 ? `
+- Include 1-3 "rollup" facts that enumerate items of one kind mentioned in this session, e.g. "Activities Melanie mentions in this session: pottery, camping, painting."
+- Include relation facts connecting people or events when present, e.g. "Caroline's friend Rob organized the charity run."
+- Start every fact with its date in [YYYY-MM-DD] form when known.` : "";
   const prompt = `Analyze the conversation transcript and output ONLY a JSON object (no other text):
-${SCHEMA_HINT}
+${DISTILL_V2 ? SCHEMA_HINT.replace("5-10 statements", "8-15 statements") : SCHEMA_HINT}
 
 Rules for "facts" (the most important field):
 - Each fact is ONE self-contained sentence a stranger could understand with no context.
 - Third person only; use explicit names, never pronouns (no he/she/they/it as subjects).
 - Resolve relative time ("yesterday", "last month", "next week") into absolute dates using the [YYYY-MM-DD] prefixes on the turns; write dates as YYYY-MM-DD. Never invent a year.
 - Copy names, numbers, places, dates exactly as written in the text.
-- Prefer facts that answer who / what / when / where.
+- Prefer facts that answer who / what / when / where.${v2Rules}
 - English only.
 
 Transcript:
@@ -308,13 +324,19 @@ ${JSON.stringify({ title: entry.title, scenario: entry.abstract.scenario, intent
 // ===== 打分原语 =====
 
 function tokenize(text: string): Set<string> {
-  // 中文滑窗 bigram（重叠）+ 英文小写词（≥3 字符）；与 mock server 语义对齐
+  // 中文滑窗 bigram（重叠）+ 英文小写词（≥3 字符）；近似 mock 语义（审查 MAJOR-5：mock 收数字，S3 前本实现不收）
   const cnRuns = text.match(/[\u4e00-\u9fff]+/g) || [];
   const cn: string[] = [];
   for (const run of cnRuns) {
     for (let i = 0; i + 1 < run.length; i++) cn.push(run.slice(i, i + 2));
   }
   const en = (text.match(/[a-zA-Z]{3,}/g) || []).map((w) => w.toLowerCase());
+  if (NUMTOK) {
+    // S3：数字 token，去前导零归一（"07"→"7"），使 query 的 "7" 能对上 [2023-05-07] 前缀里的 "07"
+    for (const run of text.match(/\d+/g) || []) {
+      en.push(run.replace(/^0+(?=\d)/, ""));
+    }
+  }
   return new Set([...cn, ...en]);
 }
 
@@ -621,35 +643,85 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
           catch (err) { parts.push(`DENSE_FALLBACK: ${String(err).slice(0, 80)}`); }
         }
 
-        // B2 五路排名 → RRF
-        const rankings: Array<Array<{ id: string; s: number }>> = [];
-        const factsKw: Array<{ id: string; s: number }> = [];
-        const sumKw: Array<{ id: string; s: number }> = [];
-        const rawKw: Array<{ id: string; s: number }> = [];
-        const factsDe: Array<{ id: string; s: number }> = [];
-        const sumDe: Array<{ id: string; s: number }> = [];
-        for (const e of entries) {
-          const sFk = bestFactScore(e, qTokens);
-          const sSk = overlapScore(summaryHay(e), qTokens);
-          const sRk = rawScore(scopeId, e.sessionId, qTokens);
-          if (sFk > 0) factsKw.push({ id: e.sessionId, s: sFk });
-          if (sSk > 0) sumKw.push({ id: e.sessionId, s: sSk });
-          if (sRk > 0) rawKw.push({ id: e.sessionId, s: sRk });
-          const v = vmap[e.sessionId];
-          if (qVec && v) {
+        // B2 五路排名 → RRF（kw 三路支持用扩展后 token 集重算——S2 PRF）
+        const denseFacts: Array<{ id: string; s: number }> = [];
+        const denseSum: Array<{ id: string; s: number }> = [];
+        if (qVec) {
+          for (const e of entries) {
+            const v = vmap[e.sessionId];
+            if (!v) continue;
             let fd = 0;
             for (const fv of v.facts) { const c = cosine(qVec, fv); if (c > fd) fd = c; }
-            if (fd > 0) factsDe.push({ id: e.sessionId, s: fd });
+            if (fd > 0) denseFacts.push({ id: e.sessionId, s: fd });
             const sd = v.summary ? cosine(qVec, v.summary) : 0;
-            if (sd > 0) sumDe.push({ id: e.sessionId, s: sd });
+            if (sd > 0) denseSum.push({ id: e.sessionId, s: sd });
           }
         }
-        rankings.push(factsKw, sumKw, rawKw);
-        if (qVec) rankings.push(factsDe, sumDe);
-        const rrf = new Map<string, number>();
-        for (const list of rankings) {
-          list.sort((x, y) => y.s - x.s || (x.id < y.id ? -1 : 1));
-          list.forEach((x, rank) => rrf.set(x.id, (rrf.get(x.id) || 0) + 1 / (RRF_K + rank + 1)));
+        const kwLists = (qT: Set<string>): Array<Array<{ id: string; s: number }>> => {
+          const fk: Array<{ id: string; s: number }> = [];
+          const sk: Array<{ id: string; s: number }> = [];
+          const rk: Array<{ id: string; s: number }> = [];
+          for (const e of entries) {
+            const a1 = bestFactScore(e, qT);
+            const b1 = overlapScore(summaryHay(e), qT);
+            const c1 = rawScore(scopeId, e.sessionId, qT);
+            if (a1 > 0) fk.push({ id: e.sessionId, s: a1 });
+            if (b1 > 0) sk.push({ id: e.sessionId, s: b1 });
+            if (c1 > 0) rk.push({ id: e.sessionId, s: c1 });
+          }
+          return [fk, sk, rk];
+        };
+        const fuse = (lists: Array<Array<{ id: string; s: number }>>): Map<string, number> => {
+          const m = new Map<string, number>();
+          for (const list of lists) {
+            list.sort((x, y) => y.s - x.s || (x.id < y.id ? -1 : 1));
+            list.forEach((x, rank) => m.set(x.id, (m.get(x.id) || 0) + 1 / (RRF_K + rank + 1)));
+          }
+          return m;
+        };
+        let qEff = qTokens;
+        let rrf = fuse([...kwLists(qTokens), ...(qVec ? [denseFacts, denseSum] : [])]);
+        // S2 PRF：首轮 top-3 session 的高分事实抽扩展词（df 过滤防大路词），并入 token 集重打分。
+        // 攻 S0 病灶：枚举/桥接词不在 query 里（"activities" 对不上 "camping"）。零 LLM，确定性。
+        if (PRF && rrf.size) {
+          const df = new Map<string, number>();
+          for (const e of entries) {
+            const st = new Set<string>();
+            for (const f of e.facts) for (const t of tokenize(f)) st.add(t);
+            for (const t of st) df.set(t, (df.get(t) || 0) + 1);
+          }
+          const half = Math.ceil(entries.length / 2);
+          const cand = new Map<string, number>();
+          const top3 = [...rrf.entries()].sort((x, y) => y[1] - x[1] || (x[0] < y[0] ? -1 : 1)).slice(0, PRF_TOP_SESS);
+          for (const [sid] of top3) {
+            const e2 = byId.get(sid);
+            if (!e2) continue;
+            const fv = vmap[sid]?.facts;
+            const scored = e2.facts
+              .map((f, i) => {
+                const kw = overlapScore(f, qTokens);
+                const dv = qVec && fv && fv[i] ? cosine(qVec, fv[i]) : 0;
+                return { f, s: Math.max(kw, dv >= DENSE_FACT_FLOOR ? dv : 0) };
+              })
+              .filter((x) => x.s > 0)
+              .sort((x, y) => y.s - x.s || (x.f < y.f ? -1 : 1))
+              .slice(0, PRF_TOP_FACTS);
+            for (const { f } of scored) {
+              for (const t of tokenize(f)) {
+                if (qTokens.has(t)) continue;
+                const d = df.get(t) || 0;
+                if (d > half) continue;
+                if (!cand.has(t)) cand.set(t, d);
+              }
+            }
+          }
+          const exp = [...cand.entries()].sort((x, y) => x[1] - y[1] || (x[0] < y[0] ? -1 : 1))
+            .slice(0, PRF_MAX_TOKENS).map(([t]) => t);
+          if (exp.length) {
+            qEff = new Set([...qTokens, ...exp]);
+            rrf = fuse([...kwLists(qEff), ...(qVec ? [denseFacts, denseSum] : [])]);
+            parts.push(`PRF: +${exp.length}tok`);
+          }
         }
 
         // B3 链扩展：入选者的链邻居折扣进候选
@@ -705,6 +777,30 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
           selectedIds = selectedIds.slice(0, topK);
         }
 
+        // S5 混合粒度：nS 个 session envelope（时间线）+ nF 条来自未入选 session 的裸事实（密度）
+        let factExtras: any[] = [];
+        if (MIX) {
+          const nS = Math.min(MIX.nS, selectedIds.length, topK);
+          const nF = Math.max(0, Math.min(MIX.nF, topK - nS));
+          const keep = selectedIds.slice(0, nS);
+          const keepSet = new Set(keep.map((x) => x.id));
+          const pool2: Array<{ e: IntentEntry; i: number; f: string; s: number }> = [];
+          for (const e of entries) {
+            if (keepSet.has(e.sessionId)) continue;
+            const fv = vmap[e.sessionId]?.facts;
+            e.facts.forEach((f, i) => {
+              const kw = overlapScore(f, qEff);
+              const dv = qVec && fv && fv[i] ? cosine(qVec, fv[i]) : 0;
+              const s = Math.max(kw, dv >= DENSE_FACT_FLOOR ? dv : 0);
+              if (s > 0) pool2.push({ e, i, f, s });
+            });
+          }
+          pool2.sort((x, y) => y.s - x.s || ((x.e.startedAt || "") < (y.e.startedAt || "") ? -1 : 1) || x.i - y.i);
+          factExtras = pool2.slice(0, nF).map((x) => renderEnvelopeFact(x.e, x.i, x.f, x.s));
+          selectedIds = keep;
+          parts.push(`MIX: ${nS}s+${factExtras.length}f`);
+        }
+
         // Tier2（intent_tier2 臂）：对 RRF 序前 5 精读
         let tier2 = new Map<string, string[]>();
         if (TIER2 && selectedIds.length) {
@@ -736,11 +832,13 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
           .map((x) => ({ e: byId.get(x.id)!, s: x.s }))
           .filter((x) => Boolean(x.e))
           .sort((x, y) => ((x.e.startedAt || "") < (y.e.startedAt || "") ? -1 : 1));
-        results = ordered.map((x) => renderEnvelopeFull(x.e, x.s, scopeId, qTokens,
+        results = ordered.map((x) => renderEnvelopeFull(x.e, x.s, scopeId, qEff,
           qVec, vmap[x.e.sessionId]?.facts, tier2.get(x.e.sessionId)));
+        if (factExtras.length) results = results.concat(factExtras);
       }
 
-      parts.push(`MODE: ${MODE}${TIER2 ? "+tier2" : ""}${OFF.size ? " ablate=" + [...OFF].join("/") : ""}`);
+      parts.push(`MODE: ${MODE}${TIER2 ? "+tier2" : ""}${OFF.size ? " ablate=" + [...OFF].join("/") : ""}`
+        + `${PRF ? " +prf" : ""}${NUMTOK ? " +numtok" : ""}${MIX ? ` +mix${MIX.nS},${MIX.nF}` : ""}${DISTILL_V2 ? " +distillv2" : ""}`);
       return json({ results, query_used: a.query, query_mode: a.query_mode || "fixed",
         latency_ms: Date.now() - t0, native_notes: parts.join("; ") });
     }
@@ -756,6 +854,7 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       const s = readScopes();
       return json({ n_memories: s.n_units, n_sessions: s.sessions.length,
         mode: `${MODE}${TIER2 ? "+tier2" : ""}`, ablate: [...OFF],
+        ladder: { prf: PRF, numtok: NUMTOK, mix: MIX ? `${MIX.nS},${MIX.nF}` : null, distill: DISTILL_V2 ? "v2" : "v1" },
         tokens_used: { ingest: null, retrieve: 0, internal_llm: internalTokens, embed: embedTokens },
         llm_calls: llmCalls, embed_calls: embedCalls,
         last_reset_at: lastResetAt, snapshots: listSnaps() });

@@ -66,3 +66,8 @@ servers/flowgen/out/
 
 # ---- macOS ----
 .DS_Store
+
+# symlink 形态的 venv/node_modules（worktree 环境，目录型 pattern 不匹配 symlink）
+.venv
+servers/intent/node_modules
+runs/*.nohup.log

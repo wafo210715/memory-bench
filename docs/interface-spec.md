@@ -97,6 +97,7 @@
 **渲染规则（全部系统强制一致）**：
 - `text`：单条 markdown 列表项，≤ **600 字符**，超出截断加 `…`；`时间戳 · 内容要点 （session 溯源）` 结构
 - 排序：score 降序；无原生分数的系统按检索顺序，`score: null`
+  - **intent 系臂豁免（2026-09-07，同 turn_range null 先例）**：intent_full/intent_tier2 按**事实时间升序**返回（score 只决定入选）——时间线组装是该系统的原生机制（BASELINE-DESIGN.md B6），属系统属性非格式漂移；对应 run 报告须声明证据排序为跨臂变量
 - `turn_range`：能定位就给，不能给 `null`——**意图系统的原生粒度是 session 级，turn_range 允许为 null**（粒度差异在论文里显式声明，不藏）
 - **这批 envelope 的渲染结果就是喂给答题 LLM 的证据文本**——格式不同 = 混淆，所以格式必须锁死
 

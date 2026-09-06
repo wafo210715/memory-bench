@@ -50,6 +50,27 @@ servers:
     command: "bun"                        # TS/Bun，与 intent-recall-mcp 同栈
     args: ["run", "servers/intent/server.ts"]
     env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL, MEMBENCH_LLM_MODEL]
+    # 2026-09-07 起 server.ts 升级为三臂消融版（英文摘要+自包含事实；此 legacy 名等价 intent_full）
+
+  # ---- 意图系统三臂消融（2026-09-07）：一份代码三入口，state/快照共享，入库只做一次 ----
+  # B 臂 intent_facts：同构建预算的纯记忆库替身（fact 粒度，mem0 形态）——量"没有意图层能拿几分"
+  # C 臂 intent_full ：意图系统（三通道 RRF + session 时间线 envelope + turn_range）
+  # D 臂 intent_tier2：C + 检索期 LLM 精读（active 类，B 档单列不进主表）
+  # C−B = 同等构建预算下意图层包装的净贡献（粗结论的归因臂）
+  intent_full:
+    command: "bun"
+    args: ["run", "servers/intent/server.ts"]
+    env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL, MEMBENCH_LLM_MODEL]
+
+  intent_facts:
+    command: "bun"
+    args: ["run", "servers/intent/server_facts.ts"]
+    env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL, MEMBENCH_LLM_MODEL]
+
+  intent_tier2:
+    command: "bun"
+    args: ["run", "servers/intent/server_tier2.ts"]
+    env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL, MEMBENCH_LLM_MODEL]
 
   # 待封装（Phase 1 后续）：
   # graphiti: Neo4j Docker + neo4j-admin dump 快照

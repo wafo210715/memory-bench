@@ -1,0 +1,288 @@
+{
+  "system": "memorydecoder",
+  "view": "code",
+  "title": "Memory Decoder at Scale — code view",
+  "subtitle": "What the LUMIA-Group/MemoryDecoder-at-Scale repo actually executes. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes do not exist in this system.",
+  "source": "repo MemoryDecoder-at-Scale @ bbbfee85 (\"Initial release\")   ·   verified against servers/memorydecoder/verification.md (61 code-side assertions: 43 ✓ / 2 ✗ / 16 ◐)",
+  "footer": "memory-bench · methodology flow · code view · every citation re-opened and confirmed during verification",
+  "legend_notes": [
+    "Same 6-lane footprint as the paper: A1, A4, A5, A6, B6, B7 have content; B1-B5 are genuinely empty — the whole self-query/index/distribution machinery in A4 runs once while building the datastore, not at query time.",
+    "Two of the paper's mechanism claims do not survive contact with the code: the distributed OPQ+HNSW+sharded Faiss pipeline is a single-machine IndexIVFPQ with no OPQ, no HNSW and no sharding (each process just loads the whole index onto its own GPU), and --ignore_first unconditionally drops the nearest neighbor regardless of whether it equals the query, silently cutting the effective neighbor count from K=1024 to 1023. See the diff view for the full paper⇄code contrast.",
+    "λ selection is genuinely THREE independently-written implementations, not the two-way split some docs describe: only the general-suite launcher uses the 288-entry task-aware auto-table; FinEval's own launcher and the standalone knowledge-task scripts (multihopqa, halueval) hardcode 0.3 and bypass the registry entirely; OpenCompass (BioInst/LawBench) is a third, separately hardcoded 0.3 default.",
+    "The domain-memory continued-pretraining step the paper requires (§3.3) has no launcher anywhere in scripts/ — drawn here as paper_only. A fully working classic online kNN-LM interpolator (KNNWrapperMulti) also ships in the repo with zero reachable call sites; see the diff view rather than this one, since it never actually executes."
+  ],
+  "nodes": [
+    {
+      "id": "corpus",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:Corpus — preprocess_text.sh → preprocess_dataset.py, block_size=2048",
+      "cite": "scripts/data/preprocess_text.sh\nutils/preprocess_dataset.py:111-167\nproduces dstore_range used by every\nlater step to stay index-aligned",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "ctx",
+      "stage": "A1",
+      "row": 1,
+      "type": "io",
+      "seq": 10,
+      "label": "IO:Prompt — harness-assembled prompt",
+      "cite": "eval/prompt.py:11-13,73-77\noutside the memory-system boundary\n(same for lm-eval / opencompass)",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "domaincpt",
+      "stage": "A6",
+      "row": 0,
+      "type": "learn",
+      "seq": null,
+      "state": "paper_only",
+      "label": "Learn:CPT — domain backbone CPT (paper only)",
+      "cite": "paper: §3.3 txt:482-484, §4 txt:533-536\ncode: scripts/ has only 3 data scripts +\n1 train script; README:128-129 lists\nonly 3 stages; no CPT launcher exists",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "key",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "seq": 2,
+      "state": "differs",
+      "label": "NLP:Embed — key — layers[-1].mlp INPUT (post-attn-layernorm, not final-layer output)",
+      "cite": "paper: final-layer hidden state,\ntxt:294-296, txt:431-432\ncode: saveEmbedMulti.py:274-285\n(llama/qwen2/qwen3), capture_input=True;\nActivationCapturer:492-493 takes input[0]",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "datastore",
+      "stage": "A4",
+      "row": 1,
+      "type": "store",
+      "seq": 3,
+      "label": "Store:Datastore — Arrow dstore_*.arrow, fp16 keys / int32 vals",
+      "cite": "saveEmbedMulti.py:319-332 (schema)\n:347-351 shift-by-1 label\n:353-355  -100 mask dropped\nnon-grad pass: train_base.py:389",
+      "prim": "P-DATASTORE"
+    },
+    {
+      "id": "annidx",
+      "stage": "A4",
+      "row": 2,
+      "type": "store",
+      "seq": 4,
+      "state": "differs",
+      "label": "Store:ANNIndex — single-machine IndexIVFPQ(IndexFlatL2), ncentroids=4096, code_size=64",
+      "cite": "paper: OPQ256 + IndexHNSW quantizer +\nsharded IndexIVFPQ, txt:436-449\ncode: build_index.py:126-202,\n:177-178,:198; sample=1000 chunks\n(:182-183); save_knn_pipeline.sh:54;\nzero hnsw/opq/shard hits repo-wide",
+      "prim": "P-ANNINDEX"
+    },
+    {
+      "id": "selfquery",
+      "stage": "A4",
+      "row": 3,
+      "type": "alg",
+      "seq": 5,
+      "state": "differs",
+      "label": "Retrieval:kNN — search(k=1024), --ignore_first drops top-1 UNCONDITIONALLY → 1023 effective",
+      "cite": "paper: conditional self-match removal,\ntxt:302\ncode: saveKNNMulti.py:133 search,\n:138-139 unconditional drop;\nlauncher K=1024 (:50), --ignore_first\nTrue (:158); each rank loads the FULL\nindex onto its own GPU, :92-109\n(data-parallel, not sharded)",
+      "prim": "P-KNNDIST"
+    },
+    {
+      "id": "dist",
+      "stage": "A4",
+      "row": 4,
+      "type": "alg",
+      "seq": 6,
+      "label": "Retrieval:kNNDist — knns_to_probs: softmax(-d/τ), τ=16.0, scatter_add + L1 norm",
+      "cite": "saveKNNMulti.py:143-153\nτ: save_knn_pipeline.sh:51 KNN_TEMP=16.0\n(CLI default 1.0, :290)",
+      "prim": "P-KNNDIST"
+    },
+    {
+      "id": "sparsify",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 7,
+      "state": "differs",
+      "label": "Store:SparseDist — threshold default 0 — ε-pruning NOT executed",
+      "cite": "paper: Eq.6 prunes p≤ε, ≈64.95/row,\ntxt:458-472\ncode: sparsify_distribution :155-178,\n> threshold (:165); CLI default 0 (:292),\nlauncher does not override; constructor\ndefault is 1e-10 (:33) but CLI path\noverwrites it to 0 (:322). K-induced\nsparse support is still kept.",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "flatten",
+      "stage": "A5",
+      "row": 1,
+      "type": "store",
+      "seq": 7,
+      "label": "Store:SparseDist — flatten to memmap shards (offset/token_id/prob/label)",
+      "cite": "utils/flatten_arrow.py\ncreate_memmaps:70-81\nwrite_shape_json:84-103",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "ckpt",
+      "stage": "A5",
+      "row": 2,
+      "type": "store",
+      "seq": 9,
+      "label": "Store:Parametric — M_ψ checkpoint, consumed via model_name_or_path / --memdec_path",
+      "cite": "train_memdec_trainer.py:1165\nfrom_pretrained (continue) or\n:1186 from_config (--from_scratch)",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "train",
+      "stage": "A6",
+      "row": 1,
+      "type": "learn",
+      "seq": 8,
+      "label": "Learn:Decoder — compute_loss: dense + sparse branch, total=α·KL+(1-α)·CE, α=0.5",
+      "cite": "compute_loss: train_memdec_trainer.py:\n765-811 (dense :774-786, sparse :787-804)\ncal_loss.kl_loss_token_memdec_sparse:47-99\nKL :94-96 (row-renorm :84-90), CE :77\ntotal=alpha*kl+(1-alpha)*ce :98\nalpha default 0.5: :139, passed via\nmemdec_alpha=memdec_args.alpha :1246",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "memdecfwd",
+      "stage": "B6",
+      "row": 0,
+      "type": "learn",
+      "seq": 11,
+      "state": "differs",
+      "label": "Learn:MemDecoder — memdec_lm forward, + optional memdec_temp scaling",
+      "cite": "paper: Eq.2 has no temperature term,\ntxt:275-277\ncode: memdec_model.py:80-86, temp\nscaling :90-91,:33,:43; default 1.0\n(hf_memdec.py:99,170) matches paper\nby default; own cache :103",
+      "prim": "P-INTERP"
+    },
+    {
+      "id": "interp",
+      "stage": "B6",
+      "row": 1,
+      "type": "fusion",
+      "seq": 12,
+      "label": "Fusion:Interp — logaddexp(logp_base+log(1-λ), logp_mem+log λ)",
+      "cite": "memdec_model.py:93-98\nweight helpers :55-62\nmathematically equivalent to Eq.2",
+      "prim": "P-INTERP"
+    },
+    {
+      "id": "coefsel_auto",
+      "stage": "B6",
+      "row": 2,
+      "type": "sched",
+      "seq": null,
+      "label": "Sched:Calibrate — 288-entry task-aware λ table (general suite only)",
+      "cite": "hf_memdec.py:181-236 (:203-214 set_lmbda)\nmemorydecoder_defaults.py:118-141,\n:22 asserts exactly 288 entries\nenabled by scripts/general/evaluate.sh:\n18,28,35",
+      "prim": "P-ORCHESTRATE"
+    },
+    {
+      "id": "coefsel_fixed",
+      "stage": "B6",
+      "row": 3,
+      "type": "sched",
+      "seq": null,
+      "label": "Sched:Calibrate — λ hardcoded 0.3 (FinEval + knowledge scripts + opencompass — 3 independent sites)",
+      "cite": "evaluate_fineval.sh:21\nknowledge-tasks/evaluate_multihopqa.py:54,\nevaluate_halueval.py:43 (bypass registry\nentirely, direct MemoryDecoder() :148-153)\nopencompass eval_bioinst_memdec.py:44,\neval_lawbench.py:83 (env LMBDA, default 0.3)",
+      "prim": "P-ORCHESTRATE"
+    },
+    {
+      "id": "backbonefwd",
+      "stage": "B7",
+      "row": 0,
+      "type": "learn",
+      "seq": 11,
+      "label": "Learn:Backbone — base_lm forward, own past_key_values",
+      "cite": "memdec_model.py:73-79 forward\n:102 own cache",
+      "prim": "P-FROZENFWD"
+    },
+    {
+      "id": "tokenout",
+      "stage": "B7",
+      "row": 1,
+      "type": "io",
+      "seq": 13,
+      "label": "IO:TokenStream — argmax (:141/:165) or HFLM.loglikelihood scoring",
+      "cite": "memdec_model.py:141,165 argmax\ndo_sample=True raises ValueError:117-120\nhf_memdec.py:238-243 loglikelihood path",
+      "prim": "P-FROZENFWD"
+    }
+  ],
+  "edges": [
+    {
+      "from": "corpus",
+      "to": "key"
+    },
+    {
+      "from": "domaincpt",
+      "to": "key",
+      "state": "paper_only",
+      "label": "would feed domain datastore — never executed"
+    },
+    {
+      "from": "key",
+      "to": "datastore"
+    },
+    {
+      "from": "datastore",
+      "to": "annidx"
+    },
+    {
+      "from": "datastore",
+      "to": "selfquery"
+    },
+    {
+      "from": "annidx",
+      "to": "selfquery"
+    },
+    {
+      "from": "selfquery",
+      "to": "dist"
+    },
+    {
+      "from": "dist",
+      "to": "sparsify"
+    },
+    {
+      "from": "sparsify",
+      "to": "flatten"
+    },
+    {
+      "from": "flatten",
+      "to": "train",
+      "label": "memmap random-access batches"
+    },
+    {
+      "from": "train",
+      "to": "ckpt"
+    },
+    {
+      "from": "ckpt",
+      "to": "memdecfwd",
+      "label": "model_name_or_path / --memdec_path"
+    },
+    {
+      "from": "ctx",
+      "to": "backbonefwd"
+    },
+    {
+      "from": "ctx",
+      "to": "memdecfwd"
+    },
+    {
+      "from": "backbonefwd",
+      "to": "interp",
+      "label": "logp_base"
+    },
+    {
+      "from": "memdecfwd",
+      "to": "interp",
+      "label": "logp_mem"
+    },
+    {
+      "from": "coefsel_auto",
+      "to": "interp",
+      "label": "λ, general suite"
+    },
+    {
+      "from": "coefsel_fixed",
+      "to": "interp",
+      "label": "λ=0.3, other suites"
+    },
+    {
+      "from": "interp",
+      "to": "tokenout"
+    }
+  ]
+}

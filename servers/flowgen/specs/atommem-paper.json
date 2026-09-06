@@ -1,0 +1,501 @@
+{
+  "system": "atommem",
+  "view": "paper",
+  "title": "AtomMem — paper view",
+  "subtitle": "The mechanism as Yao et al. describe it. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); the empty B5/B8 lanes mean the paper defines no such step.",
+  "source": "Yao et al. 2026, AtomMem (arXiv:2606.19847)   ·   every anchor re-located in the paper text during verification",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "A6 INTERNALIZE exists only through the Fact Executor's offline LoRA SFT (Eq.1, §4.1) — the one training step that produces the extractor invoked at every A2 DISTILL call.",
+    "B5 SELECT and B8 LOOP are both empty: the paper's hierarchical retrieval collapses selection into B4's rank-and-cut (top kf), and there is no query-time tool loop.",
+    "B4's fusion (Sf = we·Sh(E,Q) + (1-we)·Sh(F,Q)) is the only place two independently scored channels (event-level, fact-level) are combined; every other retrieval step uses one hybrid metric Sh = α·sim_e + β·Jac within a single pass, not a fusion of separate passes."
+  ],
+  "nodes": [
+    {
+      "id": "msg",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:Message — raw conversation turn",
+      "cite": "§3.1.1 Figure A.1 \"the current message,\nusing recent context when necessary\"",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "ext",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "seq": 2,
+      "label": "LLM:Extract — Fact Executor, merged rewrite + extract",
+      "cite": "§3.1.1 Figure A.1, 5 rules txt:1189-1207\nmerges P-REWRITE + P-EXTRACT in one call",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "meta",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "seq": 3,
+      "label": "LLM:Tag — parse attributes P/K/T + long-term-trait flag",
+      "cite": "§3.1.2 txt:250-262, F={id,c,v,P,K,T,E}\nflag also set here per §3.3 txt:357-359",
+      "prim": "P-META"
+    },
+    {
+      "id": "eroute",
+      "stage": "A2",
+      "row": 2,
+      "type": "llm",
+      "seq": 8,
+      "label": "LLM:Tag — event attribution, LLMverify (multi-select or none)",
+      "cite": "Algorithm 1 line 13, txt:1303\n§A.2 — reuses Cret, no new retrieval",
+      "prim": "P-META"
+    },
+    {
+      "id": "esum",
+      "stage": "A2",
+      "row": 3,
+      "type": "llm",
+      "seq": 9,
+      "label": "LLM:Summarize — regenerate event summary S / keywords Ke",
+      "cite": "Algorithm 1 lines 14-21, txt:1304-1317\none call per matched event",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "profagg",
+      "stage": "A2",
+      "row": 4,
+      "type": "llm",
+      "seq": 11,
+      "label": "LLM:Extract — session-end batch, candidate profile sentences",
+      "cite": "§3.3 txt:354-360 \"At the end of\na dialogue session\"",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "symf",
+      "stage": "A3",
+      "row": 0,
+      "type": "alg",
+      "seq": 4,
+      "label": "Retrieval:SymFilter — participants + temporal metadata",
+      "cite": "§3.1.3 txt:233-235 \"eliminates irrelevant\nfacts before expensive vector computations\"",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "probe",
+      "stage": "A3",
+      "row": 1,
+      "type": "alg",
+      "seq": 5,
+      "label": "Retrieval:Hybrid — top-k dedup candidates Cret, Sh=α·sim_e+β·Jac",
+      "cite": "§3.1.3 Eq.2 txt:241-242",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "resolve",
+      "stage": "A3",
+      "row": 2,
+      "type": "llm",
+      "seq": 6,
+      "label": "LLM:Resolve — joint residual c'_new + conflict tuples U (1 call)",
+      "cite": "§3.1.3 txt:264-274, U only when\nlogical conflict detected",
+      "prim": "P-CONFLICT"
+    },
+    {
+      "id": "profprobe",
+      "stage": "A3",
+      "row": 3,
+      "type": "alg",
+      "seq": 12,
+      "label": "Retrieval:Hybrid — top-kp similar existing profiles",
+      "cite": "§3.3 txt:361-362, ranked by Sh (Eq.2)",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "profresolve",
+      "stage": "A3",
+      "row": 4,
+      "type": "llm",
+      "seq": 13,
+      "label": "LLM:Resolve — redundant / update current / modify historical / new",
+      "cite": "§3.3 txt:361-372, non-destructive:\nold state copied into H",
+      "prim": "P-CONFLICT"
+    },
+    {
+      "id": "emb",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "seq": 3,
+      "label": "NLP:Embed — candidate fact — dense vector v",
+      "cite": "§3.1.2, v is part of F={id,c,v,P,K,T,E}",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "factstore",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 7,
+      "label": "Store:File — fact memory (writes c'_new, applies U)",
+      "cite": "§3.1.3, persists into global memory\nreferenced by Fact Verification",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "eventstore",
+      "stage": "A5",
+      "row": 1,
+      "type": "store",
+      "seq": 10,
+      "label": "Store:File — event memory (Fids/Pe/Ke/Te/S)",
+      "cite": "Algorithm 1 lines 14-29, txt:1304-1329",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "profstore",
+      "stage": "A5",
+      "row": 2,
+      "type": "store",
+      "seq": 14,
+      "label": "Store:File — profile memory (current + history H)",
+      "cite": "§3.3 txt:368-372",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "train",
+      "stage": "A6",
+      "row": 0,
+      "type": "learn",
+      "seq": null,
+      "state": "paper_only",
+      "label": "Learn:FactExecutor — SFT (LoRA), Qwen3-14B",
+      "cite": "Eq.1 txt:200-207; §4.1 txt:662-666\nD=4,352 samples §A.1.3 (doc mislabels §A.3)\nGPT-4o teacher + human refine, §A.1.2",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "q",
+      "stage": "B1",
+      "row": 0,
+      "type": "io",
+      "seq": 15,
+      "label": "IO:Query",
+      "cite": "§3.5.1",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "qintent",
+      "stage": "B1",
+      "row": 1,
+      "type": "llm",
+      "seq": 16,
+      "label": "LLM:Query — query intent parsing, Qparsed={Iprof,Pq,Kq,Tq}",
+      "cite": "§3.5.1 txt:403-418",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "qemb",
+      "stage": "B1",
+      "row": 2,
+      "type": "alg",
+      "seq": 17,
+      "label": "NLP:Embed — query (for Sh(F,Q))",
+      "cite": "§3.5.2, implicit — Sh needs vQ",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "pfilter",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 18,
+      "label": "Retrieval:SymFilter — filter by Pq/Tq (Primary Recall)",
+      "cite": "§3.5.2(1) txt:445-448",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "precall",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "seq": 19,
+      "label": "Retrieval:Hybrid — Sh(F,Q) top ks/2=5 → Rpri",
+      "cite": "§3.5.2(1) txt:445-448\n§A.6.1 txt:1537-1538 ks/2=5",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "efilter",
+      "stage": "B2",
+      "row": 2,
+      "type": "alg",
+      "seq": 20,
+      "label": "Retrieval:SymFilter — filter events by Pq/Tq (Compensatory Recall)",
+      "cite": "§3.5.2(2) txt:449-452",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "erecall",
+      "stage": "B2",
+      "row": 3,
+      "type": "alg",
+      "seq": 21,
+      "label": "Retrieval:Hybrid — Sh(E,Q) top events → expand members, exclude Rpri",
+      "cite": "§3.5.2(2) txt:449-457",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "profrecall",
+      "stage": "B2",
+      "row": 4,
+      "type": "alg",
+      "seq": 27,
+      "state": "degraded",
+      "label": "Retrieval:Hybrid — Sh(Pq,Q) top kp → Rprof",
+      "cite": "§3.5.3 txt:419-426, only when Iprof=1",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "subgraph",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": 23,
+      "label": "Retrieval:Graph — hop-limited local subgraph from Rseed",
+      "cite": "§3.5.2(3)/§A.3 txt:478-483,\nstill filtered by Pq/Tq",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "seedscore",
+      "stage": "B3",
+      "row": 1,
+      "type": "alg",
+      "seq": 24,
+      "label": "Diffusion:SeedPrior — power transform s̃^γs, normalize → p",
+      "cite": "§A.3.3 Eq.9 txt:1338-1351",
+      "prim": "P-DIFFUSE"
+    },
+    {
+      "id": "ppr",
+      "stage": "B3",
+      "row": 2,
+      "type": "alg",
+      "seq": 25,
+      "label": "Diffusion:MultichannelPPR — channel renorm (Eq.8), RWR (Eq.10), converge (Eq.11)",
+      "cite": "§A.3.2-3 Eq.7-11 txt:1227-1458",
+      "prim": "P-DIFFUSE"
+    },
+    {
+      "id": "crecall",
+      "stage": "B4",
+      "row": 0,
+      "type": "fusion",
+      "seq": 22,
+      "label": "Fusion:Add — Sf=we·Sh(E,Q)+(1-we)·Sh(F,Q) → Rcomp",
+      "cite": "§3.5.2(2) txt:471-477\nRseed = Rpri ∪ Rcomp",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "rerank",
+      "stage": "B4",
+      "row": 1,
+      "type": "alg",
+      "seq": 26,
+      "label": "Retrieval:Rerank — rank by r(∞), cut to top kf → Rfact",
+      "cite": "§A.3.3 txt:1455-1458 top-kf",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "assemble",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 28,
+      "label": "IO:Context — C = Rfact ∪ Rprof ∪ event_contexts",
+      "cite": "§3.5.3 Figure 8/9 Input, event_contexts\nis 4th item, txt:1739/1762/436",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "ans",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 29,
+      "label": "LLM:Answer — backbone, outside AtomMem's own boundary",
+      "cite": "§3.5.3 txt:430-434",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "train",
+      "to": "ext",
+      "state": "paper_only",
+      "label": "produces the extractor"
+    },
+    {
+      "from": "msg",
+      "to": "ext"
+    },
+    {
+      "from": "ext",
+      "to": "meta"
+    },
+    {
+      "from": "meta",
+      "to": "emb"
+    },
+    {
+      "from": "emb",
+      "to": "symf"
+    },
+    {
+      "from": "symf",
+      "to": "probe"
+    },
+    {
+      "from": "factstore",
+      "to": "probe",
+      "label": "existing memory pool"
+    },
+    {
+      "from": "probe",
+      "to": "resolve"
+    },
+    {
+      "from": "resolve",
+      "to": "factstore"
+    },
+    {
+      "from": "probe",
+      "to": "eroute",
+      "label": "Cret reused directly"
+    },
+    {
+      "from": "eroute",
+      "to": "esum"
+    },
+    {
+      "from": "esum",
+      "to": "eventstore"
+    },
+    {
+      "from": "eroute",
+      "to": "eventstore",
+      "label": "no-match branch: store independently"
+    },
+    {
+      "from": "meta",
+      "to": "profagg",
+      "label": "queued facts (needs_profile flag)"
+    },
+    {
+      "from": "profagg",
+      "to": "profprobe"
+    },
+    {
+      "from": "profstore",
+      "to": "profprobe",
+      "label": "existing profiles"
+    },
+    {
+      "from": "profprobe",
+      "to": "profresolve"
+    },
+    {
+      "from": "profresolve",
+      "to": "profstore"
+    },
+    {
+      "from": "q",
+      "to": "qintent"
+    },
+    {
+      "from": "qintent",
+      "to": "qemb"
+    },
+    {
+      "from": "qemb",
+      "to": "pfilter"
+    },
+    {
+      "from": "qemb",
+      "to": "efilter"
+    },
+    {
+      "from": "qemb",
+      "to": "profrecall",
+      "state": "degraded",
+      "label": "only if Iprof=1"
+    },
+    {
+      "from": "factstore",
+      "to": "pfilter"
+    },
+    {
+      "from": "factstore",
+      "to": "efilter"
+    },
+    {
+      "from": "eventstore",
+      "to": "efilter"
+    },
+    {
+      "from": "pfilter",
+      "to": "precall"
+    },
+    {
+      "from": "efilter",
+      "to": "erecall"
+    },
+    {
+      "from": "precall",
+      "to": "crecall",
+      "label": "exclude Rpri"
+    },
+    {
+      "from": "erecall",
+      "to": "crecall"
+    },
+    {
+      "from": "precall",
+      "to": "subgraph",
+      "label": "Rpri"
+    },
+    {
+      "from": "crecall",
+      "to": "subgraph",
+      "label": "Rcomp"
+    },
+    {
+      "from": "precall",
+      "to": "seedscore"
+    },
+    {
+      "from": "crecall",
+      "to": "seedscore"
+    },
+    {
+      "from": "subgraph",
+      "to": "ppr"
+    },
+    {
+      "from": "seedscore",
+      "to": "ppr"
+    },
+    {
+      "from": "ppr",
+      "to": "rerank"
+    },
+    {
+      "from": "rerank",
+      "to": "assemble"
+    },
+    {
+      "from": "profrecall",
+      "to": "assemble"
+    },
+    {
+      "from": "assemble",
+      "to": "ans"
+    }
+  ]
+}

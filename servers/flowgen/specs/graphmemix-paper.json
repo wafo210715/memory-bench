@@ -1,0 +1,322 @@
+{
+  "system": "graphmemix",
+  "view": "paper",
+  "title": "GraphMemix — paper view",
+  "subtitle": "The mechanism as Li et al. describe it. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); A3 ADMIT, A6 and B8 are empty — the paper defines no such step.",
+  "source": "Li et al. 2026, GraphMemix (arXiv:2608.26983v1, MemoraX AI Research)   ·   verified against servers/graphmemix/verification.md (34 paper-side assertions: 24 ✓ / 3 ✗ / 7 ◐ / 0 ?)",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "A3 ADMIT is entirely empty by design: no dedup, no conflict resolution, no eviction anywhere in the pipeline. The paper puts its whole methodological bet on B4-B5 (node verifier + edge verifier + exact forest optimization) instead — the inverse of the MIRIX/SGM/A-MEM write-time-consolidation family it argues against (§1, §2.1).",
+    "B5 SELECT is a genuine 'solve exactly' pipeline: Kruskal computes the maximum-weight forest exactly at every step of the 1-swap local search (fixed cardinality K=10), then a second bounded-exact stage enumerates every nonempty subset of that proposal to guarantee a global optimum within it (Eq.13).",
+    "The paper's implicit 'no generative LLM at write time' framing does not hold universally: H2HMem's 1,300 images get a one-time LLM-generated caption sidecar (Qwen/Qwen3-VL-8B-Instruct, A.1) before indexing — the one dataset where write-time pays a generation cost.",
+    "Node verifier and ECV are drawn as two distinct primitives on purpose: the verifier scores individual candidates (P-RERANK), ECV scores (anchor, candidate) EDGES with a six-way role gate (P-EDGEVERIFY) and produces a trusted edge set G_q^trust, not a re-ranked list. Merging them would erase the redundancy/conflict semantics the forest solver depends on."
+  ],
+  "nodes": [
+    {
+      "id": "w1",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:Corpus — user multimodal memory archive V = {e_i}",
+      "cite": "§3.1 Eq.1 @txt:534\ntxt:520-533 — only defines V, q, Π, M\nno write process described",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "w2",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "seq": 2,
+      "state": "degraded",
+      "label": "LLM:Caption — frozen caption sidecar, H2HMem only",
+      "cite": "A.1 txt:1826-1828\nTable 8 txt:1820 \"Qwen3-VL-8B generated\"\nQwen/Qwen3-VL-8B-Instruct, temp 0, 32,768-ctx\nATM/Mem-Gallery/MemEye use dataset-native fields",
+      "prim": "P-CAPTION"
+    },
+    {
+      "id": "w3",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "seq": 3,
+      "label": "NLP:Embed — multi-view U_i (raw / caption / OCR / frames) → 1,536-d",
+      "cite": "§3.1 Eq.3 @txt:558 (txt:552-559)\n\"shared multimodal encoder h\" @txt:559\n§4.1 txt:1255-1256 frozen gme-Qwen2-VL-2B-Instruct",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "w4",
+      "stage": "A4",
+      "row": 1,
+      "type": "nlp",
+      "seq": 4,
+      "label": "NLP:SchemaLink — round id / session position / time / place (dataset-specific rules)",
+      "cite": "Eq.4 @txt:569 (E_schema)\nA.1: ATM txt:1754-1757 (event_bridge/same_record/\nrecord_grounding), Mem-Gallery/MemEye txt:1764-\n1765,1823-1824, H2HMem txt:1833-1835",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "w5",
+      "stage": "A4",
+      "row": 2,
+      "type": "nlp",
+      "seq": 5,
+      "label": "NLP:MutualKNN — semantic edges E_sem, mutual top-8 nearest neighbor",
+      "cite": "Eq.4 @txt:569 (E_sem, mutual top-k)\nk=8 @txt:1257\nencoder tied to §4.1's shared h via Eq.3 @txt:559",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "w6",
+      "stage": "A4",
+      "row": 3,
+      "type": "fusion",
+      "seq": 6,
+      "label": "NLP:ViewMerge — discovery graph G_disc = (V, E_schema ∪ E_sem)",
+      "cite": "txt:580-581\nnot query-conditioned — only Top-L seeds +\nH-hop expansion (§3.3) makes it query-relevant",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "w7",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 7,
+      "label": "Store:Unspecified — backend for V and G_disc never named",
+      "cite": "V \"a fixed set\" @txt:534, no storage mechanism\ngiven anywhere in §2/§3/Appendix (verification P5)\nmatches the A5 \"~\" cell — implied, not described",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "q",
+      "stage": "B1",
+      "row": 0,
+      "type": "io",
+      "seq": 8,
+      "label": "IO:Query",
+      "cite": "§3.1 Eq.1 @txt:534 — q is an explicit parameter\nno cross-question caching discussed (verification P17)",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "b_cap",
+      "stage": "B1",
+      "row": 1,
+      "type": "llm",
+      "seq": 9,
+      "state": "degraded",
+      "label": "LLM:Caption — query-image caption, only when the question image lacks a dataset caption",
+      "cite": "A.4 txt:1906-1908\nsame verifier backbone generates it",
+      "prim": "P-CAPTION"
+    },
+    {
+      "id": "b_qemb",
+      "stage": "B1",
+      "row": 2,
+      "type": "alg",
+      "seq": 10,
+      "label": "NLP:Embed — query — same shared encoder h as write-side",
+      "cite": "§3.1 Eq.3 @txt:558-559 \"shared multimodal encoder h\"",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "b_dense",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 11,
+      "label": "Retrieval:Emb — multi-view max-sim s_i(q), Top-L=24 seeds R_q^(L)",
+      "cite": "§3.3 Eq.3 @txt:558 (txt:552-559)\nL=24 @txt:1256",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "b_expand",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": 12,
+      "label": "Retrieval:Graph — H=1 hop expansion over G_disc, rank by retrieval+relation order, Top-M=48 → C_q",
+      "cite": "§3.2 Eq.5 @txt:590 (txt:580-592)\nH=1 / M=48 @txt:1256-1257",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "b_anchor",
+      "stage": "B5",
+      "row": 0,
+      "type": "alg",
+      "seq": 13,
+      "label": "Deterministic anchor selection A_q — top of frozen retrieval order, no verifier/ECV/gold used",
+      "cite": "A.2 \"Anchor-set construction\" txt:1881-1885\n(dedup, order-preserving)",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "b_verify",
+      "stage": "B4",
+      "row": 0,
+      "type": "llm",
+      "seq": 14,
+      "label": "LLM:Rerank — listwise node verifier, v_i∈[0,5] over all of C_q → p_i",
+      "cite": "§3.3 Eq.6 @txt:609 (txt:594-599)\nEq.14 @txt:1871 (txt:1864-1870), Eq.15 @txt:1879\n(α,τ,δ)=(0.8,5.2,0.7), no per-dataset retuning (txt:1880)",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "b_ecv",
+      "stage": "B4",
+      "row": 1,
+      "type": "llm",
+      "seq": 14,
+      "label": "LLM:VerifyEdge — ECV, best anchor + s^inc∈[0,5] + six-way role, schema edges only",
+      "cite": "§3.4 Eq.7-9 @txt:625/639/650 (txt:617-649)\nclaimed to \"execute in parallel\" with the verifier\n(§4.1 txt:1314, §4.4.4 txt:1647)",
+      "prim": "P-EDGEVERIFY"
+    },
+    {
+      "id": "b_forest1",
+      "stage": "B5",
+      "row": 1,
+      "type": "fusion",
+      "seq": 15,
+      "label": "Fusion:Forest — 1-swap local search from Top-K=10 seeds, Kruskal recomputes max-weight forest each step",
+      "cite": "§3.5 txt:1080-1090, κ_prop=0.2\nB_e = κ − λc_e, Eq.12 @txt:1008",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "b_forest2",
+      "stage": "B5",
+      "row": 2,
+      "type": "fusion",
+      "seq": 16,
+      "label": "Fusion:Forest — bounded exact refinement, exhaustive nonempty subsets of S̄_q, Kruskal per subset",
+      "cite": "Eq.13 @txt:1111, κ=0.12 @txt:1313\n\"globally optimal over all nonempty subsets of S̄_q\"\n(not over all of C_q), txt:1113-1115",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "b_deliver",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 17,
+      "label": "IO:Context — Evidence Serialization: root = max-utility node per component, sort components by root utility, BFS within component, ≤K=10",
+      "cite": "A.5 txt:2214-2218",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "b_answer",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 18,
+      "label": "LLM:Answer — frozen multimodal generator, ŷ = M(q, O_q)",
+      "cite": "Eq.1 @txt:534 (M outside Π's boundary)\n§4.1 txt:1846-1848 — same backbone as verifier/ECV\noutside the GraphMemix boundary",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "w1",
+      "to": "w2",
+      "state": "degraded",
+      "label": "H2HMem media only"
+    },
+    {
+      "from": "w1",
+      "to": "w3"
+    },
+    {
+      "from": "w2",
+      "to": "w3",
+      "label": "caption becomes a view"
+    },
+    {
+      "from": "w1",
+      "to": "w4"
+    },
+    {
+      "from": "w3",
+      "to": "w5"
+    },
+    {
+      "from": "w4",
+      "to": "w6"
+    },
+    {
+      "from": "w5",
+      "to": "w6"
+    },
+    {
+      "from": "w3",
+      "to": "w7"
+    },
+    {
+      "from": "w6",
+      "to": "w7"
+    },
+    {
+      "from": "w7",
+      "to": "b_dense",
+      "label": "persisted index"
+    },
+    {
+      "from": "w7",
+      "to": "b_expand",
+      "label": "persisted graph"
+    },
+    {
+      "from": "q",
+      "to": "b_cap",
+      "state": "degraded"
+    },
+    {
+      "from": "q",
+      "to": "b_qemb"
+    },
+    {
+      "from": "b_cap",
+      "to": "b_qemb",
+      "label": "caption becomes a query view"
+    },
+    {
+      "from": "b_qemb",
+      "to": "b_dense"
+    },
+    {
+      "from": "b_dense",
+      "to": "b_expand"
+    },
+    {
+      "from": "b_expand",
+      "to": "b_anchor",
+      "label": "frozen retrieval+expansion order"
+    },
+    {
+      "from": "b_expand",
+      "to": "b_verify",
+      "label": "all of C_q"
+    },
+    {
+      "from": "b_expand",
+      "to": "b_ecv",
+      "label": "eligible pairs within C_q"
+    },
+    {
+      "from": "b_anchor",
+      "to": "b_ecv"
+    },
+    {
+      "from": "b_verify",
+      "to": "b_forest1",
+      "label": "p_i"
+    },
+    {
+      "from": "b_ecv",
+      "to": "b_forest1",
+      "label": "w_ai / c_ai edge costs"
+    },
+    {
+      "from": "b_forest1",
+      "to": "b_forest2"
+    },
+    {
+      "from": "b_forest2",
+      "to": "b_deliver"
+    },
+    {
+      "from": "b_deliver",
+      "to": "b_answer"
+    }
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "system": "memos",
+  "view": "diff",
+  "title": "MemOS — where the paper and the code part ways",
+  "subtitle": "Only the divergent steps are drawn. Each node states both sides; the lane says which stage of the pipeline the divergence sits in.",
+  "source": "paper arXiv:2507.03724v4  ×  MemOS @ 8553242   ·   servers/memos/verification.md, 148 assertions checked (104 ✓ / 10 ✗ / 34 ◐ / 0 ?), §5 divergence table D1-D16",
+  "footer": "memory-bench · methodology flow · paper ↔ code divergence",
+  "legend_notes": [
+    "The headline: MemOS's one named contribution — P-TRANSMUTE, migrating memory between plaintext/activation/parameter — has zero implementation. component_init.py hardcodes act_mem=None, para_mem=None; A6 INTERNALIZE is empty on the code side.",
+    "The second most concrete finding is structural: the paper's MemVault/vector-DB abstraction doesn't exist. Neo4jCommunityGraphDB pops every embedding out of the graph node and ships it to Qdrant — vectors never touch Neo4j.",
+    "A3 ADMIT is where the method degrades hardest: dedup/conflict/version/reorganize all exist as code but default OFF (is_reorganize=False), are unreachable (add_before_search, zero call sites), or need a field the wrapper never sends (merged_from).",
+    "The OS-metaphor naming (MemOperator/MemVault/MemStore/...) is not cosmetic — grepping the repo for any of the paper's class names returns zero hits; the real module boundaries are mem_reader/ mem_scheduler/ mem_cube/ graph_dbs/."
+  ],
+  "nodes": [
+    {
+      "id": "d2",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "state": "paper_only",
+      "label": "OS module naming (MemOperator/MemVault/MemStore/...)",
+      "cite": "paper: 9 named OS-style modules, txt:697-735,\n1035-1141, 1388-1571\ncode: zero `class Mem…` in src/memos/**; only 2\nstring residues — tree.py:179 docstring, and\nmos_prompts.py:112,222 (system-prompt text)"
+    },
+    {
+      "id": "d9",
+      "stage": "A1",
+      "row": 1,
+      "type": "io",
+      "state": "differs",
+      "label": "Write and retrieve: one loop or two calls",
+      "cite": "paper: Figure 8 — one turn extracts new memory,\nretrieves old memory and answers, one closed\nloop (txt:1227-1291)\ncode: two endpoints that never see each other —\n/product/add (server_router.py:127-134) and\n/product/search (:111-118); /product/chat/*\nwould match the paper but ENABLE_CHAT_API=false"
+    },
+    {
+      "id": "d10",
+      "stage": "A1",
+      "row": 2,
+      "type": "io",
+      "state": "differs",
+      "label": "Write trigger granularity",
+      "cite": "paper: every turn, txt:1199-1201\ncode: server.py:69-79 posts one whole session as\na single add() call; MemOS re-slices it into\n1024-token windows internally afterward"
+    },
+    {
+      "id": "d5",
+      "stage": "A2",
+      "row": 0,
+      "type": "nlp",
+      "state": "code_only",
+      "label": "Memory type taxonomy",
+      "cite": "paper: 3 system-level types — Plaintext /\nActivation / Parameter, txt:772-774\ncode: item.py:178-189 ships 10 memory_type\nvalues (Working/LongTerm/User/Tool/Skill/\nPreference/...), all inside \"Plaintext\" — a\nlayer the paper never describes"
+    },
+    {
+      "id": "d6",
+      "stage": "A2",
+      "row": 1,
+      "type": "io",
+      "state": "differs",
+      "label": "MemCube metadata fields",
+      "cite": "paper: created/last_used/source/model/usage/\npriority/expires/access/tags/embedding_fp/\nstorage_mode — txt:904-915\ncode: item.py matches only source/tags/usage\n(created≈created_at); priority/expires/access/\nembedding_fp/storage_mode absent; code adds its\nown is_fast/evolve_to/version/background/file_ids"
+    },
+    {
+      "id": "d11",
+      "stage": "A2",
+      "row": 2,
+      "type": "llm",
+      "state": "code_only",
+      "label": "Does extraction call an LLM",
+      "cite": "paper: never states it — no pseudocode anywhere\nin the text\ncode: 4 parallel LLM channels per scene — fact /\ntool-trajectory / skill / preference\n(multi_modal_struct.py:1020-1049), each further\ncalling per item/window"
+    },
+    {
+      "id": "d4",
+      "stage": "A3",
+      "row": 0,
+      "type": "sched",
+      "state": "differs",
+      "label": "Lifecycle state machine",
+      "cite": "paper: 3 versions in the same paper — §5.2\n5-state, §5.4.3 4-state, §5.4.3 also adds Frozen\n(txt:1309-1310/1466-1467/1481-1484)\ncode: item.py:109 only has activated/resolving/\narchived/deleted; Generated/Merged exist only as\nprompt-template text (mos_prompts.py:110,112)"
+    },
+    {
+      "id": "d12",
+      "stage": "A3",
+      "row": 1,
+      "type": "nlp",
+      "state": "paper_only",
+      "label": "Conflict detection, dedup, versioning",
+      "cite": "paper: listed as a Plaintext Memory capability,\ntxt:792-793, 1029-1031\ncode: GraphStructureReorganizer exists but\nis_reorganize defaults False (unset in .env);\nadd_before_search has zero call sites\n(single_cube.py:563); merged_from needs\nadd_req.info, which the wrapper never sends"
+    },
+    {
+      "id": "d14",
+      "stage": "A4",
+      "row": 0,
+      "type": "store",
+      "state": "differs",
+      "label": "Where the vector index actually lives",
+      "cite": "paper: Figure 7 draws Vector DB + Graph DB as two\npeers behind a MemVault/MemoryAdapter\nabstraction, txt:1119,1123,1529-1531\ncode: no MemVault — Neo4jCommunityGraphDB pops\n`embedding` out of every node's metadata and\nwrites it straight to Qdrant (neo4j_community.py\n:151-165,194); read path mirrors it —\nsearch_by_embedding(:293)→vec_db.search(:360) =\nQdrant, not Neo4j's own vector index"
+    },
+    {
+      "id": "d3",
+      "stage": "A5",
+      "row": 0,
+      "type": "sched",
+      "state": "differs",
+      "label": "MemScheduler's job",
+      "cite": "paper: decides which memory type to use and\nmigrates across types, txt:1425-1453\ncode: a plain task queue — labels query/answer/\nadd/mem_read/mem_organize/... (task_schemas.py\n:31-41); no type-selection logic anywhere"
+    },
+    {
+      "id": "d13",
+      "stage": "A5",
+      "row": 1,
+      "type": "store",
+      "state": "paper_only",
+      "label": "Governance: ACL / TTL / audit / watermark",
+      "cite": "paper: MemGovernance ternary permission model +\nTTL + audit log, txt:1506-1520\ncode: only user_id + cube_id namespace isolation\n(server.py:56-57,76); no ACL/TTL/watermark/audit\nAPI anywhere on this path"
+    },
+    {
+      "id": "d1",
+      "stage": "A6",
+      "row": 0,
+      "type": "learn",
+      "state": "paper_only",
+      "label": "Cross-representation memory (P-TRANSMUTE)",
+      "cite": "paper: MemCube unifies and migrates Plaintext ⇄\nActivation(KV) ⇄ Parameter(LoRA) — txt:772-774,\n916-929, 1016-1024, 1435-1453 (the paper's core\nclaim)\ncode: component_init.py:245-249 hardcodes\nact_mem=None, para_mem=None; activation/ and\nparametric/ classes exist but are never\ninstantiated on the product path"
+    },
+    {
+      "id": "d7",
+      "stage": "B1",
+      "row": 0,
+      "type": "llm",
+      "state": "paper_only",
+      "label": "Task decomposition at query time",
+      "cite": "paper: MemoryPathResolver answers 3 questions via\na topic–concept–fact split, txt:1418-1424\ncode: FAST mode's TaskGoalParser._parse_fast just\nreturns the query unchanged, zero LLM\n(task_goal_parser.py:55,73-81); ParsedTaskGoal\nhas no topic/concept/fact fields"
+    },
+    {
+      "id": "d8",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "state": "code_only",
+      "label": "Retrieval parallelism",
+      "cite": "paper: one retrieval step feeding one dispatch\ndecision, txt:1214-1217, 1300-1307\ncode: up to 7 (6 in this deployment) parallel\npaths via ThreadPoolExecutor(max_workers=5)\n(searcher.py:355-501); Path B opens 3 more\nthreads internally (recall.py)"
+    },
+    {
+      "id": "d16",
+      "stage": "B4",
+      "row": 0,
+      "type": "alg",
+      "state": "differs",
+      "label": "Reranking signal",
+      "cite": "paper: contextual similarity + access frequency +\ntemporal decay + priority tags, 4 metrics,\ntxt:1301-1307\ncode: CosineLocalReranker uses one signal —\nquery·candidate cosine (cosine_local.py:86) —\ntimes a level_weight that is dead (level_field=\n\"background\", always the same value); usage/\nfrequency is written back but never read into\nany score"
+    },
+    {
+      "id": "d15",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "state": "differs",
+      "label": "Where generation happens",
+      "cite": "paper: Table 2 / Figure 7 draw the LLM Core\ninside MemOS — generation is part of the system,\ntxt:697-712, 1078-1090\ncode: /product/search returns memory text + score\nonly; the answering LLM runs in memory-bench's\nharness, outside the MemOS process. /product/\nchat/* would match the paper but is disabled\n(ENABLE_CHAT_API=false)"
+    }
+  ],
+  "edges": []
+}

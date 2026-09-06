@@ -1,0 +1,80 @@
+{
+  "system": "memorydecoder",
+  "view": "diff",
+  "title": "Memory Decoder at Scale — where the paper and the code part ways",
+  "subtitle": "Only the divergent steps are drawn. Each node states both sides; the lane says which stage of the pipeline the divergence sits in.",
+  "source": "paper arXiv:2607.27919v1  ×  repo MemoryDecoder-at-Scale @ bbbfee85   ·   servers/memorydecoder/verification.md, 133 assertions checked (105 ✓ / 5 ✗ / 22 ◐ / 1 ?)",
+  "footer": "memory-bench · methodology flow · paper ↔ code divergence",
+  "legend_notes": [
+    "The single most consequential divergence: the paper's distributed OPQ+HNSW+sharded Faiss pipeline (the whole reason it can scale to 207B tokens) is a single-machine IndexIVFPQ in the open-source release — no OPQ, no HNSW, no sharding, and each process loads the FULL index onto its own GPU rather than searching a shard.",
+    "--ignore_first quietly changes the math: the paper's rule is 'drop the neighbor only if its key equals the query'; the code drops the top-1 neighbor unconditionally, so every trained checkpoint was distilled from K-1=1023 effective neighbors, not K=1024.",
+    "d7 is drawn in the A4 lane, not B2, on purpose: KNNWrapperMulti is a fully implemented classic online kNN-LM (retrieve + interpolate at inference) sitting in the repo with zero reachable call sites. If it were ever wired in it would populate B2 RECALL and B6 DELIVER — exactly the retrieval-at-inference mechanism the paper's central claim eliminates — but since it never executes, the coverage-matrix finding that B1-B5 are empty for the live system is unaffected.",
+    "λ selection is the other place documentation undersells the code: the paper describes one mechanism (validation-tuned, then fixed); the code has three independently written implementations, and two of them (FinEval's own launcher and the standalone knowledge scripts) both hardcode 0.3 while looking, at a glance, like they might share the registry that only the general suite actually uses."
+  ],
+  "nodes": [
+    {
+      "id": "d1",
+      "stage": "A4",
+      "row": 0,
+      "type": "store",
+      "state": "differs",
+      "label": "Distributed Faiss pipeline",
+      "cite": "paper: OPQ256 compression → IVF partition\nwith IndexHNSW quantizer → sharded by\ncontiguous centroid range → per-shard GPU\nIVFPQ search → writer merges top-K\ntxt:436-449, Fig.3 caption txt:425-428\ncode: single IndexIVFPQ(IndexFlatL2),\nncentroids=4096, code_size=64\n(build_index.py:126-202,177-178,198);\nzero hnsw/opq/shard hits repo-wide;\neach process loads the FULL index onto\nits own GPU (saveKNNMulti.py:92-109,\ngpu_id = process_index % num_gpus) —\ndata-parallel, not index-sharded"
+    },
+    {
+      "id": "d2",
+      "stage": "A4",
+      "row": 1,
+      "type": "alg",
+      "state": "differs",
+      "label": "Key vector position",
+      "cite": "paper: “hidden state from the final layer\nof M_θ”, txt:294-296, txt:431-432\ncode: layers[-1].mlp INPUT for\nllama/qwen2/qwen3 (saveEmbedMulti.py:\n274-285, capture_input=True) — this is\npost_attention_layernorm(hidden), a\nnormalized value, not the residual\nstream and not the final-layer output\nActivationCapturer:492-493 takes input[0]"
+    },
+    {
+      "id": "d3",
+      "stage": "A4",
+      "row": 2,
+      "type": "alg",
+      "state": "differs",
+      "label": "Self-match discard rule",
+      "cite": "paper: drop top-1 neighbor ONLY IF its\nkey equals the query, txt:302\ncode: saveKNNMulti.py:138-139\n“if ignore_first: return dists[:,1:],\nknns[:,1:]” — unconditional, never\ncompares key==query; launcher always\npasses --ignore_first True (:158).\nEffective neighbor count: K-1=1023,\nnot K=1024"
+    },
+    {
+      "id": "d4",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "state": "differs",
+      "label": "ε sparsification of p_ret",
+      "cite": "paper: Eq.6 prunes any p≤ε, average\n64.95 nonzero token-probability pairs\nper row (≈250× compression), txt:458-472\ncode: CLI --threshold default 0\n(saveKNNMulti.py:292), launcher does not\noverride; sparsify_distribution keeps\nall p>0 (:165). Constructor default is\nactually 1e-10 (:33) but the CLI/main()\npath overwrites it to 0 (:322). The\nK-induced sparse support set is still\nkept — only the ε probability-floor cut\nis skipped"
+    },
+    {
+      "id": "d5",
+      "stage": "A6",
+      "row": 0,
+      "type": "learn",
+      "state": "paper_only",
+      "label": "Domain backbone CPT + memory bank",
+      "cite": "paper: §3.3/§4 requires one CPT epoch of\nQwen3-4B-Base on the domain corpus\nbefore building the domain datastore\n(txt:482-484, 533-536); §5.3 (txt:804-805)\ndescribes switching domains via a\n“memory bank” of trained checkpoints\ncode: scripts/ has only 3 data scripts +\n1 train script, no CPT launcher\n(README:128-129); grep 'memory_bank'\nrepo-wide — 0 hits. Only artifact found:\nmemorydecoder_default_lambdas.json's\nmemory_model_ids table, which selects a\nλ value, not a memory checkpoint"
+    },
+    {
+      "id": "d6",
+      "stage": "B6",
+      "row": 0,
+      "type": "sched",
+      "state": "differs",
+      "label": "Interpolation coefficient selection",
+      "cite": "paper: one mechanism — validation-set\ngrid search 0:0.05:1 (Appx F, txt:2970-\n2976), then fixed for testing (§4 end,\ntxt:543-544)\ncode: THREE independent implementations—\n(a) 288-entry task-aware auto-table,\ngeneral suite only (hf_memdec.py:181-236,\nmemorydecoder_defaults.py:118-141);\n(b) FinEval launcher hardcodes 0.3\n(evaluate_fineval.sh:21) and the standalone\nknowledge scripts hardcode 0.3 and bypass\nthe registry entirely (evaluate_multihopqa.\npy:54, evaluate_halueval.py:43);\n(c) opencompass hardcodes 0.3 separately\n(eval_bioinst_memdec.py:44, eval_lawbench.\npy:83) — (b) and (c) are NOT the same code\npath, despite the identical value"
+    },
+    {
+      "id": "d7",
+      "stage": "A4",
+      "row": 3,
+      "type": "alg",
+      "state": "code_only",
+      "label": "Dead online kNN-LM interpolator",
+      "cite": "paper: inference never retrieves,\ntxt:259, txt:1727-1729 “requires no\nexternal retrieval”\ncode: KNNWrapperMulti — a complete\nclassic online kNN-LM (retrieve top-K +\ninterpolate at inference), saveEmbedMulti.\npy:47-286; only instantiation site is\ntrain_base.py:353 under `if knn_args.knn`;\ngrep '--knn' scripts/*.sh → 0 hits —\nunreachable from any released config"
+    }
+  ],
+  "edges": []
+}

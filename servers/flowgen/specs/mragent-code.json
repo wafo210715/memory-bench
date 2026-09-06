@@ -1,0 +1,439 @@
+{
+  "system": "mragent",
+  "view": "code",
+  "title": "MRAgent — code view",
+  "subtitle": "What the MRAgent repo actually executes. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes mean the stage does not exist here.",
+  "source": "MRAgent @ 7441506 (single-commit repo, 2026-06-08)   ·   verified against servers/mragent/verification.md §4 (52 code-side assertions: 38 ✓ / 2 ✗ / 11 ◐ / 1 ?)",
+  "footer": "memory-bench · methodology flow · code view · every citation re-opened and confirmed during verification",
+  "legend_notes": [
+    "A3 ADMIT holds exactly one node, and it isn't a write-time admission check at all: it's agent.py:505-518's retrieval-time prefix dedup, pinned to A3 purely by its P-DEDUP primitive (SKELETON §2.3's stage-by-primitive rule) — MRAgent's only 'ADMIT' step runs during retrieval, not construction.",
+    "B4 APPRAISE looks like two parallel LLM rerank passes but one is dead code: select_finegrained_sentence_sort's entry guard `len(coarse_ids) > config.K2` is always false on the main path, so top_ids2 stays empty and the advertised union-of-two-rerankers is a no-op (see deadrank, state=degraded).",
+    "A5 Store:JSON persists only the intermediate rewrite/keyword/embedding artifacts as a disk cache; the in-memory heterogeneous graph object itself is never serialized and is rebuilt fresh every run.",
+    "Tool dispatch inside the B8 loop fans out across three stages (B2/B3/B6) from one ToolBridge.call() — two of the seven tools additionally trigger their own embedding rerank or LLM call, mid-loop."
+  ],
+  "nodes": [
+    {
+      "id": "getdata",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:Corpus — get_data(), raw_text[D<i>][D<i>:<j>] = \"speaker:text\"",
+      "cite": "data/get_data.py:9\nLM branch drops assistant turns\nget_data.py:62-63",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "storeraw",
+      "stage": "A1",
+      "row": 1,
+      "type": "io",
+      "seq": 5,
+      "label": "IO:Corpus — store_raw_text(), loads raw_text + vectors into MemorySystem",
+      "cite": "agent.py:864 → system.py:240",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "rewrite",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "seq": 2,
+      "label": "LLM:Rewrite — merged: pronoun/time resolution + per-sentence tag + ≥10 topics + personal_sentences, 1 call/session",
+      "cite": "agent.py:592/623/657\nprompts.py:18-55 (single schema)",
+      "prim": "P-REWRITE"
+    },
+    {
+      "id": "keyword",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "seq": 3,
+      "label": "LLM:Tag — extract_keyword(), 2-30 keywords/sentence, 1 call/session",
+      "cite": "agent.py:712/669\nprompts.py:69-87\ntag_list param unused :96-99",
+      "prim": "P-META"
+    },
+    {
+      "id": "speakertag",
+      "stage": "A2",
+      "row": 2,
+      "type": "nlp",
+      "seq": 6,
+      "label": "NLP:SpeakerTag — force-append speaker into every sentence's cue list, zero LLM",
+      "cite": "agent.py:847-848\nif speaker not in ks: ks.append(speaker)",
+      "prim": "P-NLPEXTRACT"
+    },
+    {
+      "id": "prefixdedup",
+      "stage": "A3",
+      "row": 0,
+      "type": "nlp",
+      "seq": 11,
+      "state": "code_only",
+      "label": "NLP:PrefixDedup — same-origin-prefix candidates collapsed to first",
+      "cite": "agent.py:505-518\nretrieval-time, not write-time —\nsee legend_notes",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "embed",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "seq": 4,
+      "label": "NLP:Embed — 3072-d, L2-norm, over rewritten sentences + topics + ALL question texts",
+      "cite": "data/embed_rewrite.py:12,20\nllm/embeddings.py:34-36\nrag_utils.py:10-26",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "linkbuild",
+      "stage": "A4",
+      "row": 1,
+      "type": "nlp",
+      "seq": 6,
+      "label": "NLP:SchemaLink — Cue-Tag-Episode + Cue-Tag-Semantic edges, topic-episode links, timeline index",
+      "cite": "agent.py:748/772→system.py\nEpisodeEvent :78-96, PersonalEvent\n:45-51, Persona :54-75, Topic :38-42,\nKeyNode+Link :16-35,99-104",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "cachecommit",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 7,
+      "state": "differs",
+      "label": "Store:JSON — cached rewrite/keyword/embedding artifacts; the graph object itself stays in-process, never persisted",
+      "cite": "common/config.py:89-92 (3 cache\ntemplates); run.py:182-186/\n188-194/200-206 skip-if-exists;\nMemorySystem is never serialized",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "extractq",
+      "stage": "B1",
+      "row": 0,
+      "type": "llm",
+      "seq": 8,
+      "label": "LLM:Query — extract_question_keys(), cue + time range, 1×",
+      "cite": "agent.py:566\nprompts.py:206-219",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "symmatch",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 9,
+      "label": "Retrieval:SymFilter — Jaccard≥0.6/subset cue match → KeyNode, then matched_keys≥2 filter",
+      "cite": "controller.py:213-214,243-257\ncontroller.py:263,370\nagent.py:482-491",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "timepath",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "seq": 10,
+      "state": "differs",
+      "label": "Retrieval:Timeline — time-range hit filter; <50(locomo)/<20(LM) short-circuits, skipping the main candidate pipeline",
+      "cite": "system.py:137-147 get_time_event\nagent.py:64,69 TIME_EVENT_LIMIT=50\nagent.py:111,117 K2=20",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "densefetch",
+      "stage": "B2",
+      "row": 2,
+      "type": "alg",
+      "seq": 10,
+      "label": "Retrieval:Emb — K1=80 dot-product over-fetch cut",
+      "cite": "agent.py:495-498\nutils.py:47,72  np.dot",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "topicdense",
+      "stage": "B2",
+      "row": 3,
+      "type": "alg",
+      "seq": 9,
+      "label": "Retrieval:Emb — independent topic channel, top-8, never merged with dense/rerank",
+      "cite": "agent.py:236-242 TOPIC_K=8\nagent.py:520,544",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "toolsym",
+      "stage": "B2",
+      "row": 4,
+      "type": "alg",
+      "seq": 16,
+      "state": "code_only",
+      "label": "Retrieval:SymFilter — in-loop tools: query_conversation_time / query_personal_information / query_personal_aspect",
+      "cite": "tools.py:162-192 dispatch",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "tagrerank",
+      "stage": "B2",
+      "row": 5,
+      "type": "alg",
+      "seq": null,
+      "label": "Retrieval:Emb — event_by_tag internal rerank, >20 candidates (embedding, not LLM)",
+      "cite": "controller.py:29-48\n:33 RERANK_LIMIT=20\n:39-40 topk_answers_by_similarity",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "toolgraph",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": 16,
+      "state": "code_only",
+      "label": "Retrieval:Graph — in-loop tools: edges_by_tag / query_topic_events / query_event_keywords",
+      "cite": "tools.py:162-192 dispatch",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "listwiserank",
+      "stage": "B4",
+      "row": 0,
+      "type": "llm",
+      "seq": 12,
+      "label": "LLM:Rerank — listwise select ≤20 (ANSWER_SORT_PROMPT2), the only reachable rerank pass",
+      "cite": "agent.py:244,523\nprompts.py:112-116",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "deadrank",
+      "stage": "B4",
+      "row": 1,
+      "type": "llm",
+      "seq": null,
+      "state": "degraded",
+      "label": "LLM:Rerank — select_finegrained_sentence_sort, entry guard `len(coarse_ids) > K2` always false",
+      "cite": "agent.py:309,315,524-533\ntop_ids2 always empty, union is a\nno-op; only reachable via the LM\ntime-branch (agent.py:178), and\nfurther gated by MODEL_NAME==gemini",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "preselecttag",
+      "stage": "B4",
+      "row": 2,
+      "type": "llm",
+      "seq": 13,
+      "label": "LLM:Rerank — select_key_tag, pre-loop tag scoring for high-fanout cues (>15 tags), prefetches tags ≥0.7",
+      "cite": "agent.py:392,402,409-414,428,433-434\nprompts.py:6-13",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "tagscore",
+      "stage": "B4",
+      "row": 3,
+      "type": "llm",
+      "seq": null,
+      "label": "LLM:Rerank — query_event_keywords_single, in-loop tag scoring (>15 tags, unseen cue)",
+      "cite": "controller.py:54-95\n:67 TAG_MAX=15  :88 TAG_LIMIT=10",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "ansinput",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 14,
+      "label": "IO:Context — ans_input assembly (question, key_sentences, keys_candidates, key_tag_sentences, similar_topic)",
+      "cite": "agent.py:539-548\nshape varies by branch — see diff",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "toolctx",
+      "stage": "B6",
+      "row": 1,
+      "type": "io",
+      "seq": 16,
+      "state": "code_only",
+      "label": "IO:Context — in-loop tool: query_event_context, adjacent-turn window",
+      "cite": "tools.py:162-192 dispatch",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "toolloop",
+      "stage": "B8",
+      "row": 0,
+      "type": "sched",
+      "seq": 15,
+      "label": "Sched:ToolLoop — chat_with_tools_once: mode:answer | tool_calls, ≤8 rounds, round 8 forces ANSWER_SYSTEM_PROMPT_FINAL",
+      "cite": "llm/controller.py:92-234\nconfig.py:66 MAX_ROUNDS=8\n:140-143 round-8 forced prompt\n:229-232 neither answer nor\ntool_calls → empty continue",
+      "prim": "P-TOOLLOOP"
+    },
+    {
+      "id": "finalanswer",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 17,
+      "label": "LLM:Answer — final {answer, supports, confidence}, same call as the loop decision",
+      "cite": "llm/controller.py:178-181,234\n(this is r11's own call, not a\nseparate one)",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "getdata",
+      "to": "rewrite"
+    },
+    {
+      "from": "rewrite",
+      "to": "keyword"
+    },
+    {
+      "from": "rewrite",
+      "to": "speakertag"
+    },
+    {
+      "from": "rewrite",
+      "to": "embed"
+    },
+    {
+      "from": "getdata",
+      "to": "storeraw"
+    },
+    {
+      "from": "embed",
+      "to": "storeraw"
+    },
+    {
+      "from": "storeraw",
+      "to": "linkbuild"
+    },
+    {
+      "from": "keyword",
+      "to": "linkbuild"
+    },
+    {
+      "from": "speakertag",
+      "to": "linkbuild"
+    },
+    {
+      "from": "rewrite",
+      "to": "cachecommit"
+    },
+    {
+      "from": "keyword",
+      "to": "cachecommit"
+    },
+    {
+      "from": "embed",
+      "to": "cachecommit"
+    },
+    {
+      "from": "extractq",
+      "to": "symmatch"
+    },
+    {
+      "from": "linkbuild",
+      "to": "symmatch"
+    },
+    {
+      "from": "symmatch",
+      "to": "timepath",
+      "label": "if question_time present"
+    },
+    {
+      "from": "timepath",
+      "to": "ansinput",
+      "state": "differs",
+      "label": "short-circuit: hits < limit"
+    },
+    {
+      "from": "symmatch",
+      "to": "densefetch",
+      "label": "else: main pipeline"
+    },
+    {
+      "from": "extractq",
+      "to": "topicdense"
+    },
+    {
+      "from": "densefetch",
+      "to": "prefixdedup"
+    },
+    {
+      "from": "prefixdedup",
+      "to": "listwiserank"
+    },
+    {
+      "from": "prefixdedup",
+      "to": "deadrank",
+      "state": "degraded",
+      "label": "unreachable: guard always false"
+    },
+    {
+      "from": "listwiserank",
+      "to": "ansinput"
+    },
+    {
+      "from": "topicdense",
+      "to": "ansinput"
+    },
+    {
+      "from": "extractq",
+      "to": "preselecttag",
+      "label": "if high-fanout cue present"
+    },
+    {
+      "from": "preselecttag",
+      "to": "ansinput"
+    },
+    {
+      "from": "ansinput",
+      "to": "toolloop"
+    },
+    {
+      "from": "toolloop",
+      "to": "toolgraph",
+      "state": "code_only",
+      "label": "tool_calls"
+    },
+    {
+      "from": "toolloop",
+      "to": "toolsym",
+      "state": "code_only",
+      "label": "tool_calls"
+    },
+    {
+      "from": "toolloop",
+      "to": "toolctx",
+      "state": "code_only",
+      "label": "tool_calls"
+    },
+    {
+      "from": "toolgraph",
+      "to": "tagrerank",
+      "label": "if >20 candidates"
+    },
+    {
+      "from": "toolgraph",
+      "to": "tagscore",
+      "label": "if >15 tags, unseen cue"
+    },
+    {
+      "from": "tagrerank",
+      "to": "toolloop",
+      "label": "result appended"
+    },
+    {
+      "from": "tagscore",
+      "to": "toolloop",
+      "label": "result appended"
+    },
+    {
+      "from": "toolsym",
+      "to": "toolloop",
+      "label": "result appended"
+    },
+    {
+      "from": "toolctx",
+      "to": "toolloop",
+      "label": "result appended"
+    },
+    {
+      "from": "toolloop",
+      "to": "finalanswer",
+      "label": "mode: answer, exit loop"
+    }
+  ]
+}

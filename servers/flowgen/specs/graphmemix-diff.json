@@ -1,0 +1,125 @@
+{
+  "system": "graphmemix",
+  "view": "diff",
+  "title": "GraphMemix — where the paper and the code part ways",
+  "subtitle": "Only the divergent steps are drawn. Each node states both sides; the lane says which stage of the pipeline the divergence sits in. A3 ADMIT is absent from both sides — not drawn, not a divergence.",
+  "source": "Li et al. 2026 (arXiv:2608.26983v1, MemoraX AI Research)  ×  repo graphmemix @ d0ea01d  ·  servers/graphmemix/verification.md §5 (D1–D14): 12 of 14 drawn — D12 excluded per verification.md's own C52 note, D14 excluded as an eval-only ablation artifact",
+  "footer": "memory-bench · methodology flow · paper ↔ code divergence",
+  "legend_notes": [
+    "A3 ADMIT holds no nodes on either side and is intentionally not drawn: the paper defines no dedup/conflict/eviction step, and the code's only write-time guard is a memory_id idempotency check, not similarity-based admission — a shared absence, not a divergence.",
+    "The most consequential divergence sits at B4: the paper presents the node-utility formula as one fixed closed-form 'equivalent up to displayed rounding' to (α,τ,δ)=(0.8,5.2,0.7), but the shipped coefficients are gold-label-fitted via an undescribed 5-fold SHA256 calibration protocol and do not equal the paper's derived numbers (D7+D8) — and part of that fitted feature vector (D9's standardization fields) is dead code even in the shipping pipeline.",
+    "The most quantitatively falsifiable divergence is the ATM schema-relation gap: the paper's Table 6 states 6.23 average Fixed Edges for ATM, but static trace of the ATM converter plus the code's two generic relation rules (D1) — missing all three paper-named relation types (D2) — yields 0 schema edges for that dataset.",
+    "D12 (w^schema typed vs a global 0.99 constant) is deliberately excluded: verification.md's own corroboration entry C52 shows the paper itself hardcodes the identical single 0.99 ceiling (txt:1258, txt:1471), so this is a tension between Eq.9's notation and the paper's own stated implementation, not a paper↔code conflict."
+  ],
+  "nodes": [
+    {
+      "id": "d13",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "state": "differs",
+      "label": "H2HMem caption generation",
+      "cite": "paper: Qwen3-VL-8B-Instruct generates the\ncaption sidecar, txt:1826-1828, Table 8 txt:1820\ncode: only consumes caption_sidecar field\n(reader.py:34,44-45); generation script absent\nrepo-wide — 20 grep hits, all consumers"
+    },
+    {
+      "id": "d1",
+      "stage": "A4",
+      "row": 0,
+      "type": "nlp",
+      "state": "differs",
+      "label": "ATM schema-relation coverage",
+      "cite": "paper: 3 dataset-specific rules incl.\nevent_bridge/same_record/record_grounding\ntxt:1754-1757; Table 6 claims ATM avg 6.23\nFixed Edges, txt:1359\ncode: only same_round/consecutive_turn generic\nrules (build_graphmemix_relation_store.py:70-104);\nATM converter writes neither field\n(converters/atm.py:400-411,445-461) → 0 schema\nedges by static trace"
+    },
+    {
+      "id": "d2",
+      "stage": "A4",
+      "row": 1,
+      "type": "nlp",
+      "state": "paper_only",
+      "label": "event_bridge / same_record / record_grounding relation types",
+      "cite": "paper: named per-dataset schema relations\ntxt:1754-1757\ncode: repo-wide grep finds zero implementations;\nrecord_grounding appears only as an invalid-role\ntest fixture, tests/test_score_graphmemix_ecv.py:63"
+    },
+    {
+      "id": "d3",
+      "stage": "A4",
+      "row": 2,
+      "type": "nlp",
+      "state": "code_only",
+      "label": "spatiotemporal_event relation type",
+      "cite": "paper: no counterpart — closest is event_bridge,\nwhich code never implements\ncode: build_graphmemix_relation_store.py:152-189;\nthresholds default 0 → :159-160 return {} — a\nno-op in every production config"
+    },
+    {
+      "id": "d5",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "state": "code_only",
+      "label": "source_top_k=200 pre-filter",
+      "cite": "paper: retrieval goes straight to Top-L=24 seeds,\nno intermediate layer, txt:1256\ncode: per-view FAISS top-200, max-pool, then cut\nto L=24 (concrete_memix.py:574-575,\nsource_top_k=200 in graphmemix.json:29)"
+    },
+    {
+      "id": "d6",
+      "stage": "B4",
+      "row": 0,
+      "type": "sched",
+      "state": "differs",
+      "label": "Verifier / ECV parallelism claim",
+      "cite": "paper: unconditional \"no serial dependency and\nexecute in parallel\", txt:1314, txt:1647\ncode: ecv stage requires node stage's persisted\ncandidate_ids + query_captions cache\n(score_graphmemix_ecv.py:260 --candidate-cache\nrequired, :406,486,520); the query-image-caption\nLLM call fires only inside node stage\n(score_graphmemix_verifier.py:83-115,280-282)"
+    },
+    {
+      "id": "d11",
+      "stage": "B4",
+      "row": 1,
+      "type": "llm",
+      "state": "differs",
+      "label": "ECV candidate coverage",
+      "cite": "paper: A.4 requires \"complete and unique candidate\ncoverage\" over all of C_q, txt:2179-2181,\nEq.8 @txt:639\ncode: production --edge-only mode only scores\ncandidates with an eligible schema edge\n(score_graphmemix_ecv.py:479,499); candidates with\nno eligible edge never enter the prompt"
+    },
+    {
+      "id": "d4",
+      "stage": "B4",
+      "row": 2,
+      "type": "fusion",
+      "state": "code_only",
+      "label": "missing_atomic_floor for graph-only candidates",
+      "cite": "paper: Eq.6 @txt:609 defines s_i(q) as the\nretrieval score; leaves candidates never retrieved\n(reached only via graph expansion) undefined\ncode: synthesizes floor = min(retrieval_scores)\n− 0.01 so every candidate still gets a p_i input\n(graphmemix_core.py:114-119)"
+    },
+    {
+      "id": "d7",
+      "stage": "B4",
+      "row": 3,
+      "type": "fusion",
+      "state": "differs",
+      "label": "Node-utility coefficient equivalence",
+      "cite": "paper: presents (α,τ,δ)=(0.8,5.2,0.7) as one fixed\nsetting, equivalent to σ(4.2s+0.2v−3.6) \"up to\ndisplayed rounding\", Eq.14/15 @txt:1871,1879\ncode: ships gold-label-fitted logistic coefficients\na=4.0541 b=0.2254 c=−3.7113\n(shared_dev.json:7-11) — none of the three equal\nthe paper's derived τα=4.16 / τ(1−α)/5=0.208 /\n−τδ=−3.64"
+    },
+    {
+      "id": "d8",
+      "stage": "B4",
+      "row": 4,
+      "type": "fusion",
+      "state": "code_only",
+      "label": "Gold-label calibration protocol",
+      "cite": "paper: only one passing mention, \"calibrated node\nutilities\", A.6 txt:2221 — no fold, split, or\nfitting procedure described anywhere\ncode: full SHA256 5-fold dev-split logistic-fit\nprotocol, protocol id\ngraphmemix-shared-logistic-devfold-1.0\n(shared_dev.json:2; fold() in\nscore_graphmemix_verifier.py:28-30)"
+    },
+    {
+      "id": "d9",
+      "stage": "B4",
+      "row": 5,
+      "type": "fusion",
+      "state": "code_only",
+      "label": "Unused standardization fields",
+      "cite": "paper: n/a — Eq.14/15 are already unstandardized,\nso behavior does not diverge here\ncode: shared_dev.json:12-21 ships mean/scale\nstandardization fields that no code anywhere\nreads (repo-wide grep for \"standardization\" hits\nonly this JSON)"
+    },
+    {
+      "id": "d10",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "state": "differs",
+      "label": "Evidence ordering: when root+BFS runs",
+      "cite": "paper: A.5 describes root+BFS acting on the final\nselected forest, txt:2214-2218\ncode: root+BFS is computed once during the K=10\nselect proposal (probe_graphmemix_pcsf.py:225-242);\nthe later prune stage only mask-filters and never\nre-sorts (evaluate_graphmemix_exact_pruning.py:110)"
+    }
+  ],
+  "edges": []
+}

@@ -16,6 +16,9 @@ Each stage is a fixed-width vertical lane.  A node declares (stage, row); x come
 from the lane, y from the row.  Because lane x is identical in every diagram, the
 same module lands in the same horizontal position in all 42 figures.
 
+Edge routing is likewise mechanical -- see the Router class.  Nothing about a
+figure's appearance is a per-diagram judgement call.
+
 Spec format: see specs/*.json
 """
 import json
@@ -198,32 +201,139 @@ def build(spec):
 
 
 # -------------------------------------------------------------------- edges ---
+# Routing.  Every edge gets its own lane so that dense diagrams stay readable:
+#   * cross-band edges each get a private horizontal channel in the band gap,
+#     and the gap widens automatically with the number of such edges
+#   * backward edges travel in the gutter between two rows instead of one
+#     shared arc under the whole band
+#   * forward edges detour into a gutter when a node sits in the way
+#   * several edges entering the same node fan out across its top edge
+# Adopted 2026-09-06 after an A/B comparison on the graphiti code view, which
+# has 8 cross-band and 6 backward edges; the previous single-channel routing
+# collapsed all eight into what looked like one line.
 CHANNEL = [0.0]
+ROUTER = [None]
+
+
+class Router:
+    def __init__(self, spec, nodes, a_top, b_top, a_h, b_h):
+        self.geo = {n.id: n for n in nodes}
+        self.nodes = nodes
+        self.a_bottom = a_top + a_h
+        self.b_top = b_top
+        edges = spec.get("edges", [])
+
+        def band(nid):
+            return BAND_OF[self.geo[nid].stage]
+
+        cross, back = [], []
+        for e in edges:
+            if e["from"] not in self.geo or e["to"] not in self.geo:
+                continue
+            if band(e["from"]) != band(e["to"]):
+                cross.append((e["from"], e["to"]))
+            elif STAGE_ORDER[self.geo[e["to"]].stage] < STAGE_ORDER[self.geo[e["from"]].stage]:
+                back.append((e["from"], e["to"]))
+
+        # one private channel per cross-band edge, spread across the band gap
+        gap_lo = self.a_bottom + 22
+        gap_hi = self.b_top - BAND_HEAD - 12
+        n = max(1, len(cross))
+        step = (gap_hi - gap_lo) / n if n > 1 else 0
+        self.chan = {k: gap_lo + i * step for i, k in enumerate(cross)}
+        self.back_idx = {k: i for i, k in enumerate(back)}
+
+        # fan-out: how many edges arrive at each node from above/below
+        self.in_top, self.in_left = {}, {}
+        for e in edges:
+            if e["from"] not in self.geo or e["to"] not in self.geo:
+                continue
+            t = e["to"]
+            if band(e["from"]) != band(t) or \
+               STAGE_ORDER[self.geo[t].stage] <= STAGE_ORDER[self.geo[e["from"]].stage]:
+                self.in_top.setdefault(t, []).append(e["from"])
+            else:
+                self.in_left.setdefault(t, []).append(e["from"])
+        # gutter jitter so two edges never share the same horizontal run
+        self.gut = {}
+        for i, e in enumerate(edges):
+            self.gut[(e["from"], e["to"])] = i
+
+    def entry_top(self, a, b):
+        """Spread arrivals across b's top edge instead of stacking them at cx."""
+        peers = self.in_top.get(b.id, [])
+        if len(peers) <= 1:
+            return b.cx
+        i = peers.index(a.id) if a.id in peers else 0
+        span = min(NODE_W - 40, 26 * (len(peers) - 1))
+        return b.x + NODE_W / 2 - span / 2 + (span / (len(peers) - 1)) * i
+
+    def blocked(self, a, b, y):
+        """Is there a node sitting on the straight run from a to b at height y?"""
+        x0, x1 = a.x + NODE_W, b.x
+        for n in self.nodes:
+            if n is a or n is b:
+                continue
+            if BAND_OF[n.stage] != BAND_OF[a.stage]:
+                continue
+            if n.x + NODE_W < x0 + 2 or n.x > x1 - 2:
+                continue
+            if n.y - 6 < y < n.y + n.h + 6:
+                return True
+        return False
+
+    def path(self, a, b):
+        key = (a.id, b.id)
+        same_band = BAND_OF[a.stage] == BAND_OF[b.stage]
+        ax, ay = a.x + NODE_W, a.cy
+        bx, by = b.x, b.cy
+
+        if not same_band:
+            chan = self.chan.get(key, CHANNEL[0])
+            ex = self.entry_top(a, b)
+            d = (f"M {a.cx} {a.y + a.h} L {a.cx} {chan} L {ex} {chan} L {ex} {b.y}")
+            return d, (ex, b.y, 90), ((a.cx + ex) / 2, chan - 6)
+
+        if a.stage == b.stage:                        # same lane, stacked
+            ex = self.entry_top(a, b)
+            return (f"M {a.cx} {a.y + a.h} L {a.cx} {(a.y + a.h + b.y)/2} "
+                    f"L {ex} {(a.y + a.h + b.y)/2} L {ex} {b.y}"), \
+                   (ex, b.y, 90), (a.cx, (a.y + a.h + b.y) / 2 - 4)
+
+        if STAGE_ORDER[b.stage] > STAGE_ORDER[a.stage]:      # forward
+            if abs(ay - by) < 3 and not self.blocked(a, b, ay):
+                return f"M {ax} {ay} L {bx} {by}", (bx, by, 0), ((ax + bx) / 2, ay - 6)
+            if abs(ay - by) < 3:
+                # a node is in the way: dip into the gutter under this row
+                g = max(a.y + a.h, b.y + b.h) + 11 + 7 * (self.gut[key] % 3)
+                d = (f"M {ax} {ay} L {ax + 12} {ay} L {ax + 12} {g} "
+                     f"L {bx - 12} {g} L {bx - 12} {by} L {bx} {by}")
+                return d, (bx, by, 0), ((ax + bx) / 2, g - 5)
+            mid = ax + (bx - ax) / 2 + 6 * (self.gut[key] % 3 - 1)
+            d = (f"M {ax} {ay} L {mid} {ay} Q {mid+8} {ay} {mid+8} "
+                 f"{ay + (8 if by > ay else -8)} L {mid+8} {by - (8 if by > ay else -8)} "
+                 f"Q {mid+8} {by} {mid+16} {by} L {bx} {by}")
+            return d, (bx, by, 0), (mid + 8, (ay + by) / 2)
+
+        # backward — travel in the gutter between the two rows, not under the band
+        i = self.back_idx.get(key, 0)
+        ex = self.entry_top(a, b)
+        if b.y > a.y + a.h - 2:                        # target sits lower: go down
+            g = (a.y + a.h + b.y) / 2 + 4 * (i % 3 - 1)
+            d = f"M {a.cx} {a.y + a.h} L {a.cx} {g} L {ex} {g} L {ex} {b.y}"
+            return d, (ex, b.y, 90), ((a.cx + ex) / 2, g - 5)
+        if b.y + b.h < a.y + 2:                        # target sits higher: go up
+            g = (a.y + b.y + b.h) / 2 - 4 * (i % 3 - 1)
+            d = f"M {a.cx} {a.y} L {a.cx} {g} L {b.cx} {g} L {b.cx} {b.y + b.h}"
+            return d, (b.cx, b.y + b.h, 270), ((a.cx + b.cx) / 2, g - 5)
+        lift = max(a.y + a.h, b.y + b.h) + 16 + 9 * i   # overlapping rows: arc under
+        return (f"M {a.cx} {a.y + a.h} C {a.cx} {lift} {b.cx} {lift} {b.cx} {b.y + b.h}"), \
+               (b.cx, b.y + b.h, 270), ((a.cx + b.cx) / 2, lift - 4)
 
 
 def edge_path(a, b, kind):
-    """Orthogonal-ish routing. Forward within a band = elbow; cross-band = channel."""
-    same_band = BAND_OF[a.stage] == BAND_OF[b.stage]
-    ax, ay = a.x + NODE_W, a.cy
-    bx, by = b.x, b.cy
-    if same_band:
-        if STAGE_ORDER[b.stage] > STAGE_ORDER[a.stage]:
-            if abs(ay - by) < 3:
-                return f"M {ax} {ay} L {bx} {by}", (bx, by, 0)
-            mid = ax + (bx - ax) / 2
-            return (f"M {ax} {ay} L {mid} {ay} Q {mid+8} {ay} {mid+8} "
-                    f"{ay + (8 if by > ay else -8)} L {mid+8} {by - (8 if by > ay else -8)} "
-                    f"Q {mid+8} {by} {mid+16} {by} L {bx} {by}"), (bx, by, 0)
-        if a.stage == b.stage:                       # same lane, stacked
-            return (f"M {a.cx} {a.y + a.h} L {b.cx} {b.y}"), (b.cx, b.y, 90)
-        # backward (loop) — arc under the band
-        lift = max(a.y + a.h, b.y + b.h) + 26
-        return (f"M {a.cx} {a.y + a.h} C {a.cx} {lift} {b.cx} {lift} {b.cx} {b.y + b.h}"), \
-               (b.cx, b.y + b.h, 270)
-    # cross-band: drop into the dedicated channel that runs in the band gap
-    chan = CHANNEL[0]
-    return (f"M {a.cx} {a.y + a.h} L {a.cx} {chan} L {b.cx} {chan} L {b.cx} {b.y}"), \
-           (b.cx, b.y, 90)
+    d, head, _lab = ROUTER[0].path(a, b)
+    return d, head
 
 
 def arrow(px, py, rot, color):
@@ -233,6 +343,13 @@ def arrow(px, py, rot, color):
 
 # ------------------------------------------------------------------- render ---
 def render(spec):
+    # widen the band gap so every cross-band edge gets its own channel
+    global BAND_GAP
+    _stage = {n["id"]: n["stage"] for n in spec["nodes"]}
+    _cross = sum(1 for e in spec.get("edges", [])
+                 if e["from"] in _stage and e["to"] in _stage
+                 and BAND_OF[_stage[e["from"]]] != BAND_OF[_stage[e["to"]]])
+    BAND_GAP = max(74, 46 + 20 * _cross)
     nodes, by_id, W, H, a_top, b_top, a_h, b_h = build(spec)
     used_states = {n.state for n in nodes} | {e.get("state", "both") for e in spec.get("edges", [])}
     used_types = {n.type for n in nodes}
@@ -291,6 +408,7 @@ def render(spec):
                            f'text-anchor="middle" fill="#c7cad1">—</text>')
 
     CHANNEL[0] = b_top - BAND_HEAD - 22
+    ROUTER[0] = Router(spec, nodes, a_top, b_top, a_h, b_h)
     # ---- edges (drawn under nodes) ------------------------------------------
     for e in spec.get("edges", []):
         a, b = by_id.get(e["from"]), by_id.get(e["to"])
@@ -299,12 +417,12 @@ def render(spec):
         st = e.get("state", "both")
         color = STATE_ACCENT.get(st) or "#4b5563"
         dash = STATES[st]["dash"] or e.get("dash", "")
-        d, (px, py, rot) = edge_path(a, b, e.get("kind", ""))
+        d, (px, py, rot), (lmx, lmy) = ROUTER[0].path(a, b)
         da = f' stroke-dasharray="{dash}"' if dash else ""
         out.append(f'<path d="{d}" fill="none" stroke="{color}" stroke-width="1.5"{da}/>')
         out.append(arrow(px, py, rot, color))
         if e.get("label"):
-            mx, my = (a.x + NODE_W + b.x) / 2, (a.cy + b.cy) / 2 - 7
+            mx, my = lmx, lmy
             wpx = len(e["label"]) * 5.4 + 10
             out.append(f'<rect x="{mx-wpx/2}" y="{my-9.5}" width="{wpx}" height="13" rx="3" '
                        f'fill="#ffffff" stroke="{color}" stroke-width="0.7" fill-opacity="0.96"/>')

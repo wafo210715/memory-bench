@@ -1,0 +1,143 @@
+{
+  "system": "mragent",
+  "view": "diff",
+  "title": "MRAgent — where the paper and the code part ways",
+  "subtitle": "Only the divergent steps are drawn. Each node states both sides; the lane says which stage of the pipeline the divergence sits in.",
+  "source": "paper arXiv:2606.06036v1 (Ji et al.)  ×  MRAgent @ 7441506   ·   servers/mragent/verification.md §5, 15 divergences (14 drawn; D5 \"round cap, both 8\" omitted — the one place the two sides agree)",
+  "footer": "memory-bench · methodology flow · paper ↔ code divergence",
+  "legend_notes": [
+    "The single largest headline is D8: embedding is entirely absent from the paper's description of MRAgent itself (it only appears describing baselines), yet is load-bearing at three separate points in the code.",
+    "The paper's f_route is explicitly framed as a pruning step (D6, Eq.12) — the code never filters accumulated tool results, they only ever grow (controller.py:206-223).",
+    "D2/D3: the write side's five formally-independent LLM functions collapse into two actual API calls per session, and the 'topic' content comes straight from raw dialogue rather than the already-segmented episode set Eq.21 specifies.",
+    "Not shown here because it isn't a paper↔code divergence: code-architecture.md's claim of 'two rerank paths taking a union' is a bug in that .md file, not a methodology gap — the code only ever runs one rerank pass (see mragent-code.json's deadrank node, state=degraded)."
+  ],
+  "nodes": [
+    {
+      "id": "d1",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "state": "differs",
+      "label": "Episode content: rewritten text vs raw dialogue line",
+      "cite": "paper: episode = R_LLM output\nEq.18  txt:1281-1285\ncode: EpisodeEvent.text takes the\nraw dialogue line, not the\nrewritten sentence — the rewrite\nfeeds only the embedding and tag\nextraction, then is discarded\nagent.py:796-803,811"
+    },
+    {
+      "id": "d2",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "state": "differs",
+      "label": "Distillation granularity: 5 functions vs 2 prompts",
+      "cite": "paper: R_LLM/T_LLM/K_LLM/S_LLM/\nA_LLM, five independent functions\nEq.18-21  txt:1283/1289/1302/1313\ncode: one rewrite call (R+T+A+S\nmerged) + one keyword call (K),\n2 calls per session\nprompts.py:18-55, 69-87"
+    },
+    {
+      "id": "d3",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "state": "differs",
+      "label": "Topic input: episode set vs session raw text",
+      "cite": "paper: A_LLM({e_i}) operates on\nthe already-segmented episode set\nEq.21  txt:1311-1313\ncode: topics come from the same\nprompt as the rewrite, generated\ndirectly from session raw dialogue,\nnot from {e_i}\nprompts.py:27; agent.py:593-597"
+    },
+    {
+      "id": "d13",
+      "stage": "A2",
+      "row": 2,
+      "type": "nlp",
+      "state": "code_only",
+      "label": "Speaker forced into every sentence's cue list",
+      "cite": "paper: K_LLM extracts entities/\nattributes/salient descriptors,\nno mention of always adding the\nspeaker  txt:1293-1294\ncode: agent.py:847-848\nif speaker not in ks: ks.append(speaker)"
+    },
+    {
+      "id": "d11",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "state": "code_only",
+      "label": "LM dataset: assistant turns dropped at load",
+      "cite": "paper: Appx D.1 gives no such\nasymmetric filtering  txt:1610-1623\ncode: get_data.py:62-63 keeps\nonly user turns for the LM\ndataset; agent.py:806-810"
+    },
+    {
+      "id": "d7",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "state": "code_only",
+      "label": "ActiveSetInit: one line vs a 5-stage pipeline",
+      "cite": "paper: Alg.1 line2, matching\nmechanism itself undescribed\ntxt:1331, 408-409\ncode: graph text match → K1=80\ndense over-fetch → prefix dedup →\none listwise LLM rerank (the\nsecond claimed path never fires,\nagent.py:315 guard always false)\n→ independent topic top-8 →\nconditional tag score\nagent.py:454-548"
+    },
+    {
+      "id": "d8",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "state": "code_only",
+      "label": "Embedding is absent from the paper, load-bearing in the code",
+      "cite": "paper: embedding only appears in\nbaseline descriptions, never for\nMRAgent itself  txt:36,134,1626-1641\ncode: 3 embedding uses — K1\ncrude cut, topic channel, and\nevent_by_tag internal rerank\nembeddings.py:34-36; agent.py:497,520;\ncontroller.py:39-40"
+    },
+    {
+      "id": "d9",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "state": "differs",
+      "label": "Tool signature: mapping operator vs required note field",
+      "cite": "paper: Table 4 ϕ(c,g)→e is a pure\ntyped mapping, no side params\ntxt:1248-1265\ncode: edges_by_tag requires an\n8-80 char `note` justifying the\ncall — outside the paper's\noperator definition\ntools.py:8,21-28"
+    },
+    {
+      "id": "d10",
+      "stage": "B3",
+      "row": 1,
+      "type": "alg",
+      "state": "differs",
+      "label": "Timeline: reconstruction constraint vs pre-loop-only fast path",
+      "cite": "paper: unified timeline organized\nto impose temporal constraints\nduring reconstruction\n§3.2  txt:296-299\ncode: never exposed as a tool the\nloop can call; consulted once\nbefore the loop starts, then unused\nsystem.py:118,137-147;\nagent.py:64,111; tools.py:4-155"
+    },
+    {
+      "id": "d15",
+      "stage": "B3",
+      "row": 2,
+      "type": "alg",
+      "state": "differs",
+      "label": "Reported tool coverage vs actually-enabled tools",
+      "cite": "paper: Table 6 reports evidence\ncoverage for only 5 of the 7 tools\ntxt:1848-1857\ncode: all 7 tools are wired and\ncallable, including the 2 missing\nfrom Table 6 — one of them\n(query_event_keywords) internally\ntriggers its own LLM call\ntools.py:51,83; controller.py:54-95"
+    },
+    {
+      "id": "d4",
+      "stage": "B8",
+      "row": 0,
+      "type": "sched",
+      "state": "differs",
+      "label": "Tool-invocation cap: 10 per turn vs one global 50",
+      "cite": "paper: Appx D.4 \"allow up to 10\ntool invocations per turn\"\ntxt:1696-1697\ncode: config.py:67 MAX_TOOL_CALLS=50\nis a budget shared across all ≤8\nrounds, no per-round cap exists\ncontroller.py:187-190"
+    },
+    {
+      "id": "d6",
+      "stage": "B4",
+      "row": 0,
+      "type": "llm",
+      "state": "paper_only",
+      "label": "f_route pruning of accumulated evidence",
+      "cite": "paper: Eq.12, f_route explicitly\nselects/prunes H^(t+1)\ntxt:496-498, 508-510\ncode: no filter function anywhere;\ntool results only ever appended\ncontroller.py:206-223"
+    },
+    {
+      "id": "d14",
+      "stage": "B4",
+      "row": 1,
+      "type": "llm",
+      "state": "code_only",
+      "label": "Gemini-only gate on the (dead) second rerank path",
+      "cite": "paper: no model-specific branching\nanywhere in the retrieval algorithm\ncode: the LM time-branch's second\nrerank call is additionally gated\nby config.MODEL_NAME == \"gemini\"\nagent.py:180"
+    },
+    {
+      "id": "d12",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "state": "code_only",
+      "label": "Per-category prompt switching for answering",
+      "cite": "paper: one QA and Tool-Use Prompt,\nAppendix E  txt:1898-1917\ncode: locomo category 2/3 and the\nLM dataset each swap in a\ndifferent system prompt\nagent.py:550-558; prompts.py:167-182;\ncontroller.py:125-126"
+    }
+  ],
+  "edges": []
+}

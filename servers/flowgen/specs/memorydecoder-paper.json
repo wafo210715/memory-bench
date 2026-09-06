@@ -1,0 +1,255 @@
+{
+  "system": "memorydecoder",
+  "view": "paper",
+  "title": "Memory Decoder at Scale — paper view",
+  "subtitle": "The mechanism as Wei et al. describe it: retrieval happens once, offline, to build a training signal; inference is two frozen forward passes plus a fixed-weight interpolation. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes are stages this mechanism does not have.",
+  "source": "Wei et al. 2026, Memory Decoder at Scale (arXiv:2607.27919v1)   ·   every anchor re-located in the paper txt during verification (59 paper-side assertions, 50 ✓ / 3 ✗ / 5 ◐ / 1 ?)",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "B1-B5 are empty on purpose, and A4 is the busiest lane in this whole project. The dense retrieval (self-query top-K over the datastore) happens once, offline, while building the datastore and its distribution supervision -- not at query time. This is the case the whole A/B (formation/mobilization) split was named after: calling it a 'retrieval stage' would be wrong, since at inference the Faiss index and datastore are never loaded (txt:259).",
+    "β is NOT an undocumented hyperparameter: Appendix Table 9 and Table 10 both list 'Memory loss weight' = 0.5 for every backbone size and for domain memory -- an earlier reading that only checked the main text missed this.",
+    "α is also not a blind default: Appendix F sweeps a 0:0.05:1 grid (21 points, Fig.11) and Table 15 records the per-task selected value; the paper's own text (§4 end) says it is 'fixed for testing' after this validation-set search.",
+    "Domain memory (biology/law/finance) reuses the exact same A4-A6 pipeline as general memory; the only extra step is one continued-pretraining pass over the domain corpus so the backbone that extracts keys is domain-adapted (§3.3)."
+  ],
+  "nodes": [
+    {
+      "id": "corpus",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:Corpus — deduplicated Pile, 207B tokens (D_mem)",
+      "cite": "§2, txt:429-435\nTable 8, txt:2031-2035\ndomain variant: up to 4.4B tokens,\ntxt:485, Table 8 txt:2049-2051",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "ctx",
+      "stage": "A1",
+      "row": 1,
+      "type": "io",
+      "seq": 10,
+      "label": "IO:Prompt — inference-time context c_t, fed to both M_θ and M_ψ",
+      "cite": "§2, txt:274\n\"M_θ and M_ψ process the same\ncontext in parallel\"",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "domaincpt",
+      "stage": "A6",
+      "row": 0,
+      "type": "learn",
+      "seq": 1,
+      "label": "Learn:CPT — continued pretraining of Qwen3-4B-Base on domain corpus (domain memory only)",
+      "cite": "§3.3, txt:482-484\n§4, txt:533-534\n“follow the same architecture,\nobjective, and sparse training\npipeline” as general memory",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "key",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "seq": 2,
+      "label": "NLP:Embed — key — φ_θ(c_t), M_θ final-layer hidden state",
+      "cite": "§3.1 Eq.3, txt:294-296\n“hidden state from the final\nlayer of M_θ at the final position”",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "datastore",
+      "stage": "A4",
+      "row": 1,
+      "type": "store",
+      "seq": 3,
+      "label": "Store:Datastore — R_mem = {(k_t, x_t)}, key → next real token",
+      "cite": "§3.1 Eq.3, txt:306\nO(N²) motivates §2 txt:429-435",
+      "prim": "P-DATASTORE"
+    },
+    {
+      "id": "annidx",
+      "stage": "A4",
+      "row": 2,
+      "type": "store",
+      "seq": 4,
+      "label": "Store:ANNIndex — OPQ256 + IndexHNSW-quantized, sharded IndexIVFPQ",
+      "cite": "§3.1 + Fig.3 steps 1-2\ntxt:436-442\nFig.3 caption, txt:425-428",
+      "prim": "P-ANNINDEX"
+    },
+    {
+      "id": "selfquery",
+      "stage": "A4",
+      "row": 3,
+      "type": "alg",
+      "seq": 5,
+      "label": "Retrieval:kNN — self-query top-K over the ANN index (offline)",
+      "cite": "Fig.3 step 3, txt:443-448\nHNSW routes → per-shard GPU\nIVFPQ search → writer merges top-K",
+      "prim": "P-KNNDIST"
+    },
+    {
+      "id": "dist",
+      "stage": "A4",
+      "row": 4,
+      "type": "alg",
+      "seq": 6,
+      "label": "Retrieval:kNNDist — softmax(-d/τ) vote over K neighbors → dense p_ret",
+      "cite": "§3.1 Eq.4-5, txt:311-320\nτ only appears symbolically,\nno numeric value given",
+      "prim": "P-KNNDIST"
+    },
+    {
+      "id": "sparsify",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 7,
+      "label": "Store:SparseDist — ε-prune p_ret, keep p>ε (≈64.95/row, ≈250× compression)",
+      "cite": "§3.2 Eq.6, txt:458-472\noffset-aligned streaming +\nFP32 renorm, txt:473-479",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "ckpt",
+      "stage": "A5",
+      "row": 1,
+      "type": "store",
+      "seq": 9,
+      "label": "Store:Parametric — trained M_ψ weights",
+      "cite": "§2 output; §4 txt:487-538\nbacked by AdamW schedule\ntxt:530-532",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "train",
+      "stage": "A6",
+      "row": 1,
+      "type": "learn",
+      "seq": 8,
+      "label": "Learn:Decoder — L_mem = β·D_KL(p_ret‖p_ψ) + (1-β)·CE(x_t,p_ψ); β=0.5",
+      "cite": "§2 Eq.1, txt:269-273\nβ=0.5: Table 9 txt:2145/2163/2181,\nTable 10 txt:2225/2240/2255\n(NOT an undocumented default)",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "memdecfwd",
+      "stage": "B6",
+      "row": 0,
+      "type": "learn",
+      "seq": 11,
+      "label": "Learn:MemDecoder — M_ψ forward, p_ψ(·|c_t), no retrieved text as input",
+      "cite": "§2, txt:258-259, txt:274\nsame tokenizer/vocab as M_θ,\ntxt:257-259",
+      "prim": "P-INTERP"
+    },
+    {
+      "id": "interp",
+      "stage": "B6",
+      "row": 1,
+      "type": "fusion",
+      "seq": 12,
+      "label": "Fusion:Interp — p_final = (1-α)·p_θ + α·p_ψ",
+      "cite": "§2 Eq.2, txt:275-277\nno multi-step assembly —\ninterpolation IS the delivery",
+      "prim": "P-INTERP"
+    },
+    {
+      "id": "coefsel",
+      "stage": "B6",
+      "row": 2,
+      "type": "sched",
+      "seq": null,
+      "label": "Sched:Calibrate — α tuned on validation set, grid 0:0.05:1 (Table 15 per-task)",
+      "cite": "Appx F, txt:2970-2976\nFig.11 caption, txt:3211\n§4 end, txt:543-544 “fixed for testing”",
+      "prim": "P-ORCHESTRATE"
+    },
+    {
+      "id": "backbonefwd",
+      "stage": "B7",
+      "row": 0,
+      "type": "learn",
+      "seq": 11,
+      "label": "Learn:Backbone — M_θ frozen forward, p_θ(·|c_t)",
+      "cite": "§2, txt:274\nbackbone side, not part of the\nmemory system's own machinery",
+      "prim": "P-FROZENFWD"
+    },
+    {
+      "id": "tokenout",
+      "stage": "B7",
+      "row": 1,
+      "type": "io",
+      "seq": 13,
+      "label": "IO:TokenStream — next-token decision from p_final",
+      "cite": "§3 L58, txt:804-805\nno explicit generate() described;\none-shot interpolation per token",
+      "prim": "P-FROZENFWD"
+    }
+  ],
+  "edges": [
+    {
+      "from": "corpus",
+      "to": "key"
+    },
+    {
+      "from": "domaincpt",
+      "to": "key",
+      "label": "domain branch: CPT'd backbone as key extractor"
+    },
+    {
+      "from": "key",
+      "to": "datastore"
+    },
+    {
+      "from": "datastore",
+      "to": "annidx"
+    },
+    {
+      "from": "datastore",
+      "to": "selfquery",
+      "label": "keys reused as queries"
+    },
+    {
+      "from": "annidx",
+      "to": "selfquery"
+    },
+    {
+      "from": "selfquery",
+      "to": "dist"
+    },
+    {
+      "from": "dist",
+      "to": "sparsify"
+    },
+    {
+      "from": "sparsify",
+      "to": "train",
+      "label": "streamed via offset + read-only memmap"
+    },
+    {
+      "from": "train",
+      "to": "ckpt"
+    },
+    {
+      "from": "ckpt",
+      "to": "memdecfwd",
+      "label": "M_ψ weights"
+    },
+    {
+      "from": "ctx",
+      "to": "backbonefwd"
+    },
+    {
+      "from": "ctx",
+      "to": "memdecfwd",
+      "label": "same c_t, parallel"
+    },
+    {
+      "from": "backbonefwd",
+      "to": "interp",
+      "label": "p_θ"
+    },
+    {
+      "from": "memdecfwd",
+      "to": "interp",
+      "label": "p_ψ"
+    },
+    {
+      "from": "coefsel",
+      "to": "interp",
+      "label": "α"
+    },
+    {
+      "from": "interp",
+      "to": "tokenout",
+      "label": "p_final"
+    }
+  ]
+}

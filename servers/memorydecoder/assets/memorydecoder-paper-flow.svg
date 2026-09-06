@@ -1,0 +1,313 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1980" height="1491" viewBox="0 0 1980 1491" font-family="Inter, -apple-system, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Noto Sans SC&quot;, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="24" y="30" font-size="19" font-weight="700" fill="#111827">Memory Decoder at Scale — paper view</text>
+<text x="24" y="50" font-size="11.5" fill="#4b5563">The mechanism as Wei et al. describe it: retrieval happens once, offline, to build a training signal; inference is two frozen forward passes plus a fixed-weight interpolation. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes are stages this mechanism does not have.</text>
+<text x="24" y="66" font-size="9.5" fill="#9ca3af" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Wei et al. 2026, Memory Decoder at Scale (arXiv:2607.27919v1)   ·   every anchor re-located in the paper txt during verification (59 paper-side assertions, 50 ✓ / 3 ✗ / 5 ◐ / 1 ?)</text>
+<circle cx="1411" cy="44" r="8" fill="#111827"/>
+<text x="1411" y="47.3" font-size="9" font-weight="700" text-anchor="middle" fill="#ffffff">n</text>
+<text x="1426" y="47.5" font-size="10" fill="#6b7280">true execution order — lanes are canonical stages, not sequence</text>
+<rect x="14" y="100" width="1276" height="805.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="93" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">A · MEMORY FORMATION  (query-independent)</text>
+<rect x="18" y="104" width="196" height="793.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="116.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A1 INTAKE</text>
+<rect x="230" y="104" width="196" height="793.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="328.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A2 DISTILL</text>
+<text x="328.0" y="515.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="442" y="104" width="196" height="793.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="540.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A3 ADMIT</text>
+<text x="540.0" y="515.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="654" y="104" width="196" height="793.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="752.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A4 INDEX</text>
+<rect x="866" y="104" width="196" height="793.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="964.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A5 COMMIT</text>
+<rect x="1078" y="104" width="196" height="793.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1176.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A6 INTERNALIZE</text>
+<rect x="14" y="995.0" width="1700" height="466.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="988.0" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">B · MEMORY MOBILIZATION  (query-conditioned)</text>
+<rect x="18" y="999.0" width="196" height="454.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="116.0" y="1016.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B1 CUE</text>
+<text x="116.0" y="1241.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="230" y="999.0" width="196" height="454.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="328.0" y="1016.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B2 RECALL</text>
+<text x="328.0" y="1241.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="442" y="999.0" width="196" height="454.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="540.0" y="1016.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B3 EXPAND</text>
+<text x="540.0" y="1241.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="654" y="999.0" width="196" height="454.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="752.0" y="1016.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B4 APPRAISE</text>
+<text x="752.0" y="1241.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="866" y="999.0" width="196" height="454.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="964.0" y="1016.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B5 SELECT</text>
+<text x="964.0" y="1241.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="1078" y="999.0" width="196" height="454.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1176.0" y="1016.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B6 DELIVER</text>
+<rect x="1290" y="999.0" width="196" height="454.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1388.0" y="1016.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B7 GENERATE</text>
+<rect x="1502" y="999.0" width="196" height="454.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="1600.0" y="1016.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B8 LOOP</text>
+<text x="1600.0" y="1241.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<path d="M 208.0 199.5 L 672.0 201.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(672.0,201.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 1182.0 295.0 C 1182.0 311.0 758.0 311.0 758.0 268.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(758.0,268.0) rotate(270)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="840.8" y="297.5" width="258.4" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="970.0" y="307.0" font-size="8.5" text-anchor="middle" fill="#4b5563">domain branch: CPT'd backbone as key extractor</text>
+<path d="M 758.0 268.0 L 758.0 292.5 L 758.0 292.5 L 758.0 317.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(758.0,317.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 758.0 424.0 L 758.0 454.5 L 758.0 454.5 L 758.0 485.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(758.0,485.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 758.0 424.0 L 758.0 525.0 L 745.0 525.0 L 745.0 626.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(745.0,626.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="693.6" y="511.5" width="128.8" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="758.0" y="521.0" font-size="8.5" text-anchor="middle" fill="#4b5563">keys reused as queries</text>
+<path d="M 758.0 604.0 L 758.0 615.0 L 771.0 615.0 L 771.0 626.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(771.0,626.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 758.0 745.0 L 758.0 756.0 L 758.0 756.0 L 758.0 767.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(758.0,767.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 844.0 828.0 L 864.0 828.0 Q 872.0 828.0 872.0 820.0 L 872.0 209.0 Q 872.0 201.0 880.0 201.0 L 884.0 201.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(884.0,201.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 1056.0 201.0 L 1082.0 201.0 Q 1090.0 201.0 1090.0 209.0 L 1090.0 382.0 Q 1090.0 390.0 1098.0 390.0 L 1096.0 390.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1096.0,390.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="982.4" y="286.0" width="215.20000000000002" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="1090.0" y="295.5" font-size="8.5" text-anchor="middle" fill="#4b5563">streamed via offset + read-only memmap</text>
+<path d="M 1182.0 463.0 C 1182.0 488.0 970.0 488.0 970.0 421.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(970.0,421.0) rotate(270)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 970.0 421.0 L 970.0 911.0 L 1169.0 911.0 L 1169.0 1029.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1169.0,1029.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="1034.8" y="895.5" width="69.4" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="1069.5" y="905.0" font-size="8.5" text-anchor="middle" fill="#4b5563">M_ψ weights</text>
+<path d="M 122.0 439.0 L 122.0 935.0 L 1394.0 935.0 L 1394.0 1029.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1394.0,1029.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 122.0 439.0 L 122.0 959.0 L 1195.0 959.0 L 1195.0 1029.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1195.0,1029.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="604.9" y="943.5" width="107.2" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="658.5" y="953.0" font-size="8.5" text-anchor="middle" fill="#4b5563">same c_t, parallel</text>
+<path d="M 1394.0 1136.0 L 1394.0 1151.0 L 1156.0 1151.0 L 1156.0 1158.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1156.0,1158.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="1261.9" y="1136.5" width="26.200000000000003" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="1275.0" y="1146.0" font-size="8.5" text-anchor="middle" fill="#4b5563">p_θ</text>
+<path d="M 1182.0 1136.0 L 1182.0 1147.0 L 1182.0 1147.0 L 1182.0 1158.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1182.0,1158.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="1168.9" y="1133.5" width="26.200000000000003" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="1182.0" y="1143.0" font-size="8.5" text-anchor="middle" fill="#4b5563">p_ψ</text>
+<path d="M 1182.0 1445.0 L 1182.0 1301.5 L 1208.0 1301.5 L 1208.0 1158.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1208.0,1158.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="1174.3" y="1288.0" width="15.4" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="1182.0" y="1297.5" font-size="8.5" text-anchor="middle" fill="#4b5563">α</text>
+<path d="M 1268.0 1204.0 L 1288.0 1204.0 Q 1296.0 1204.0 1296.0 1212.0 L 1296.0 1215.5 Q 1296.0 1223.5 1304.0 1223.5 L 1308.0 1223.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1308.0,1223.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="1272.1" y="1204.25" width="47.800000000000004" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="1296.0" y="1213.75" font-size="8.5" text-anchor="middle" fill="#4b5563">p_final</text>
+<rect x="36.0" y="134.0" width="172" height="131" rx="65.5" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.6"/>
+<text x="122.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Corpus —</text>
+<text x="122.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">deduplicated Pile, 207B</text>
+<text x="122.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">tokens (D_mem)</text>
+<text x="47.0" y="202.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§2, txt:429-435</text>
+<text x="47.0" y="214.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Table 8, txt:2031-2035</text>
+<text x="47.0" y="226.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">domain variant: up to 4.4B</text>
+<text x="47.0" y="238.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">tokens,</text>
+<text x="47.0" y="250.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">txt:485, Table 8 txt:2049-2051</text>
+<circle cx="37.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="37.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">1</text>
+<rect x="36.0" y="317.0" width="172" height="122" rx="61.0" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.6"/>
+<text x="122.0" y="339.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Prompt —</text>
+<text x="122.0" y="354.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">inference-time context</text>
+<text x="122.0" y="369.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">c_t, fed to both M_θ</text>
+<text x="122.0" y="384.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">and M_ψ</text>
+<text x="47.0" y="400.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§2, txt:274</text>
+<text x="47.0" y="412.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&quot;M_θ and M_ψ process the same</text>
+<text x="47.0" y="424.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">context in parallel&quot;</text>
+<circle cx="37.0" cy="318.0" r="9.5" fill="#111827"/>
+<text x="37.0" y="321.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">10</text>
+<rect x="1096.0" y="134.0" width="172" height="161" rx="7" fill="#f5d0fe" stroke="#a21caf" stroke-width="1.6"/>
+<text x="1182.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Learn:CPT — continued</text>
+<text x="1182.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">pretraining of</text>
+<text x="1182.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Qwen3-4B-Base on domain</text>
+<text x="1182.0" y="201.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">corpus (domain memory</text>
+<text x="1182.0" y="216.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">only)</text>
+<text x="1107.0" y="232.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.3, txt:482-484</text>
+<text x="1107.0" y="244.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§4, txt:533-534</text>
+<text x="1107.0" y="256.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">“follow the same architecture,</text>
+<text x="1107.0" y="268.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">objective, and sparse training</text>
+<text x="1107.0" y="280.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">pipeline” as general memory</text>
+<circle cx="1097.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="1097.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">1</text>
+<rect x="672.0" y="134.0" width="172" height="134" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="758.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">NLP:Embed — key —</text>
+<text x="758.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">φ_θ(c_t), M_θ</text>
+<text x="758.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">final-layer hidden</text>
+<text x="758.0" y="201.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">state</text>
+<text x="683.0" y="217.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.1 Eq.3, txt:294-296</text>
+<text x="683.0" y="229.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">“hidden state from the final</text>
+<text x="683.0" y="241.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">layer of M_θ at the final</text>
+<text x="683.0" y="253.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">position”</text>
+<circle cx="673.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">2</text>
+<path d="M 672.0 324.0 a 86.0 7 0 0 1 172 0 v 93 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.6"/>
+<path d="M 672.0 324.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#6b7280" stroke-width="1.2800000000000002"/>
+<text x="758.0" y="340.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Store:Datastore — R_mem</text>
+<text x="758.0" y="355.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">= {(k_t, x_t)}, key →</text>
+<text x="758.0" y="370.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">next real token</text>
+<text x="683.0" y="386.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.1 Eq.3, txt:306</text>
+<text x="683.0" y="398.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">O(N²) motivates §2 txt:429-435</text>
+<circle cx="673.0" cy="318.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="321.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">3</text>
+<path d="M 672.0 492.0 a 86.0 7 0 0 1 172 0 v 105 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.6"/>
+<path d="M 672.0 492.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#6b7280" stroke-width="1.2800000000000002"/>
+<text x="758.0" y="508.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Store:ANNIndex — OPQ256</text>
+<text x="758.0" y="523.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">+ IndexHNSW-quantized,</text>
+<text x="758.0" y="538.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">sharded IndexIVFPQ</text>
+<text x="683.0" y="554.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.1 + Fig.3 steps 1-2</text>
+<text x="683.0" y="566.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">txt:436-442</text>
+<text x="683.0" y="578.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Fig.3 caption, txt:425-428</text>
+<circle cx="673.0" cy="486.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="489.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
+<rect x="672.0" y="626.0" width="172" height="119" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="758.0" y="648.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Retrieval:kNN —</text>
+<text x="758.0" y="663.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">self-query top-K over</text>
+<text x="758.0" y="678.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">the ANN index (offline)</text>
+<text x="683.0" y="694.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Fig.3 step 3, txt:443-448</text>
+<text x="683.0" y="706.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">HNSW routes → per-shard GPU</text>
+<text x="683.0" y="718.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">IVFPQ search → writer merges</text>
+<text x="683.0" y="730.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">top-K</text>
+<circle cx="673.0" cy="627.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="630.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">5</text>
+<rect x="672.0" y="767.0" width="172" height="122" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="758.0" y="789.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Retrieval:kNNDist —</text>
+<text x="758.0" y="804.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">softmax(-d/τ) vote over</text>
+<text x="758.0" y="819.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">K neighbors → dense</text>
+<text x="758.0" y="834.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">p_ret</text>
+<text x="683.0" y="850.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.1 Eq.4-5, txt:311-320</text>
+<text x="683.0" y="862.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">τ only appears symbolically,</text>
+<text x="683.0" y="874.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">no numeric value given</text>
+<circle cx="673.0" cy="768.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="771.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">6</text>
+<path d="M 884.0 141.0 a 86.0 7 0 0 1 172 0 v 120 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.6"/>
+<path d="M 884.0 141.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#6b7280" stroke-width="1.2800000000000002"/>
+<text x="970.0" y="157.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Store:SparseDist —</text>
+<text x="970.0" y="172.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">ε-prune p_ret, keep p&gt;ε</text>
+<text x="970.0" y="187.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(≈64.95/row, ≈250×</text>
+<text x="970.0" y="202.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">compression)</text>
+<text x="895.0" y="218.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.2 Eq.6, txt:458-472</text>
+<text x="895.0" y="230.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">offset-aligned streaming +</text>
+<text x="895.0" y="242.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">FP32 renorm, txt:473-479</text>
+<circle cx="885.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">7</text>
+<path d="M 884.0 324.0 a 86.0 7 0 0 1 172 0 v 90 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.6"/>
+<path d="M 884.0 324.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#6b7280" stroke-width="1.2800000000000002"/>
+<text x="970.0" y="340.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Store:Parametric —</text>
+<text x="970.0" y="355.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">trained M_ψ weights</text>
+<text x="895.0" y="371.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§2 output; §4 txt:487-538</text>
+<text x="895.0" y="383.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">backed by AdamW schedule</text>
+<text x="895.0" y="395.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">txt:530-532</text>
+<circle cx="885.0" cy="318.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="321.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">9</text>
+<rect x="1096.0" y="317.0" width="172" height="146" rx="7" fill="#f5d0fe" stroke="#a21caf" stroke-width="1.6"/>
+<text x="1182.0" y="339.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Learn:Decoder — L_mem =</text>
+<text x="1182.0" y="354.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">β·D_KL(p_ret‖p_ψ) +</text>
+<text x="1182.0" y="369.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(1-β)·CE(x_t,p_ψ);</text>
+<text x="1182.0" y="384.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">β=0.5</text>
+<text x="1107.0" y="400.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§2 Eq.1, txt:269-273</text>
+<text x="1107.0" y="412.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">β=0.5: Table 9</text>
+<text x="1107.0" y="424.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">txt:2145/2163/2181,</text>
+<text x="1107.0" y="436.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Table 10 txt:2225/2240/2255</text>
+<text x="1107.0" y="448.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(NOT an undocumented default)</text>
+<circle cx="1097.0" cy="318.0" r="9.5" fill="#111827"/>
+<text x="1097.0" y="321.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">8</text>
+<rect x="1096.0" y="1029.0" width="172" height="107" rx="7" fill="#f5d0fe" stroke="#a21caf" stroke-width="1.6"/>
+<text x="1182.0" y="1051.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Learn:MemDecoder — M_ψ</text>
+<text x="1182.0" y="1066.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">forward, p_ψ(·|c_t), no</text>
+<text x="1182.0" y="1081.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">retrieved text as input</text>
+<text x="1107.0" y="1097.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§2, txt:258-259, txt:274</text>
+<text x="1107.0" y="1109.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">same tokenizer/vocab as M_θ,</text>
+<text x="1107.0" y="1121.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">txt:257-259</text>
+<circle cx="1097.0" cy="1030.0" r="9.5" fill="#111827"/>
+<text x="1097.0" y="1033.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">11</text>
+<rect x="1096.0" y="1158.0" width="172" height="92" rx="7" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.6"/>
+<text x="1182.0" y="1180.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Fusion:Interp — p_final</text>
+<text x="1182.0" y="1195.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">= (1-α)·p_θ + α·p_ψ</text>
+<text x="1107.0" y="1211.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§2 Eq.2, txt:275-277</text>
+<text x="1107.0" y="1223.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">no multi-step assembly —</text>
+<text x="1107.0" y="1235.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">interpolation IS the delivery</text>
+<circle cx="1097.0" cy="1159.0" r="9.5" fill="#111827"/>
+<text x="1097.0" y="1162.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">12</text>
+<rect x="1096.0" y="1311.0" width="172" height="134" rx="7" fill="#fef3c7" stroke="#b45309" stroke-width="1.6"/>
+<text x="1182.0" y="1333.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Sched:Calibrate — α</text>
+<text x="1182.0" y="1348.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">tuned on validation</text>
+<text x="1182.0" y="1363.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">set, grid 0:0.05:1</text>
+<text x="1182.0" y="1378.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(Table 15 per-task)</text>
+<text x="1107.0" y="1394.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Appx F, txt:2970-2976</text>
+<text x="1107.0" y="1406.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Fig.11 caption, txt:3211</text>
+<text x="1107.0" y="1418.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§4 end, txt:543-544 “fixed for</text>
+<text x="1107.0" y="1430.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">testing”</text>
+<rect x="1308.0" y="1029.0" width="172" height="107" rx="7" fill="#f5d0fe" stroke="#a21caf" stroke-width="1.6"/>
+<text x="1394.0" y="1051.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Learn:Backbone — M_θ</text>
+<text x="1394.0" y="1066.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">frozen forward,</text>
+<text x="1394.0" y="1081.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">p_θ(·|c_t)</text>
+<text x="1319.0" y="1097.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§2, txt:274</text>
+<text x="1319.0" y="1109.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">backbone side, not part of the</text>
+<text x="1319.0" y="1121.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">memory system's own machinery</text>
+<circle cx="1309.0" cy="1030.0" r="9.5" fill="#111827"/>
+<text x="1309.0" y="1033.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">11</text>
+<rect x="1308.0" y="1158.0" width="172" height="131" rx="65.5" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.6"/>
+<text x="1394.0" y="1180.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:TokenStream —</text>
+<text x="1394.0" y="1195.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">next-token decision</text>
+<text x="1394.0" y="1210.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">from p_final</text>
+<text x="1319.0" y="1226.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3 L58, txt:804-805</text>
+<text x="1319.0" y="1238.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">no explicit generate()</text>
+<text x="1319.0" y="1250.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">described;</text>
+<text x="1319.0" y="1262.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">one-shot interpolation per</text>
+<text x="1319.0" y="1274.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">token</text>
+<circle cx="1309.0" cy="1159.0" r="9.5" fill="#111827"/>
+<text x="1309.0" y="1162.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">13</text>
+<rect x="1726" y="100" width="208" height="1345.0" rx="9" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="1740" y="122" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NODE TYPE</text>
+<rect x="1740" y="130" width="16" height="11" rx="3" fill="#ffedd5" stroke="#ea580c" stroke-width="1.4"/>
+<text x="1763" y="138" font-size="10" fill="#4b5563">Retrieval / ranking</text>
+<rect x="1740" y="147" width="16" height="11" rx="3" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.4"/>
+<text x="1763" y="155" font-size="10" fill="#4b5563">Fusion / gating</text>
+<rect x="1740" y="164" width="16" height="11" rx="3" fill="#fef3c7" stroke="#b45309" stroke-width="1.4"/>
+<text x="1763" y="172" font-size="10" fill="#4b5563">Scheduling</text>
+<rect x="1740" y="181" width="16" height="11" rx="3" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.4"/>
+<text x="1763" y="189" font-size="10" fill="#4b5563">Storage</text>
+<rect x="1740" y="198" width="16" height="11" rx="3" fill="#f5d0fe" stroke="#a21caf" stroke-width="1.4"/>
+<text x="1763" y="206" font-size="10" fill="#4b5563">Learned parameters</text>
+<rect x="1740" y="215" width="16" height="11" rx="3" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.4"/>
+<text x="1763" y="223" font-size="10" fill="#4b5563">Input / output</text>
+<text x="1740" y="248" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NOTES</text>
+<text x="1740" y="263" font-size="9.5" fill="#4b5563">• B1-B5 are empty on purpose, and A4</text>
+<text x="1740" y="274.5" font-size="9.5" fill="#4b5563">is the busiest lane in this whole</text>
+<text x="1740" y="286.0" font-size="9.5" fill="#4b5563">project. The dense retrieval</text>
+<text x="1740" y="297.5" font-size="9.5" fill="#4b5563">(self-query top-K over the datastore)</text>
+<text x="1740" y="309.0" font-size="9.5" fill="#4b5563">happens once, offline, while building</text>
+<text x="1740" y="320.5" font-size="9.5" fill="#4b5563">the datastore and its distribution</text>
+<text x="1740" y="332.0" font-size="9.5" fill="#4b5563">supervision -- not at query time. This</text>
+<text x="1740" y="343.5" font-size="9.5" fill="#4b5563">is the case the whole A/B</text>
+<text x="1740" y="355.0" font-size="9.5" fill="#4b5563">(formation/mobilization) split was</text>
+<text x="1740" y="366.5" font-size="9.5" fill="#4b5563">named after: calling it a 'retrieval</text>
+<text x="1740" y="378.0" font-size="9.5" fill="#4b5563">stage' would be wrong, since at</text>
+<text x="1740" y="389.5" font-size="9.5" fill="#4b5563">inference the Faiss index and</text>
+<text x="1740" y="401.0" font-size="9.5" fill="#4b5563">datastore are never loaded (txt:259).</text>
+<text x="1740" y="417.5" font-size="9.5" fill="#4b5563">• β is NOT an undocumented</text>
+<text x="1740" y="429.0" font-size="9.5" fill="#4b5563">hyperparameter: Appendix Table 9 and</text>
+<text x="1740" y="440.5" font-size="9.5" fill="#4b5563">Table 10 both list 'Memory loss</text>
+<text x="1740" y="452.0" font-size="9.5" fill="#4b5563">weight' = 0.5 for every backbone size</text>
+<text x="1740" y="463.5" font-size="9.5" fill="#4b5563">and for domain memory -- an earlier</text>
+<text x="1740" y="475.0" font-size="9.5" fill="#4b5563">reading that only checked the main</text>
+<text x="1740" y="486.5" font-size="9.5" fill="#4b5563">text missed this.</text>
+<text x="1740" y="503.0" font-size="9.5" fill="#4b5563">• α is also not a blind default:</text>
+<text x="1740" y="514.5" font-size="9.5" fill="#4b5563">Appendix F sweeps a 0:0.05:1 grid (21</text>
+<text x="1740" y="526.0" font-size="9.5" fill="#4b5563">points, Fig.11) and Table 15 records</text>
+<text x="1740" y="537.5" font-size="9.5" fill="#4b5563">the per-task selected value; the</text>
+<text x="1740" y="549.0" font-size="9.5" fill="#4b5563">paper's own text (§4 end) says it is</text>
+<text x="1740" y="560.5" font-size="9.5" fill="#4b5563">'fixed for testing' after this</text>
+<text x="1740" y="572.0" font-size="9.5" fill="#4b5563">validation-set search.</text>
+<text x="1740" y="588.5" font-size="9.5" fill="#4b5563">• Domain memory (biology/law/finance)</text>
+<text x="1740" y="600.0" font-size="9.5" fill="#4b5563">reuses the exact same A4-A6 pipeline</text>
+<text x="1740" y="611.5" font-size="9.5" fill="#4b5563">as general memory; the only extra step</text>
+<text x="1740" y="623.0" font-size="9.5" fill="#4b5563">is one continued-pretraining pass over</text>
+<text x="1740" y="634.5" font-size="9.5" fill="#4b5563">the domain corpus so the backbone that</text>
+<text x="1740" y="646.0" font-size="9.5" fill="#4b5563">extracts keys is domain-adapted</text>
+<text x="1740" y="657.5" font-size="9.5" fill="#4b5563">(§3.3).</text>
+<text x="24" y="1475.0" font-size="9" fill="#9ca3af">memory-bench · methodology flow · paper view</text>
+</svg>

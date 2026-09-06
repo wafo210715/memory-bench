@@ -1,0 +1,203 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1980" height="1525" viewBox="0 0 1980 1525" font-family="Inter, -apple-system, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Noto Sans SC&quot;, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="24" y="30" font-size="19" font-weight="700" fill="#111827">LiveMem — where the paper and the code part ways</text>
+<text x="24" y="50" font-size="11.5" fill="#4b5563">Only the divergent steps are drawn. Each node states both sides; the lane says which stage of the pipeline the divergence sits in.</text>
+<text x="24" y="66" font-size="9.5" fill="#9ca3af" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper arXiv:2608.02515v2  ×  repo LiveMem @ 71a6a8b   ·   servers/livemem/verification.md, 98 assertions checked (76 ✓ / 3 ✗ / 18 ◐ / 1 ?)</text>
+<rect x="14" y="100" width="1276" height="733.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="93" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">A · MEMORY FORMATION  (query-independent)</text>
+<rect x="18" y="104" width="196" height="721.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="116.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A1 INTAKE</text>
+<text x="116.0" y="479.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="230" y="104" width="196" height="721.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="328.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A2 DISTILL</text>
+<text x="328.0" y="479.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="442" y="104" width="196" height="721.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="540.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A3 ADMIT</text>
+<text x="540.0" y="479.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="654" y="104" width="196" height="721.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="752.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A4 INDEX</text>
+<text x="752.0" y="479.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="866" y="104" width="196" height="721.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="964.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A5 COMMIT</text>
+<text x="964.0" y="479.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="1078" y="104" width="196" height="721.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1176.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A6 INTERNALIZE</text>
+<rect x="14" y="891.0" width="1700" height="604.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="884.0" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">B · MEMORY MOBILIZATION  (query-conditioned)</text>
+<rect x="18" y="895.0" width="196" height="592.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="116.0" y="912.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B1 CUE</text>
+<text x="116.0" y="1206.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="230" y="895.0" width="196" height="592.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="328.0" y="912.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B2 RECALL</text>
+<text x="328.0" y="1206.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="442" y="895.0" width="196" height="592.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="540.0" y="912.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B3 EXPAND</text>
+<text x="540.0" y="1206.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="654" y="895.0" width="196" height="592.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="752.0" y="912.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B4 APPRAISE</text>
+<text x="752.0" y="1206.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="866" y="895.0" width="196" height="592.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="964.0" y="912.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B5 SELECT</text>
+<text x="964.0" y="1206.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="1078" y="895.0" width="196" height="592.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1176.0" y="912.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B6 DELIVER</text>
+<rect x="1290" y="895.0" width="196" height="592.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="1388.0" y="912.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B7 GENERATE</text>
+<text x="1388.0" y="1206.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="1502" y="895.0" width="196" height="592.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="1600.0" y="912.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B8 LOOP</text>
+<text x="1600.0" y="1206.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="1096.0" y="925.0" width="172" height="296" rx="7" fill="#fef3c7" stroke="#b45309" stroke-width="2.2"/>
+<text x="1182.0" y="947.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Serving chunk/eviction</text>
+<text x="1182.0" y="962.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">mode</text>
+<text x="1107.0" y="978.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: Appx C.2, txt:1683-1685</text>
+<text x="1107.0" y="990.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&quot;serving ... deterministic</text>
+<text x="1107.0" y="1002.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">fixed-stride chunks&quot;</text>
+<text x="1107.0" y="1014.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: serve_livemem.sh never</text>
+<text x="1107.0" y="1026.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">sets</text>
+<text x="1107.0" y="1038.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">MEM_EVICT_MODE -&gt;</text>
+<text x="1107.0" y="1050.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">evict_registry.py:67</text>
+<text x="1107.0" y="1062.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">defaults &quot;message&quot;;</text>
+<text x="1107.0" y="1074.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">chunking.py:17-36</text>
+<text x="1107.0" y="1086.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">splits on &lt;|im_start|&gt;. Only</text>
+<text x="1107.0" y="1098.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">RL rollout</text>
+<text x="1107.0" y="1110.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(run_grpo_dev.sh:124) is</text>
+<text x="1107.0" y="1122.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">fixed-stride,</text>
+<text x="1107.0" y="1134.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">and its RULE_TABLE</text>
+<text x="1107.0" y="1146.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(eviction_policy.py:</text>
+<text x="1107.0" y="1158.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">57-64, max window 8192, chunk</text>
+<text x="1107.0" y="1170.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">512)</text>
+<text x="1107.0" y="1182.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">does NOT match the benchmark</text>
+<text x="1107.0" y="1194.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">override</text>
+<text x="1107.0" y="1206.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(chunk 1024, budget 8K/32K)</text>
+<circle cx="1257.0" cy="936.0" r="8" fill="#b45309"/>
+<text x="1257.0" y="939.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="1096.0" y="134.0" width="172" height="203" rx="7" fill="#f5d0fe" stroke="#0f766e" stroke-width="2.2"/>
+<text x="1182.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Design Y —</text>
+<text x="1182.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">write_mask-gated</text>
+<text x="1182.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">read/write</text>
+<text x="1107.0" y="202.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: zero hits for &quot;design</text>
+<text x="1107.0" y="214.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">x/y&quot;,</text>
+<text x="1107.0" y="226.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&quot;write_mask&quot;, &quot;gated read&quot;,</text>
+<text x="1107.0" y="238.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&quot;read-only&quot;</text>
+<text x="1107.0" y="250.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code:</text>
+<text x="1107.0" y="262.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">memory_gdn2.py:12-14,128-133</text>
+<text x="1107.0" y="274.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">modeling_memory_qwen3.py:219-2</text>
+<text x="1107.0" y="286.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">22</text>
+<text x="1107.0" y="298.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">dedicated synth dataset,</text>
+<text x="1107.0" y="310.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">data.py:321-326,354</text>
+<text x="1107.0" y="322.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">-- never in any released yaml</text>
+<circle cx="1257.0" cy="145.0" r="8" fill="#0f766e"/>
+<text x="1257.0" y="148.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">C</text>
+<rect x="1096.0" y="359.0" width="172" height="188" rx="7" fill="#f5d0fe" stroke="#b45309" stroke-width="2.2"/>
+<text x="1182.0" y="381.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">memory_design default</text>
+<text x="1182.0" y="396.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">value</text>
+<text x="1107.0" y="412.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper + all 3 released yaml: X</text>
+<text x="1107.0" y="424.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">training-side Config default:</text>
+<text x="1107.0" y="436.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">configuration_memory_qwen3.py:</text>
+<text x="1107.0" y="448.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">20</text>
+<text x="1107.0" y="460.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">= Y</text>
+<text x="1107.0" y="472.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">modeling_memory_qwen3.py:460 =</text>
+<text x="1107.0" y="484.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Y</text>
+<text x="1107.0" y="496.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">vLLM serving Config default:</text>
+<text x="1107.0" y="508.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">vllm/.../configuration_memory_</text>
+<text x="1107.0" y="520.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">qwen3.py:</text>
+<text x="1107.0" y="532.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">45 = X</text>
+<circle cx="1257.0" cy="370.0" r="8" fill="#b45309"/>
+<text x="1257.0" y="373.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="1096.0" y="569.0" width="172" height="248" rx="7" fill="#f5d0fe" stroke="#0f766e" stroke-width="2.2"/>
+<text x="1182.0" y="591.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">mem_layers ignored by</text>
+<text x="1182.0" y="606.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">the serving path</text>
+<text x="1107.0" y="622.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: txt:194 &quot;each attention</text>
+<text x="1107.0" y="634.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">layer&quot;,</text>
+<text x="1107.0" y="646.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">no partial-coverage option</text>
+<text x="1107.0" y="658.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">discussed</text>
+<text x="1107.0" y="670.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">training:</text>
+<text x="1107.0" y="682.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">configuration_memory_qwen3.py:</text>
+<text x="1107.0" y="694.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">75-77 supports</text>
+<text x="1107.0" y="706.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">memory_layer_indices</text>
+<text x="1107.0" y="718.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">serving: grep</text>
+<text x="1107.0" y="730.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">'mem_layers|memory_layer_</text>
+<text x="1107.0" y="742.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">indices' models/vllm/ -&gt; 0</text>
+<text x="1107.0" y="754.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">hits;</text>
+<text x="1107.0" y="766.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">vllm/modeling_memory_qwen3.py:</text>
+<text x="1107.0" y="778.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">92-94</text>
+<text x="1107.0" y="790.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">unconditionally attaches every</text>
+<text x="1107.0" y="802.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">layer</text>
+<circle cx="1257.0" cy="580.0" r="8" fill="#0f766e"/>
+<text x="1257.0" y="583.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">C</text>
+<rect x="1096.0" y="1243.0" width="172" height="236" rx="7" fill="#fef3c7" stroke="#dc2626" stroke-width="2.2" stroke-dasharray="6 4"/>
+<text x="1182.0" y="1265.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Two-part request</text>
+<text x="1182.0" y="1280.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">teardown</text>
+<text x="1107.0" y="1296.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: txt:1712-1714 &quot;removes</text>
+<text x="1107.0" y="1308.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">the</text>
+<text x="1107.0" y="1320.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">request's turnover record AND</text>
+<text x="1107.0" y="1332.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">the</text>
+<text x="1107.0" y="1344.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">state manager releases its</text>
+<text x="1107.0" y="1356.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">recurrent</text>
+<text x="1107.0" y="1368.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">slot&quot;</text>
+<text x="1107.0" y="1380.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code:</text>
+<text x="1107.0" y="1392.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">evict_registry.py:266-275 only</text>
+<text x="1107.0" y="1404.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">clears the turnover-record</text>
+<text x="1107.0" y="1416.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">table;</text>
+<text x="1107.0" y="1428.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">grep</text>
+<text x="1107.0" y="1440.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">'release.*slot|free.*ssm_state</text>
+<text x="1107.0" y="1452.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">'</text>
+<text x="1107.0" y="1464.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">models/vllm/ -&gt; 0 hits</text>
+<circle cx="1257.0" cy="1254.0" r="8" fill="#dc2626"/>
+<text x="1257.0" y="1257.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">P</text>
+<rect x="1726" y="100" width="208" height="1379.0" rx="9" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="1740" y="122" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NODE TYPE</text>
+<rect x="1740" y="130" width="16" height="11" rx="3" fill="#fef3c7" stroke="#b45309" stroke-width="1.4"/>
+<text x="1763" y="138" font-size="10" fill="#4b5563">Scheduling</text>
+<rect x="1740" y="147" width="16" height="11" rx="3" fill="#f5d0fe" stroke="#a21caf" stroke-width="1.4"/>
+<text x="1763" y="155" font-size="10" fill="#4b5563">Learned parameters</text>
+<text x="1740" y="182" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">PAPER vs CODE</text>
+<rect x="1740" y="189" width="18" height="13" rx="3" fill="#ffffff" stroke="#dc2626" stroke-width="2" stroke-dasharray="6 4"/>
+<circle cx="1766" cy="195" r="6.5" fill="#dc2626"/>
+<text x="1766" y="198.6" font-size="8.5" font-weight="700" text-anchor="middle" fill="#ffffff">P</text>
+<text x="1779" y="198" font-size="9.5" fill="#4b5563">Paper only — not in code</text>
+<rect x="1740" y="209" width="18" height="13" rx="3" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+<circle cx="1766" cy="215" r="6.5" fill="#0f766e"/>
+<text x="1766" y="218.6" font-size="8.5" font-weight="700" text-anchor="middle" fill="#ffffff">C</text>
+<text x="1779" y="218" font-size="9.5" fill="#4b5563">Code only — not in paper</text>
+<rect x="1740" y="229" width="18" height="13" rx="3" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
+<circle cx="1766" cy="235" r="6.5" fill="#b45309"/>
+<text x="1766" y="238.6" font-size="8.5" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<text x="1779" y="238" font-size="9.5" fill="#4b5563">Both, but behave</text>
+<text x="1779" y="249" font-size="9.5" fill="#4b5563">differently</text>
+<text x="1740" y="277" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NOTES</text>
+<text x="1740" y="292" font-size="9.5" fill="#4b5563">• The headline divergence: paper Appx</text>
+<text x="1740" y="303.5" font-size="9.5" fill="#4b5563">C.2 promises deterministic</text>
+<text x="1740" y="315.0" font-size="9.5" fill="#4b5563">fixed-stride serving; the actual</text>
+<text x="1740" y="326.5" font-size="9.5" fill="#4b5563">benchmark server (serve_livemem.sh)</text>
+<text x="1740" y="338.0" font-size="9.5" fill="#4b5563">never sets MEM_EVICT_MODE, so it</text>
+<text x="1740" y="349.5" font-size="9.5" fill="#4b5563">silently runs message-mode chunking.</text>
+<text x="1740" y="361.0" font-size="9.5" fill="#4b5563">Only RL rollout is genuinely</text>
+<text x="1740" y="372.5" font-size="9.5" fill="#4b5563">fixed-stride — and even then its</text>
+<text x="1740" y="384.0" font-size="9.5" fill="#4b5563">RULE_TABLE parameters (max window</text>
+<text x="1740" y="395.5" font-size="9.5" fill="#4b5563">8192, chunk 512) don't match the</text>
+<text x="1740" y="407.0" font-size="9.5" fill="#4b5563">benchmark's own override (chunk 1024,</text>
+<text x="1740" y="418.5" font-size="9.5" fill="#4b5563">budget 8K/32K), so the</text>
+<text x="1740" y="430.0" font-size="9.5" fill="#4b5563">code-architecture.md claim that the</text>
+<text x="1740" y="441.5" font-size="9.5" fill="#4b5563">two modes 'coincide at 8k/32k' is also</text>
+<text x="1740" y="453.0" font-size="9.5" fill="#4b5563">false.</text>
+<text x="1740" y="469.5" font-size="9.5" fill="#4b5563">• Design Y (write-masked gated</text>
+<text x="1740" y="481.0" font-size="9.5" fill="#4b5563">read/write) is a complete, tested</text>
+<text x="1740" y="492.5" font-size="9.5" fill="#4b5563">implementation with its own synthetic</text>
+<text x="1740" y="504.0" font-size="9.5" fill="#4b5563">dataset, sitting entirely unused —</text>
+<text x="1740" y="515.5" font-size="9.5" fill="#4b5563">every released checkpoint is Design X.</text>
+<text x="1740" y="527.0" font-size="9.5" fill="#4b5563">Worth flagging for anyone trying to</text>
+<text x="1740" y="538.5" font-size="9.5" fill="#4b5563">reproduce 'the LiveMem mechanism' from</text>
+<text x="1740" y="550.0" font-size="9.5" fill="#4b5563">the repo without reading the yaml</text>
+<text x="1740" y="561.5" font-size="9.5" fill="#4b5563">configs.</text>
+<text x="1740" y="578.0" font-size="9.5" fill="#4b5563">• Two independent defaults for the</text>
+<text x="1740" y="589.5" font-size="9.5" fill="#4b5563">same flag point in opposite</text>
+<text x="1740" y="601.0" font-size="9.5" fill="#4b5563">directions: the training-side Python</text>
+<text x="1740" y="612.5" font-size="9.5" fill="#4b5563">Config defaults to Design Y, the vLLM</text>
+<text x="1740" y="624.0" font-size="9.5" fill="#4b5563">serving Config defaults to Design X —</text>
+<text x="1740" y="635.5" font-size="9.5" fill="#4b5563">a model built without an explicit yaml</text>
+<text x="1740" y="647.0" font-size="9.5" fill="#4b5563">override would train as Y and serve as</text>
+<text x="1740" y="658.5" font-size="9.5" fill="#4b5563">X.</text>
+<text x="24" y="1509.0" font-size="9" fill="#9ca3af">memory-bench · methodology flow · paper ↔ code divergence</text>
+</svg>

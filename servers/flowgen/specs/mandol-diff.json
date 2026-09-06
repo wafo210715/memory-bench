@@ -1,0 +1,143 @@
+{
+  "system": "mandol",
+  "view": "diff",
+  "title": "Mandol — where the paper and the code part ways",
+  "subtitle": "Only the divergent steps are drawn. Each node states both sides; the lane says which stage of the pipeline the divergence sits in.",
+  "source": "paper arXiv:2606.29778v1  ×  repo AgentCombo/Mandol @ 6d7af4f + memory-bench @ 947c136   ·   servers/mandol/verification.md §6.1 (paper↔upstream, 15 items) + §6.2 (upstream↔adapter, 15 items)",
+  "footer": "memory-bench · methodology flow · paper ↔ code divergence",
+  "legend_notes": [
+    "The headline mechanism error: ARCHITECTURE.md called P2's '100% L0 evidence' a retrieval ranking failure. It is not — retrieve() passes ms_names=[conv_id], and L1/L2 units are never assigned to that space in the first place (measured: 419/419 uids in conv-26's space are L0). The candidate set is structurally empty of abstractions before any scoring happens.",
+    "Two of the numbers attached to the paper don't belong to it: λ=0.6 is the code's default (the paper's Eq.3 gives λ no value at all), and the production script's κ=3.0 overrides the paper's own stated κ=2.5.",
+    "Two whole paper claims have zero code footprint anywhere in the repository: the DuckDB persistence backend (actual: rocksdict) and all three Table 2 API names (quantitative_search / search_unit / build_memory_from_raw).",
+    "The paper's headline multi-hop mechanism (selective subgraph expansion) and its 4th memory source (emotional) are both paper_only — not because they are unimplemented in the abstract, but because the exact reproduction config that produced the paper's numbers (topk_graph=0, locomo_types=[STRUCTURED]) turns them off."
+  ],
+  "nodes": [
+    {
+      "id": "d1",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "state": "paper_only",
+      "label": "Emotional memory / preference-evolution chains never built",
+      "cite": "paper: §3.1.2/§4 txt:285-288,755-758, 4 separate\nmentions of a 4th memory source\ncode: hierarchical_prompts.py:35-38 locomo_types()=[STRUCTURED];\nlongmemeval_types() also excludes it (:40-43) — verification #89"
+    },
+    {
+      "id": "d2",
+      "stage": "A4",
+      "row": 0,
+      "type": "store",
+      "state": "paper_only",
+      "label": "DuckDB persistence backend does not exist",
+      "cite": "paper: §3.2/§4/Table 1, 3 separate declarations\ntxt:220,437-439,797-801\ncode: zero \"duckdb\" hits repo-wide (incl. pyproject/docs/website,\nexcl. lockfile); actual backend is rocksdict==0.3.29\n(rocksdb_payload_store.py) — diff A1"
+    },
+    {
+      "id": "d3",
+      "stage": "A4",
+      "row": 1,
+      "type": "alg",
+      "state": "paper_only",
+      "label": "Table 2's three core APIs are absent: quantitative_search / search_unit / build_memory_from_raw",
+      "cite": "paper: txt:706-716 (Table 2)\ncode: zero occurrences of all three names, repo-wide.\nWhat exists instead: traverse_explicit_nodes (semantic_graph.py:1337),\ntraverse_implicit_nodes (:1434), add_relationship (:610), save_graph (:1626) — diff A2"
+    },
+    {
+      "id": "d4",
+      "stage": "A4",
+      "row": 2,
+      "type": "nlp",
+      "state": "differs",
+      "label": "KG relations extracted (5,208) but 0 edges land — a four-layer bug chain",
+      "cite": "paper: entity graph with reference/attribute edges,\n§4 txt:751-755\ncode: candidate list omits entity_id (towers/kg.py:90-111);\nload_kg reads wrong keys (towers/load.py:223-234); relations\nresolved by name-lookup miss; marker kg.edges=0 for conv-41…50 — diff B4"
+    },
+    {
+      "id": "d5",
+      "stage": "A4",
+      "row": 3,
+      "type": "nlp",
+      "state": "differs",
+      "label": "source_unit_uids traceback links — paper's unified links vs. three separate per-tower graphs",
+      "cite": "paper: §3.1.2 txt:289-292, traceable links back\nto base units\ncode: base/episodic/kg live in three separate graphs;\ncross-graph add_relationship silently returns False\n(semantic_graph.py:644-649) → 0 traceback edges for episodic and kg — diff B5"
+    },
+    {
+      "id": "d6",
+      "stage": "B1",
+      "row": 0,
+      "type": "alg",
+      "state": "differs",
+      "label": "Query-adaptive routing: online intent classifier (paper) vs. dataset gold category (code)",
+      "cite": "paper: §3.3.1 txt:461-472, lightweight intent classifier\nfrom query features (time expressions, entity mentions), no LLM\ncode: locomo_triple_router.py:1177 category=qa_item.get(\"category\",1)\n→ locomo_tower_router.py:106-119 static table; for the paper's best\nbackbone (GPT-4.1-mini) all 5 categories map to the same config\n(identity routing — no differentiation) — diff A3/A4"
+    },
+    {
+      "id": "d7",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "state": "differs",
+      "label": "P2's \"100% L0 evidence\": structural exclusion, not a ranking failure",
+      "cite": "ARCHITECTURE.md claimed: dense kNN ranked L1/L2 too low to surface\ncode: server.py:281 retrieve() passes ms_names=[conv_id]; L1/L2 units\nonly ever join hierarchical_memory:L1_Summary/:L2_Insight spaces,\nnever the conv space. Measured: conv-26 space = 419/419 uids, all L0,\nchild_space_names=[] — the FAISS candidate set never contained an\nabstraction to rank (semantic_map.py:2186-2192,2539-2557) — verification #15"
+    },
+    {
+      "id": "d8",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "state": "paper_only",
+      "label": "Selective subgraph expansion is dead on the benchmarked route",
+      "cite": "paper: §3.3.1 txt:477-480, key multi-hop evidence-completion\nmechanism\ncode: locomo_tower_router.py:66-74 _cfg_full() sets topk_graph=0,\nuse_entity_relation=False; locomo_triple.py:3359 gates the traversal\ncall on topk_graph>0 — entity_retriever.search() never executes — diff A6"
+    },
+    {
+      "id": "d9",
+      "stage": "B4",
+      "row": 0,
+      "type": "fusion",
+      "state": "differs",
+      "label": "Tri-tower fusion: upstream unifies + prefilters; the adapter just concatenates",
+      "cite": "upstream: locomo_triple_router_quantification.py:690 reranker.rerank()\nover all 75 merged candidates, then tower_separate keeps ~35\n(:698-710) — rows C23-C24\nadapter: towers/retrieve.py:282-289 concatenates 15+30+30=75 straight\ninto the cascade, no cross-tower rerank or weight — row A29\n(measured cascade.stage1_in = 75, always) — diff B1"
+    },
+    {
+      "id": "d10",
+      "stage": "B5",
+      "row": 0,
+      "type": "fusion",
+      "state": "differs",
+      "label": "Eq.(3)'s λ has no paper value; the code's default (0.6) is what got mis-attributed to the paper",
+      "cite": "paper: Eq.3 txt:680, λ appears only as a symbol, no number\nanywhere in the paper (grep for \"0.6\" near λ: no hits)\ncode: cascade_pruner.py:191,1133 default λ=0.6; production script\npasses 0.7 (run_reproduction_suite.sh:355); ARCHITECTURE.md wrote\n\"paper Eq.(1) κ=2.5/λ=0.6\" — λ isn't even in Eq.(1) — verification #75, diff A8"
+    },
+    {
+      "id": "d11",
+      "stage": "B5",
+      "row": 1,
+      "type": "fusion",
+      "state": "differs",
+      "label": "Eq.(1)'s κ: paper states 2.5, the script that produced the paper's numbers uses 3.0",
+      "cite": "paper: Eq.1 txt:657,672, κ=2.5\ncode: cascade_pruner.py:186 default also 2.5, but\nrun_reproduction_suite.sh:354(+13 more sites) passes\n--cascade-mad-multiplier 3.0 for every section — diff A7"
+    },
+    {
+      "id": "d12",
+      "stage": "B5",
+      "row": 2,
+      "type": "fusion",
+      "state": "differs",
+      "label": "Query-time temporal decay is live in P3, contradicting the \"no decay\" claim",
+      "cite": "ARCHITECTURE.md claimed: query-time temporal reasoning does not decay\ncode: cascade_pruner.py:637-644 stage2 arbitration score includes\ntemporal_bonus=exp(−Δh/temporal_decay_hours), decay_hours default\n720h (:194), weight w_temporal=0.2 — participates in every P3\ncross-tower conflict decision — verification #85"
+    },
+    {
+      "id": "d13",
+      "stage": "B5",
+      "row": 3,
+      "type": "fusion",
+      "state": "code_only",
+      "label": "Token budget: script specifies 1500-2000, the cascade pruner never receives it",
+      "cite": "upstream script: run_reproduction_suite.sh:358 etc.,\n--cascade-max-context-tokens 1500/1800/2000\nadapter: towers/retrieve.py:297-302 only passes mode/mad/λ/abs_min,\nnot max_tokens → falls back to class default 4096; measured cascade\ntoken median 2,682, 98.0% of queries exceed 1500 — diff B2"
+    },
+    {
+      "id": "d14",
+      "stage": "B7",
+      "row": 0,
+      "type": "io",
+      "state": "code_only",
+      "label": "Gold-category prompt injection: upstream's own eval harness does it, the paper never mentions it, the adapter doesn't either",
+      "cite": "paper: §5.1, no mention of category injection anywhere\nupstream: locomo_triple_router.py:2147-2149 injects\n\"QUESTION CATEGORY: {category} - {guidance}\" into the answer prompt\nadapter: bench/runner.py:276 answer_user(evidence_text, question) —\nno category, uniform across all arms — diff A14"
+    }
+  ],
+  "edges": []
+}

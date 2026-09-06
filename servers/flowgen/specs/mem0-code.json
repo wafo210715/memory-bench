@@ -11,55 +11,348 @@
     "Two RECALL channels are inert in the benchmarked config — BM25 needs a backend that implements it (Chroma returns nothing) and entity boost needs spaCy."
   ],
   "nodes": [
-    {"id": "sess",   "stage": "A1", "row": 0, "type": "io",    "seq": 1,  "label": "Session messages", "cite": "Memory.add()"},
-    {"id": "hist",   "stage": "A3", "row": 0, "type": "alg",   "seq": 2,  "label": "Recall last 10 turns", "cite": "main.py:918-920  Phase 0"},
-    {"id": "probe",  "stage": "A3", "row": 1, "type": "alg",   "seq": 3,  "label": "Dense probe: top-10 existing memories as dedup reference", "cite": "main.py:923-929  Phase 1"},
-    {"id": "ext",    "stage": "A2", "row": 2, "type": "llm",   "seq": 4,  "label": "LLM:Extract — one call, ADD-only", "cite": "main.py:940  Phase 2\nprompts.py:468 \"sole operation is ADD\""},
-    {"id": "resolve","stage": "A3", "row": 2, "type": "llm",   "seq": null, "state": "paper_only", "label": "LLM:Resolve — ADD / UPDATE / DELETE / NOOP", "cite": "paper §2.1 + Alg.1\nno automatic call site in code"},
-    {"id": "emb",    "stage": "A4", "row": 3, "type": "alg",   "seq": 5,  "label": "Batch embed", "cite": "main.py:991  Phase 3"},
-    {"id": "md5",    "stage": "A3", "row": 3, "type": "nlp",   "seq": 6,  "label": "NLP:HashDedup — exact md5", "cite": "main.py:1005-1043  Phase 4-5"},
-    {"id": "vs",     "stage": "A5", "row": 3, "type": "store", "seq": 7,  "label": "Store:Vector", "cite": "main.py:1045-1075  Phase 6"},
-    {"id": "audit",  "stage": "A5", "row": 4, "type": "store", "seq": 8,  "label": "Store:SQLite history — event hardcoded ADD", "cite": "main.py:1070"},
-    {"id": "ner",    "stage": "A2", "row": 5, "type": "nlp",   "seq": 9,  "state": "code_only", "label": "NLP:NER — spaCy, zero LLM", "cite": "optional; off without spaCy"},
-    {"id": "elink",  "stage": "A4", "row": 5, "type": "nlp",   "seq": 10, "state": "code_only", "label": "NLP:EmbDedup 0.95 + co-occurrence link", "cite": "builds linked_memory_ids"},
-    {"id": "estore", "stage": "A5", "row": 5, "type": "store", "seq": 11, "label": "Store:Entity", "cite": "separate collection"},
-    {"id": "raw",    "stage": "A5", "row": 6, "type": "store", "seq": 12, "state": "code_only", "label": "Store:SQLite messages — raw dialogue kept", "cite": "main.py:1192-1193  Phase 8\nstorage.py:134-141"},
-
-    {"id": "q",      "stage": "B1", "row": 0, "type": "io",    "seq": 13, "label": "Query", "cite": "Memory.search()"},
-    {"id": "qemb",   "stage": "B1", "row": 1, "type": "alg",   "seq": 14, "label": "Embed query", "cite": ""},
-    {"id": "dense",  "stage": "B2", "row": 0, "type": "alg",   "seq": 15, "label": "Retrieval:Emb — over-fetch max(4k, 60)", "cite": ""},
-    {"id": "bm25",   "stage": "B2", "row": 1, "type": "alg",   "seq": 16, "state": "degraded", "label": "Retrieval:BM25", "cite": "backend must implement it\nChroma returns nothing"},
-    {"id": "eboost", "stage": "B2", "row": 2, "type": "nlp",   "seq": 17, "state": "degraded", "label": "Retrieval:EntityBoost — score ≥ 0.5", "cite": "needs spaCy; off otherwise"},
-    {"id": "fuse",   "stage": "B4", "row": 1, "type": "fusion","seq": 18, "label": "Fusion:Add — weighted sum, adaptive denominator", "cite": "score_and_rank()"},
-    {"id": "rerank", "stage": "B4", "row": 2, "type": "alg",   "seq": null, "state": "paper_only", "label": "Retrieval:Rerank", "cite": "hook exists, default None"},
-    {"id": "sel",    "stage": "B5", "row": 1, "type": "alg",   "seq": 19, "label": "Threshold gate + top-k", "cite": ""},
-    {"id": "deliver","stage": "B6", "row": 1, "type": "io",    "seq": 20, "label": "Structured top-k list — not prompt text", "cite": "{id, memory, score, metadata}"},
-    {"id": "ans",    "stage": "B7", "row": 1, "type": "llm",   "seq": 21, "label": "LLM:Answer — caller assembles the prompt", "cite": "outside the mem0 boundary"}
+    {
+      "id": "sess",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "Session messages",
+      "cite": "Memory.add()",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "hist",
+      "stage": "A3",
+      "row": 0,
+      "type": "alg",
+      "seq": 2,
+      "label": "Retrieval:Recent — Recall last 10 turns",
+      "cite": "main.py:918-920  Phase 0",
+      "prim": "P-DEDUP|P-ORCHESTRATE",
+      "prim_note": "读近期历史为抽取提供上下文：它确实查了库存（故在 A3），但服务的是 A2 抽取而非准入判定"
+    },
+    {
+      "id": "probe",
+      "stage": "A3",
+      "row": 1,
+      "type": "alg",
+      "seq": 3,
+      "label": "Retrieval:Emb — Dense probe: top-10 existing memories as dedup reference",
+      "cite": "main.py:923-929  Phase 1",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "ext",
+      "stage": "A2",
+      "row": 2,
+      "type": "llm",
+      "seq": 4,
+      "label": "LLM:Extract — one call, ADD-only",
+      "cite": "main.py:940  Phase 2\nprompts.py:468 \"sole operation is ADD\"",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "resolve",
+      "stage": "A3",
+      "row": 2,
+      "type": "llm",
+      "seq": null,
+      "state": "paper_only",
+      "label": "LLM:Resolve — ADD / UPDATE / DELETE / NOOP",
+      "cite": "paper §2.1 + Alg.1\nno automatic call site in code",
+      "prim": "P-CONFLICT"
+    },
+    {
+      "id": "emb",
+      "stage": "A4",
+      "row": 3,
+      "type": "alg",
+      "seq": 5,
+      "label": "NLP:Embed",
+      "cite": "main.py:991  Phase 3",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "md5",
+      "stage": "A3",
+      "row": 3,
+      "type": "nlp",
+      "seq": 6,
+      "label": "NLP:HashDedup — exact md5",
+      "cite": "main.py:1005-1043  Phase 4-5",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "vs",
+      "stage": "A5",
+      "row": 3,
+      "type": "store",
+      "seq": 7,
+      "label": "Store:Vector",
+      "cite": "main.py:1045-1075  Phase 6",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "audit",
+      "stage": "A5",
+      "row": 4,
+      "type": "store",
+      "seq": 8,
+      "label": "Store:SQLite history — event hardcoded ADD",
+      "cite": "main.py:1070",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "ner",
+      "stage": "A2",
+      "row": 5,
+      "type": "nlp",
+      "seq": 9,
+      "state": "code_only",
+      "label": "NLP:NER — spaCy, zero LLM",
+      "cite": "optional; off without spaCy",
+      "prim": "P-NLPEXTRACT"
+    },
+    {
+      "id": "elink",
+      "stage": "A4",
+      "row": 5,
+      "type": "nlp",
+      "seq": 10,
+      "state": "code_only",
+      "label": "NLP:CooccurLink 0.95 + co-occurrence link",
+      "cite": "builds linked_memory_ids",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "estore",
+      "stage": "A5",
+      "row": 5,
+      "type": "store",
+      "seq": 11,
+      "label": "Store:Entity",
+      "cite": "separate collection",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "raw",
+      "stage": "A5",
+      "row": 6,
+      "type": "store",
+      "seq": 12,
+      "state": "code_only",
+      "label": "Store:SQLite messages — raw dialogue kept",
+      "cite": "main.py:1192-1193  Phase 8\nstorage.py:134-141",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "q",
+      "stage": "B1",
+      "row": 0,
+      "type": "io",
+      "seq": 13,
+      "label": "IO:Query — Query",
+      "cite": "Memory.search()",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "qemb",
+      "stage": "B1",
+      "row": 1,
+      "type": "alg",
+      "seq": 14,
+      "label": "NLP:Embed — query",
+      "cite": "",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "dense",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 15,
+      "label": "Retrieval:Emb — over-fetch max(4k, 60)",
+      "cite": "",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "bm25",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "seq": 16,
+      "state": "degraded",
+      "label": "Retrieval:BM25",
+      "cite": "backend must implement it\nChroma returns nothing",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "eboost",
+      "stage": "B2",
+      "row": 2,
+      "type": "nlp",
+      "seq": 17,
+      "state": "degraded",
+      "label": "Retrieval:EntityBoost — score ≥ 0.5",
+      "cite": "needs spaCy; off otherwise",
+      "prim": "P-SYMFILTER",
+      "prim_note": "实体重叠加成实质是对召回得分的加成，机制上更接近 P-FUSE；但它在代码里是与 dense/BM25 并列的第三条召回通道，故留在 B2"
+    },
+    {
+      "id": "fuse",
+      "stage": "B4",
+      "row": 1,
+      "type": "fusion",
+      "seq": 18,
+      "label": "Fusion:Add — weighted sum, adaptive denominator",
+      "cite": "score_and_rank()",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "rerank",
+      "stage": "B4",
+      "row": 2,
+      "type": "alg",
+      "seq": null,
+      "state": "paper_only",
+      "label": "Retrieval:Rerank",
+      "cite": "hook exists, default None",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "sel",
+      "stage": "B5",
+      "row": 1,
+      "type": "alg",
+      "seq": 19,
+      "label": "Threshold gate + top-k",
+      "cite": "",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "deliver",
+      "stage": "B6",
+      "row": 1,
+      "type": "io",
+      "seq": 20,
+      "label": "IO:Structured — Structured top-k list — not prompt text",
+      "cite": "{id, memory, score, metadata}",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "ans",
+      "stage": "B7",
+      "row": 1,
+      "type": "llm",
+      "seq": 21,
+      "label": "LLM:Answer — caller assembles the prompt",
+      "cite": "outside the mem0 boundary",
+      "prim": "P-GENERATE"
+    }
   ],
   "edges": [
-    {"from": "sess",  "to": "hist"},
-    {"from": "hist",  "to": "probe"},
-    {"from": "probe", "to": "ext"},
-    {"from": "ext",   "to": "emb"},
-    {"from": "emb",   "to": "md5"},
-    {"from": "md5",   "to": "vs"},
-    {"from": "vs",    "to": "audit"},
-    {"from": "ext",   "to": "ner"},
-    {"from": "ner",   "to": "elink"},
-    {"from": "elink", "to": "estore"},
-    {"from": "sess",  "to": "raw"},
-    {"from": "ext",   "to": "resolve", "state": "paper_only", "label": "never reached"},
-    {"from": "q",     "to": "qemb"},
-    {"from": "qemb",  "to": "dense"},
-    {"from": "qemb",  "to": "bm25",   "state": "degraded"},
-    {"from": "qemb",  "to": "eboost", "state": "degraded"},
-    {"from": "dense", "to": "fuse"},
-    {"from": "bm25",  "to": "fuse",   "state": "degraded"},
-    {"from": "eboost","to": "fuse",   "state": "degraded"},
-    {"from": "fuse",  "to": "sel"},
-    {"from": "sel",   "to": "deliver"},
-    {"from": "deliver","to": "ans"},
-    {"from": "vs",    "to": "dense"},
-    {"from": "estore","to": "eboost"}
+    {
+      "from": "sess",
+      "to": "hist"
+    },
+    {
+      "from": "hist",
+      "to": "probe"
+    },
+    {
+      "from": "probe",
+      "to": "ext"
+    },
+    {
+      "from": "ext",
+      "to": "emb"
+    },
+    {
+      "from": "emb",
+      "to": "md5"
+    },
+    {
+      "from": "md5",
+      "to": "vs"
+    },
+    {
+      "from": "vs",
+      "to": "audit"
+    },
+    {
+      "from": "ext",
+      "to": "ner"
+    },
+    {
+      "from": "ner",
+      "to": "elink"
+    },
+    {
+      "from": "elink",
+      "to": "estore"
+    },
+    {
+      "from": "sess",
+      "to": "raw"
+    },
+    {
+      "from": "ext",
+      "to": "resolve",
+      "state": "paper_only",
+      "label": "never reached"
+    },
+    {
+      "from": "q",
+      "to": "qemb"
+    },
+    {
+      "from": "qemb",
+      "to": "dense"
+    },
+    {
+      "from": "qemb",
+      "to": "bm25",
+      "state": "degraded"
+    },
+    {
+      "from": "qemb",
+      "to": "eboost",
+      "state": "degraded"
+    },
+    {
+      "from": "dense",
+      "to": "fuse"
+    },
+    {
+      "from": "bm25",
+      "to": "fuse",
+      "state": "degraded"
+    },
+    {
+      "from": "eboost",
+      "to": "fuse",
+      "state": "degraded"
+    },
+    {
+      "from": "fuse",
+      "to": "sel"
+    },
+    {
+      "from": "sel",
+      "to": "deliver"
+    },
+    {
+      "from": "deliver",
+      "to": "ans"
+    },
+    {
+      "from": "vs",
+      "to": "dense"
+    },
+    {
+      "from": "estore",
+      "to": "eboost"
+    }
   ]
 }

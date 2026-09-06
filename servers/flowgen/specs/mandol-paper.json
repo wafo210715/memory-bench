@@ -1,0 +1,434 @@
+{
+  "system": "mandol",
+  "view": "paper",
+  "title": "Mandol — paper view",
+  "subtitle": "The mechanism as Zhang et al. describe it. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); A6 and B8 are empty because the paper defines no such step.",
+  "source": "Zhang et al. 2026, Mandol (arXiv:2606.29778v1)   ·   every anchor re-located in the paper text during verification (servers/mandol/verification.md §3)",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "B5 SELECT is drawn as three internal stages of one mechanism (Eq.1 MAD denoising → Eq.2 cross-source conflict arbitration → Eq.3 token-constrained MMR) — the paper presents this as one cascading pipeline, and the code's CascadeConfidencePruner implements exactly this three-stage structure, hence one canonical name Fusion:Cascade for all three.",
+    "A6 INTERNALIZE and B8 LOOP are both empty: nothing is trained into parameters, and retrieval is stated to be entirely LLM-free with no query-time tool loop (abstract txt:31-33, §1 txt:110-112, §3.3 txt:459).",
+    "The paper claims four memory sources (basic/episodic/semantic/emotional) — all four are drawn here as the paper states them; the code view shows only three ever produce evidence.",
+    "P13's persistence backend is drawn exactly as the paper states it (DuckDB) — the diff view shows this backend does not exist anywhere in the implementation."
+  ],
+  "nodes": [
+    {
+      "id": "chunk",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:Turn — raw dialogue partitioned into chunks",
+      "cite": "§4 P1  txt:735-737",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "unit",
+      "stage": "A1",
+      "row": 1,
+      "type": "nlp",
+      "seq": 2,
+      "label": "IO:Turn — chunk → fine-grained memory units (content/speaker/temporal)",
+      "cite": "§4 P2  txt:737-740",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "incr",
+      "stage": "A1",
+      "row": 2,
+      "type": "sched",
+      "seq": null,
+      "label": "Sched:Incremental — new conversation only updates affected units/edges/chains",
+      "cite": "§4 P12  txt:758-762\nno full-space rebuild",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "space",
+      "stage": "A2",
+      "row": 0,
+      "type": "nlp",
+      "seq": 5,
+      "label": "NLP:Tag — memory space assignment (session/task/topic)",
+      "cite": "§3.1.1 P5  txt:256-260",
+      "prim": "P-META"
+    },
+    {
+      "id": "rewrite",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "seq": 7,
+      "label": "LLM:Rewrite — session-level context enhancement, adds [Time | Topic] prefix",
+      "cite": "§3.1.2 P7  txt:292-299\nexample: \"booked a hutong homestay\" →\n\"[Time: … | Topic: …] Booked a hutong homestay\"",
+      "prim": "P-REWRITE"
+    },
+    {
+      "id": "epext",
+      "stage": "A2",
+      "row": 2,
+      "type": "llm",
+      "seq": 8,
+      "label": "LLM:Extract — episodic events → temporal event chains (agglomerative)",
+      "cite": "§3.1.2/§4 P8  txt:283-289,747-751\n\"leverages an LLM to agglomerate\"",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "semext",
+      "stage": "A2",
+      "row": 3,
+      "type": "llm",
+      "seq": 9,
+      "label": "LLM:Extract — entities + relations → entity graph",
+      "cite": "§4 P9  txt:751-755",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "ematext",
+      "stage": "A2",
+      "row": 4,
+      "type": "llm",
+      "seq": 10,
+      "label": "LLM:Extract — preferences/states → preference-evolution chains",
+      "cite": "§3.1.2/§4 P10  txt:285-288,755-758",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "conflict",
+      "stage": "A3",
+      "row": 0,
+      "type": "nlp",
+      "seq": 10,
+      "label": "NLP:Conflict — preference state-update versioning (state-update edges)",
+      "cite": "§3.1.2 P10  txt:285-288\nprim tag P-CONFLICT, no dedup step\nis described anywhere else in the paper",
+      "prim": "P-CONFLICT"
+    },
+    {
+      "id": "embed",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "seq": 3,
+      "label": "NLP:Embed — dense vector encode raw info (unified semantic vector)",
+      "cite": "§3.1.1 P3  txt:250-254",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "index",
+      "stage": "A4",
+      "row": 1,
+      "type": "alg",
+      "seq": 4,
+      "label": "Retrieval:BM25 + Retrieval:Emb + Retrieval:SPLADE — merged: three indexes (inverted/dense/sparse)",
+      "cite": "§3.2 P4  txt:411-417\npaper presents this as one combined step",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "edges",
+      "stage": "A4",
+      "row": 2,
+      "type": "nlp",
+      "seq": 6,
+      "label": "NLP:SchemaLink — explicit structural edges (temporal order / entity reference / state update), rule parsing",
+      "cite": "§3.1.1/§4 P6  txt:262-266,740-743\nexplicitly \"rule parsing\", no LLM",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "srclink",
+      "stage": "A4",
+      "row": 3,
+      "type": "nlp",
+      "seq": 11,
+      "label": "NLP:SchemaLink — source_unit_uids traceback edges (abstract → base units)",
+      "cite": "§3.1.2 P11  txt:289-292",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "persist",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 12,
+      "label": "Store:DuckDB — persist + LRU/LFU eviction, page-in callback",
+      "cite": "§3.2/§4 P13  txt:790-802",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "query",
+      "stage": "B1",
+      "row": 0,
+      "type": "io",
+      "seq": 13,
+      "label": "IO:Query",
+      "cite": "§3.3.1",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "route",
+      "stage": "B1",
+      "row": 1,
+      "type": "alg",
+      "seq": 14,
+      "label": "Retrieval:CueMatch — query-adaptive routing, intent classifier (no LLM) selects active sources + per-source budget",
+      "cite": "§3.3.1 P14  txt:461-472\nexplicitly \"without LLM\"",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "bm25",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 15,
+      "label": "Retrieval:BM25",
+      "cite": "§3.3.1 P15  txt:472-476\nhybrid recall, in parallel",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "splade",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "seq": 15,
+      "label": "Retrieval:SPLADE",
+      "cite": "§3.3.1 P15  txt:472-476",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "dense",
+      "stage": "B2",
+      "row": 2,
+      "type": "alg",
+      "seq": 15,
+      "label": "Retrieval:Emb",
+      "cite": "§3.3.1 P15  txt:472-476",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "subgraph",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": 17,
+      "label": "Retrieval:Graph — selective subgraph expansion from top-ranked units, edge-type + budget pruning",
+      "cite": "§3.3.1 P17  txt:477-480",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "rrf",
+      "stage": "B4",
+      "row": 0,
+      "type": "fusion",
+      "seq": 16,
+      "label": "Fusion:RRF",
+      "cite": "§3.3.1 P16  txt:476-477",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "crossenc",
+      "stage": "B4",
+      "row": 1,
+      "type": "fusion",
+      "seq": 18,
+      "label": "Fusion:CrossEncoder — lightweight cross-encoder rerank → S_ce(c_i)",
+      "cite": "§3.3.1 P18  txt:480-483",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "cascade1",
+      "stage": "B5",
+      "row": 0,
+      "type": "fusion",
+      "seq": 19,
+      "label": "Fusion:Cascade — stage1 intra-source denoising, Eq.(1) τ=median(S_ce)−κ·MAD, κ=2.5",
+      "cite": "§3.3.2 Eq.1 P19  txt:655-673\nκ=2.5 stated at txt:657,672",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "cascade2",
+      "stage": "B5",
+      "row": 1,
+      "type": "fusion",
+      "seq": 20,
+      "label": "Fusion:Cascade — stage2 cross-source conflict arbitration, Eq.(2) S_arb=w_rel·S_ce+w_temp·f_time+w_source·f_source",
+      "cite": "§3.3.2 Eq.2 P20  txt:626-648\nf_source: basic 1.0 / episodic 0.8 / semantic 0.6",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "cascade3",
+      "stage": "B5",
+      "row": 2,
+      "type": "fusion",
+      "seq": 21,
+      "label": "Fusion:Cascade — stage3 token-constrained MMR pack, Eq.(3) λ·Rel−(1−λ)·Red",
+      "cite": "§3.3.2 Eq.3 P21  txt:674-692\nλ given no numeric value anywhere in the paper",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "assemble",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 22,
+      "label": "IO:Context — compact LLM context from selected set",
+      "cite": "§4 P22  txt:786-789",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "answer",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 23,
+      "label": "LLM:Answer — backbone (GPT-4o-mini / GPT-4.1-mini), outside Mandol's own boundary",
+      "cite": "§5.1 P23  txt:1040-1044",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "chunk",
+      "to": "unit"
+    },
+    {
+      "from": "unit",
+      "to": "space"
+    },
+    {
+      "from": "unit",
+      "to": "embed"
+    },
+    {
+      "from": "embed",
+      "to": "index"
+    },
+    {
+      "from": "unit",
+      "to": "edges"
+    },
+    {
+      "from": "unit",
+      "to": "rewrite"
+    },
+    {
+      "from": "unit",
+      "to": "epext"
+    },
+    {
+      "from": "unit",
+      "to": "semext"
+    },
+    {
+      "from": "unit",
+      "to": "ematext"
+    },
+    {
+      "from": "ematext",
+      "to": "conflict"
+    },
+    {
+      "from": "epext",
+      "to": "srclink"
+    },
+    {
+      "from": "semext",
+      "to": "srclink"
+    },
+    {
+      "from": "ematext",
+      "to": "srclink"
+    },
+    {
+      "from": "index",
+      "to": "persist"
+    },
+    {
+      "from": "edges",
+      "to": "persist"
+    },
+    {
+      "from": "srclink",
+      "to": "persist"
+    },
+    {
+      "from": "conflict",
+      "to": "persist"
+    },
+    {
+      "from": "persist",
+      "to": "incr",
+      "label": "next conversation"
+    },
+    {
+      "from": "query",
+      "to": "route"
+    },
+    {
+      "from": "route",
+      "to": "bm25"
+    },
+    {
+      "from": "route",
+      "to": "splade"
+    },
+    {
+      "from": "route",
+      "to": "dense"
+    },
+    {
+      "from": "persist",
+      "to": "bm25"
+    },
+    {
+      "from": "persist",
+      "to": "splade"
+    },
+    {
+      "from": "persist",
+      "to": "dense"
+    },
+    {
+      "from": "bm25",
+      "to": "rrf"
+    },
+    {
+      "from": "splade",
+      "to": "rrf"
+    },
+    {
+      "from": "dense",
+      "to": "rrf"
+    },
+    {
+      "from": "rrf",
+      "to": "subgraph"
+    },
+    {
+      "from": "edges",
+      "to": "subgraph",
+      "label": "traverses explicit edges"
+    },
+    {
+      "from": "subgraph",
+      "to": "crossenc"
+    },
+    {
+      "from": "crossenc",
+      "to": "cascade1"
+    },
+    {
+      "from": "cascade1",
+      "to": "cascade2"
+    },
+    {
+      "from": "cascade2",
+      "to": "cascade3"
+    },
+    {
+      "from": "cascade3",
+      "to": "assemble"
+    },
+    {
+      "from": "assemble",
+      "to": "answer"
+    }
+  ]
+}

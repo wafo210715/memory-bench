@@ -1,0 +1,228 @@
+{
+  "system": "amem",
+  "view": "code",
+  "title": "A-MEM — code view",
+  "subtitle": "What the upstream repo (agiresearch/A-mem) actually executes — NOT memory-bench's fixed arm. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes mean the stage does not exist here.",
+  "source": "repo agiresearch/A-mem @ ceffb86 (2025-12-12)   ·   verified against servers/amem/verification.md §4.1 (C1-C10) and §5.1 (D1-D13)",
+  "footer": "memory-bench · methodology flow · code view (upstream) · fixed-arm deltas noted only in cite footnotes",
+  "legend_notes": [
+    "This view = upstream agiresearch/A-mem (agentic_memory/*.py) only. memory-bench's own fixed arm (servers/amem/fixed.py, 7 patches F1-F9) repairs exactly these defects — noted only in cite footnotes below, not drawn as a parallel flow.",
+    "A2 DISTILL is empty except one paper_only marker: analyze_content() is fully implemented (memory_system.py:159) but has zero call sites anywhere in the repo — every note's keywords/context/tags stay at their fallback defaults.",
+    "B3 EXPAND computes real graph-linked neighbors (:554-583), then B5's return memories[:k] (:585) discards every one of them — is_neighbor is False in 100% of returned results.",
+    "The fixed arm drops upstream's own consolidate hook entirely (fixed.py:385-387 has no threshold check) — an unintentional regression versus upstream, not a fix."
+  ],
+  "nodes": [
+    {
+      "id": "c1",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:TurnPair — MemoryNote(content) created with default fields",
+      "cite": "memory_system.py:233-238\ndefaults: keywords=[], context=\"General\", tags=[]  (:68-72)",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "extdead",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "seq": null,
+      "state": "paper_only",
+      "label": "LLM:Extract — analyze_content() defined, ZERO call sites repo-wide",
+      "cite": "memory_system.py:159 (def only)\nadd_note() :238 never invokes it\ngrep -rn analyze_content: 1 hit (its own def)\nfixed.py:369-378 restores this call — memory-bench patch, not upstream",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "c2",
+      "stage": "A3",
+      "row": 0,
+      "type": "alg",
+      "seq": 2,
+      "state": "differs",
+      "label": "Retrieval:Emb — find_related_memories(note.content, k=5)",
+      "cite": "memory_system.py:605\nquery = raw note.content, not the rich Eq.3 embedding\npaper Eq.4 expects e_n (verification D3)",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "c3",
+      "stage": "A3",
+      "row": 1,
+      "type": "llm",
+      "seq": 3,
+      "state": "differs",
+      "label": "LLM:Evolve — one merged call does link-suggestion + neighbor-revise",
+      "cite": "memory_system.py:612-671\n_evolution_system_prompt :127-157 (single template)\npaper: two separate prompts Ps2+Ps3 (verification D7)",
+      "prim": "P-REVISE"
+    },
+    {
+      "id": "c3b",
+      "stage": "A3",
+      "row": 2,
+      "type": "nlp",
+      "seq": 4,
+      "state": "differs",
+      "label": "NLP:Revise — overwrites noteslist[indices[i]], wrong target",
+      "cite": "memory_system.py:687-716\nindices[i]==i → rewrites the i-th OLDEST note by insertion order,\nnot the i-th retrieved neighbor (verification D5)",
+      "prim": "P-REVISE"
+    },
+    {
+      "id": "c3a",
+      "stage": "A4",
+      "row": 0,
+      "type": "nlp",
+      "seq": 4,
+      "state": "differs",
+      "label": "NLP:LinkWrite — note.links.extend(suggested_connections)",
+      "cite": "memory_system.py:679-683\nLLM only ever sees \"memory index:{i}\" (:307-308)\nlinks end up holding positional strings, not real note IDs (verification D4)",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "c5",
+      "stage": "A4",
+      "row": 1,
+      "type": "alg",
+      "seq": 6,
+      "state": "differs",
+      "label": "NLP:Embed (index) — add_document(note.content only)",
+      "cite": "memory_system.py:258\nkeywords/tags/context land in metadata only, not vectorized (retrievers.py:81-83)\npaper Eq.3 requires concat(c_i,K_i,G_i,X_i)  (verification D2)",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "c6",
+      "stage": "A3",
+      "row": 3,
+      "type": "sched",
+      "seq": null,
+      "state": "code_only",
+      "label": "Sched:Lifecycle — consolidate_memories() every 100 evolutions, full Chroma rebuild",
+      "cite": "memory_system.py:97,124,260-263,266-286\npaper has no consolidation step (verification D8)\nfixed arm drops this entirely (verification E10) — a regression, not a fix",
+      "prim": "P-REVISE"
+    },
+    {
+      "id": "c4",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 5,
+      "label": "Store:Database — in-memory dict only, no disk persistence",
+      "cite": "memory_system.py:242  self.memories[note.id] = note",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "c7",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 7,
+      "label": "Retrieval:Emb — Chroma top-k, k=5 default",
+      "cite": "memory_system.py:509,516  search_agentic(query, k=5)\nretriever.search(query, k)",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "c9",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": 9,
+      "state": "degraded",
+      "label": "Retrieval:Graph — 1-hop via note.links, appended after top-k hits",
+      "cite": "memory_system.py:554-583\nFig.2 caption implies inclusion (paper P8)\nfixed arm (fixed.py:438-462) keeps 5 of these via a reserved quota — NOT upstream behavior",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "c10",
+      "stage": "B5",
+      "row": 0,
+      "type": "alg",
+      "seq": 10,
+      "state": "code_only",
+      "label": "P-Select — return memories[:k], discards every appended neighbor",
+      "cite": "memory_system.py:585\nmeasured: is_neighbor never True in the returned set (c9's output never survives)\npaper describes no truncation/selection step (verification D9)",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "c8",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 8,
+      "label": "IO:Structured — memory_dict list, not prompt text",
+      "cite": "memory_system.py:528-552",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "ans",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 11,
+      "label": "LLM:Answer — harness call, outside the memory-system boundary",
+      "cite": "bench/runner.py — shared by native + fixed arms\nverification.md §4.2 boundary note",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "c1",
+      "to": "extdead",
+      "state": "paper_only",
+      "label": "never reached"
+    },
+    {
+      "from": "c1",
+      "to": "c2"
+    },
+    {
+      "from": "c2",
+      "to": "c3"
+    },
+    {
+      "from": "c3",
+      "to": "c3a"
+    },
+    {
+      "from": "c3",
+      "to": "c3b"
+    },
+    {
+      "from": "c3a",
+      "to": "c4"
+    },
+    {
+      "from": "c3b",
+      "to": "c4"
+    },
+    {
+      "from": "c4",
+      "to": "c5"
+    },
+    {
+      "from": "c5",
+      "to": "c6",
+      "state": "code_only",
+      "label": "every 100 evolutions"
+    },
+    {
+      "from": "c5",
+      "to": "c7",
+      "label": "reads Chroma index"
+    },
+    {
+      "from": "c7",
+      "to": "c8"
+    },
+    {
+      "from": "c8",
+      "to": "c9"
+    },
+    {
+      "from": "c9",
+      "to": "c10"
+    },
+    {
+      "from": "c10",
+      "to": "ans"
+    }
+  ]
+}

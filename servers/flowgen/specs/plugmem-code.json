@@ -1,0 +1,548 @@
+{
+  "system": "plugmem",
+  "view": "code",
+  "title": "PlugMem — code view",
+  "subtitle": "What plugmem/ (the package both LongMemEval and WebArena's eval scripts actually call over HTTP) executes. Lane = canonical stage; B5 and B8 are empty — the system has no combinatorial selector and no retrieval loop.",
+  "source": "repo PlugMem @ 3b2ce75 (TIMAN-group/PlugMem, 2026-06-26)   ·   verified against servers/plugmem/verification.md (71 code-side assertions: 57 ✓ / 3 ✗ / 11 ◐)",
+  "footer": "memory-bench · methodology flow · code view · every citation re-opened and confirmed during verification",
+  "legend_notes": [
+    "B8 LOOP is empty: MemoryGraph itself has zero multi-hop machinery (grep multi_hop|Tmax|max_hop|enough across plugmem/ = 0 hits). The only multi-hop code in the repo lives in src/eval/hotpotqa/eval_qa_all.py — an evaluation-harness script, outside the system boundary, semantic-only, and off by default (--n_round_retrieval=1).",
+    "Episodic mode is the most wasteful path: retrieve_memory() runs the semantic AND procedural channels first (results dumped into _audit and discarded), then a third, separate session-vote channel actually produces the output (verification C-39b).",
+    "B4 APPRAISE only really exists for the semantic channel: value_func.evaluate() there degenerates to pure cosine — importance/recency/credibility are always 0, and value_base.py even forgets to add v_credibility. The procedural channel skips B4 entirely and returns its cosine top-k straight from B3.",
+    "Return scoring is dead code twice over: get_return() has zero call sites in plugmem/, and the src/ predecessor has the call commented out with _return hardcoded to 0.0 one line below."
+  ],
+  "nodes": [
+    {
+      "id": "step_io",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:TurnPair — (action_t, observation_t+1)",
+      "cite": "Memory.append()  core/memory.py:59",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "c_subgoal",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "seq": 2,
+      "label": "LLM:Extract — subgoal (get_subgoal)",
+      "cite": "memory.py:60",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "c_reward",
+      "stage": "A2",
+      "row": 2,
+      "type": "llm",
+      "seq": 3,
+      "label": "LLM:Judge — action-validity NL statement (get_reward)",
+      "cite": "memory.py:68",
+      "prim": "P-META"
+    },
+    {
+      "id": "c_state",
+      "stage": "A2",
+      "row": 3,
+      "type": "llm",
+      "seq": 4,
+      "label": "LLM:Summarize — rolling state (get_state)",
+      "cite": "memory.py:95",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "c_trajseg",
+      "stage": "A2",
+      "row": 4,
+      "type": "alg",
+      "seq": 5,
+      "label": "NLP:Segment — adjacent-subgoal cosine < 0.75 (hardcoded)",
+      "cite": "memory.py:76-83, threshold :81\nsrc/memory_structuring/memory.py:48\nsame value",
+      "prim": "P-NLPEXTRACT"
+    },
+    {
+      "id": "c_sem_extract",
+      "stage": "A2",
+      "row": 5,
+      "type": "llm",
+      "seq": 6,
+      "label": "LLM:Extract — get_semantic, per step (coref+dedup+≤4 sent+≤10 items)",
+      "cite": "Memory.close() → memory.py:115\nstructuring.py:122,124,136",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "c_proc_extract",
+      "stage": "A2",
+      "row": 6,
+      "type": "llm",
+      "seq": 8,
+      "label": "LLM:Extract — get_procedural, per segment",
+      "cite": "Memory.close() → memory.py:123",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "c_return_dead",
+      "stage": "A2",
+      "row": 7,
+      "type": "llm",
+      "seq": null,
+      "state": "paper_only",
+      "label": "LLM:Judge — get_return() defined, zero call sites",
+      "cite": "inference/structuring.py:96,124\n_return=0.0 hardcoded\nsrc/.../structuring_inference.py:138\ncall commented out, 139 = 0.0",
+      "prim": "P-META"
+    },
+    {
+      "id": "c_tag_dedup",
+      "stage": "A3",
+      "row": 8,
+      "type": "nlp",
+      "seq": 9,
+      "state": "code_only",
+      "label": "NLP:TextDedup — tag exact-string match (tag2node)",
+      "cite": "memory_graph.py:442-450\ntag2node.get(tag_str); paper has\nno separate tag-dedup mechanism",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "c_intent_dedup",
+      "stage": "A3",
+      "row": 9,
+      "type": "nlp",
+      "seq": 10,
+      "state": "differs",
+      "label": "NLP:TextDedup — intent exact-string match (subgoal2node)",
+      "cite": "memory_graph.py:515\nsubgoal2node.get(subgoal_str)\ninsert() 363-593 has no cosine call",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "c_intent_merge",
+      "stage": "A3",
+      "row": 10,
+      "type": "llm",
+      "seq": 11,
+      "state": "differs",
+      "label": "LLM:Dedup — get_new_subgoal, on exact-string repeat",
+      "cite": "memory_graph.py:519",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "c_update_merge",
+      "stage": "A3",
+      "row": 11,
+      "type": "llm",
+      "seq": null,
+      "state": "degraded",
+      "label": "LLM:Dedup — update_semantic_subgraph, merge_threshold=0.5",
+      "cite": "memory_graph.py:1348,1351\nget_new_semantic :1301\nLME --update_merge_first default off\n:91; HotpotQA eval_qa_all.py:381",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "c_delete",
+      "stage": "A3",
+      "row": 12,
+      "type": "sched",
+      "seq": null,
+      "state": "differs",
+      "label": "Sched:Evict — credibility_decay=0 (no-op) + soft-delete only",
+      "cite": "memory_graph.py:1356,1374\nonly delete API = whole-graph\nroutes/graphs.py:53 delete_graph",
+      "prim": "P-EVICT"
+    },
+    {
+      "id": "c_embed_wm",
+      "stage": "A4",
+      "row": 5,
+      "type": "alg",
+      "seq": 7,
+      "label": "NLP:Embed — propositions, tags, subgoals, prescriptions",
+      "cite": "memory.py:118-121",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "c_link_sem_edges",
+      "stage": "A4",
+      "row": 6,
+      "type": "nlp",
+      "seq": 12,
+      "label": "NLP:SchemaLink — Link — tag↔semantic, semantic→episodic provenance, sibling",
+      "cite": "memory_graph.py:442-450\nsibling bro_semantic_ids :496\ngraph_node.py:81 (undocumented\nby code-architecture.md)",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "c_link_proc_edges",
+      "stage": "A4",
+      "row": 7,
+      "type": "nlp",
+      "seq": 13,
+      "label": "NLP:SchemaLink — Link — hierarchical intent→prescription (child list), provenance→episodic",
+      "cite": "memory_graph.py (insert() 363-593)",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "c_persist",
+      "stage": "A5",
+      "row": 3,
+      "type": "store",
+      "seq": 14,
+      "label": "Store:Vector — MemoryGraph.insert(): 5 node types → 5 Chroma collections",
+      "cite": "memory_graph.py:363\nchroma.py:17 NODE_TYPES,\ncreate_graph :72-81",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "c_query",
+      "stage": "B1",
+      "row": 0,
+      "type": "io",
+      "seq": 15,
+      "label": "IO:Query",
+      "cite": "MemoryGraph.retrieve_memory()\n:988",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "c_mode",
+      "stage": "B1",
+      "row": 1,
+      "type": "llm",
+      "seq": 16,
+      "label": "LLM:Route — get_mode(): episodic / semantic / procedural",
+      "cite": ":1011-1015\n_normalize_mode :56-70 fallback\nsemantic",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "c_plan",
+      "stage": "B1",
+      "row": 2,
+      "type": "llm",
+      "seq": 17,
+      "label": "LLM:Query — get_plan(): next_subgoal + query_tags",
+      "cite": ":1019-1022, unconditional",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "c_dense_sem",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 18,
+      "state": "differs",
+      "label": "Retrieval:Emb — brute-force cosine, ALL active semantic nodes, top-5 (hardcoded)",
+      "cite": ":663, :686-699\nsem_node_topk=5, not the caller's k\nalso runs (and discards) in episodic\nmode — :1037-1044 → _audit",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "c_dense_subgoal",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "seq": 18,
+      "label": "Retrieval:Emb — brute-force cosine, ALL SubgoalNode, best-1 (threshold 0.1)",
+      "cite": "retrieve_subgoal_nodes() :892,\n:911, :935 return []\nalso runs (and discards) in episodic\nmode — :1045-1052 → _audit",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "c_dense_epi",
+      "stage": "B2",
+      "row": 2,
+      "type": "alg",
+      "seq": 18,
+      "label": "Retrieval:Emb — retrieve_semantic_nodes_wo_tag, skip tag routing, first-30",
+      "cite": ":809, first-30 :860\ndoes not check is_active",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "c_tag_route",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": 19,
+      "label": "Retrieval:Graph — best-1 TagNode (threshold 0.8) → its semantic nodes",
+      "cite": "retrieve_tag_nodes() :599\nPhase 2 :714-740",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "c_proc_subtree",
+      "stage": "B3",
+      "row": 1,
+      "type": "alg",
+      "seq": 19,
+      "label": "Retrieval:Graph — within winning SubgoalNode's children, cosine top-k (default k=1)",
+      "cite": ":939-972\nProceduralRelevant(k=1)\nvalue_functions.py:176",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "c_session_vote",
+      "stage": "B3",
+      "row": 2,
+      "type": "alg",
+      "seq": 19,
+      "state": "differs",
+      "label": "Retrieval:Graph — session_id vote ≥3 → full session; else proposition text (no provenance)",
+      "cite": ":862-878\n>=3 :871; <3 returns\nsn.get_semantic_memory() :876-877",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "c_fuse_rerank",
+      "stage": "B4",
+      "row": 0,
+      "type": "alg",
+      "seq": 20,
+      "state": "differs",
+      "label": "Retrieval:Rerank — value_func.evaluate(): importance/recency/credibility ≡ 0",
+      "cite": "Phase 3 :745-797\nvalue_functions.py:75-88\nvalue_base.py:30 misses v_credibility",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "c_assemble",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 21,
+      "label": "IO:Structured — rendered messages, returned (not reasoning-compressed)",
+      "cite": ":1079-1092, return :1108",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "c_reason_hook",
+      "stage": "B6",
+      "row": 1,
+      "type": "llm",
+      "seq": null,
+      "state": "degraded",
+      "label": "LLM:MemReader — retrieve_and_reason() hook, zero call sites",
+      "cite": ":1274-1297\nsrc/eval/ has no .retrieve_and_reason(\ncall anywhere",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "c_llm_compress",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 22,
+      "label": "LLM:Answer — LLM — caller-side reasoning compression (gpt-4o), outside plugmem boundary",
+      "cite": "eval_longmemeval_all.py:102\nplugmem_agent.py:234",
+      "prim": "P-GENERATE"
+    },
+    {
+      "id": "c_answer",
+      "stage": "B7",
+      "row": 1,
+      "type": "llm",
+      "seq": 23,
+      "label": "LLM:Answer — caller decision, outside plugmem boundary",
+      "cite": "eval_longmemeval_all.py:116",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "step_io",
+      "to": "c_subgoal"
+    },
+    {
+      "from": "step_io",
+      "to": "c_reward"
+    },
+    {
+      "from": "step_io",
+      "to": "c_state"
+    },
+    {
+      "from": "c_subgoal",
+      "to": "c_trajseg"
+    },
+    {
+      "from": "c_trajseg",
+      "to": "c_sem_extract"
+    },
+    {
+      "from": "c_sem_extract",
+      "to": "c_embed_wm"
+    },
+    {
+      "from": "c_embed_wm",
+      "to": "c_link_sem_edges"
+    },
+    {
+      "from": "c_trajseg",
+      "to": "c_proc_extract"
+    },
+    {
+      "from": "c_proc_extract",
+      "to": "c_return_dead",
+      "state": "paper_only",
+      "label": "never reached"
+    },
+    {
+      "from": "c_proc_extract",
+      "to": "c_embed_wm"
+    },
+    {
+      "from": "c_proc_extract",
+      "to": "c_intent_dedup",
+      "state": "differs",
+      "label": "subgoal string, no cosine call"
+    },
+    {
+      "from": "c_intent_dedup",
+      "to": "c_intent_merge",
+      "state": "differs",
+      "label": "exact string match"
+    },
+    {
+      "from": "c_intent_dedup",
+      "to": "c_link_proc_edges",
+      "label": "no match — new node"
+    },
+    {
+      "from": "c_intent_merge",
+      "to": "c_link_proc_edges",
+      "state": "differs",
+      "label": "merged node"
+    },
+    {
+      "from": "c_proc_extract",
+      "to": "c_link_proc_edges",
+      "label": "provenance → episodic"
+    },
+    {
+      "from": "c_sem_extract",
+      "to": "c_tag_dedup",
+      "state": "code_only"
+    },
+    {
+      "from": "c_tag_dedup",
+      "to": "c_link_sem_edges",
+      "state": "code_only"
+    },
+    {
+      "from": "c_link_sem_edges",
+      "to": "c_persist"
+    },
+    {
+      "from": "c_link_proc_edges",
+      "to": "c_persist"
+    },
+    {
+      "from": "step_io",
+      "to": "c_persist",
+      "label": "episodic node"
+    },
+    {
+      "from": "c_link_sem_edges",
+      "to": "c_update_merge",
+      "state": "degraded"
+    },
+    {
+      "from": "c_update_merge",
+      "to": "c_link_sem_edges",
+      "state": "degraded",
+      "label": "merge replaces originals"
+    },
+    {
+      "from": "c_link_sem_edges",
+      "to": "c_delete",
+      "state": "differs"
+    },
+    {
+      "from": "c_link_proc_edges",
+      "to": "c_delete",
+      "state": "differs"
+    },
+    {
+      "from": "c_persist",
+      "to": "c_dense_sem",
+      "label": "G_S read"
+    },
+    {
+      "from": "c_persist",
+      "to": "c_dense_subgoal",
+      "label": "G_P read"
+    },
+    {
+      "from": "c_persist",
+      "to": "c_dense_epi",
+      "label": "G_S read, no tag routing"
+    },
+    {
+      "from": "c_persist",
+      "to": "c_tag_route",
+      "label": "TagNode index"
+    },
+    {
+      "from": "c_persist",
+      "to": "c_session_vote",
+      "label": "G_E session index"
+    },
+    {
+      "from": "c_query",
+      "to": "c_mode"
+    },
+    {
+      "from": "c_query",
+      "to": "c_plan"
+    },
+    {
+      "from": "c_mode",
+      "to": "c_dense_sem",
+      "label": "mode=semantic (default)"
+    },
+    {
+      "from": "c_mode",
+      "to": "c_dense_subgoal",
+      "label": "mode=procedural"
+    },
+    {
+      "from": "c_mode",
+      "to": "c_dense_epi",
+      "label": "mode=episodic"
+    },
+    {
+      "from": "c_plan",
+      "to": "c_tag_route",
+      "label": "query_tags"
+    },
+    {
+      "from": "c_dense_sem",
+      "to": "c_fuse_rerank"
+    },
+    {
+      "from": "c_tag_route",
+      "to": "c_fuse_rerank"
+    },
+    {
+      "from": "c_dense_subgoal",
+      "to": "c_proc_subtree"
+    },
+    {
+      "from": "c_dense_epi",
+      "to": "c_session_vote"
+    },
+    {
+      "from": "c_fuse_rerank",
+      "to": "c_assemble"
+    },
+    {
+      "from": "c_proc_subtree",
+      "to": "c_assemble"
+    },
+    {
+      "from": "c_session_vote",
+      "to": "c_assemble"
+    },
+    {
+      "from": "c_assemble",
+      "to": "c_reason_hook",
+      "state": "degraded",
+      "label": "unused hook"
+    },
+    {
+      "from": "c_assemble",
+      "to": "c_llm_compress",
+      "label": "outside plugmem boundary"
+    },
+    {
+      "from": "c_llm_compress",
+      "to": "c_answer"
+    }
+  ]
+}

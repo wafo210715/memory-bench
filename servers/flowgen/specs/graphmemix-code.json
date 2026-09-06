@@ -1,0 +1,378 @@
+{
+  "system": "graphmemix",
+  "view": "code",
+  "title": "GraphMemix — code view",
+  "subtitle": "What the ligeng0197/graphmemix release pipeline actually executes. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes mean the stage does not exist here.",
+  "source": "repo graphmemix @ d0ea01d (single commit)   ·   verified against servers/graphmemix/verification.md (55 code-side assertions: 35 ✓ / 2 ✗ / 17 ◐ / 1 ?)",
+  "footer": "memory-bench · methodology flow · code view · every citation re-opened and confirmed during verification",
+  "legend_notes": [
+    "A3 ADMIT stays empty in code too — the only fact-storage-time dedup is a memory_id idempotency guard (_ingest:339), not a similarity-based P-DEDUP; no P-CONFLICT, no P-EVICT, no training anywhere.",
+    "The node-utility fusion the paper writes as one formula next to the verifier call is a separate script in a later pipeline stage here, with logistic-regression coefficients fit on gold labels via a 5-fold SHA256 dev split — a calibration protocol the paper never describes, and the numbers do not equal the paper's stated (0.8, 5.2, 0.7) even 'up to displayed rounding'.",
+    "The paper's unconditional 'execute in parallel' claim for the two verifiers does not hold: the ecv stage requires node stage's persisted candidate_ids + query_captions cache before it can run at all, and the conditional query-image-caption LLM call only ever fires inside the node stage.",
+    "Constructing ConcreteMemixMethod (checkpoint / priors / reader stages) unconditionally requires an external private repo, vendor/memix-core, that ships nowhere in this repository, its README, or its docs — three of the nine pipeline stages cannot run without it (task-specific confirmation, §5-A of verification.md)."
+  ],
+  "nodes": [
+    {
+      "id": "c_w0",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "seq": 1,
+      "state": "degraded",
+      "label": "LLM:Caption — h2hmem caption sidecar, generated outside this repo",
+      "cite": "run_graphmemix_release.py:118-119 (h2hmem only)\nconfigs/release/graphmemix.json:56 caption_sidecar\nreader.py:34,44-45 only CONSUMES it\ngeneration script absent repo-wide (20 grep hits,\nall consumers); paper txt:1826-1828 says Qwen3-VL-8B",
+      "prim": "P-CAPTION"
+    },
+    {
+      "id": "c_w1",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 2,
+      "label": "IO:Corpus — checkpoint stage ingest: unified memories.jsonl + assets → record",
+      "cite": "build_memix_checkpoints.py:41-67\nConcreteMemixMethod.ingest → _adapt_memory\nconcrete_memix.py:397-499",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "c_w2",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "seq": 3,
+      "label": "NLP:Embed — unit split: per-image, per-video-frame, text-only-if-no-media",
+      "cite": "concrete_memix.py:466-498\n:488-489 text unit is a fallback only, NOT emitted\nalongside media units (C9)",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "c_w3",
+      "stage": "A4",
+      "row": 1,
+      "type": "alg",
+      "seq": 4,
+      "label": "NLP:Embed — encode_units → FAISS Flat-IP",
+      "cite": "concrete_memix.py:370-373\ningest_batch_size=16",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "c_w4",
+      "stage": "A4",
+      "row": 2,
+      "type": "nlp",
+      "seq": 6,
+      "label": "NLP:SchemaLink — same_round (native_round_id) / consecutive_turn (session_id+sequence)",
+      "cite": "build_graphmemix_relation_store.py:70-104\nsame_round :91,99; consecutive_turn :90,101,103",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "c_w4b",
+      "stage": "A4",
+      "row": 3,
+      "type": "nlp",
+      "seq": null,
+      "state": "code_only",
+      "label": "NLP:SchemaLink — spatiotemporal_event, thresholds default 0 (always a no-op)",
+      "cite": "build_graphmemix_relation_store.py:152-189\nreturn {} at :159-160; production never overrides\n(D3 — no paper counterpart, closest is event_bridge\nwhich the code never implements, C47)",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "c_w5",
+      "stage": "A4",
+      "row": 4,
+      "type": "nlp",
+      "seq": 8,
+      "label": "NLP:MutualKNN — canonical-unit vector mean, mutual top-8",
+      "cite": "reconstruct_vectors :209-222 (mean over ALL\ncanonical units, not just video frames — C18)\nmutual_neighbors :225-254; k=8 in prod (graphmemix.json:32)",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "c_w7",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 5,
+      "label": "Store:Vector — FAISS index + state.json, per context",
+      "cite": "_save_checkpoint concrete_memix.py:875-903\nindex-{version:08d}.faiss :883, state.json :896\n(code-architecture.md wrongly cited 365-396, C11)",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "c_w8",
+      "stage": "A5",
+      "row": 1,
+      "type": "store",
+      "seq": 9,
+      "label": "Store — relation_store/{dataset}.jsonl + .summary.json",
+      "cite": "build_graphmemix_relation_store.py:333-365\nexplicit_similarity fixed 0.99 for every schema edge\n(:267,336), regardless of relation type",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "c_query",
+      "stage": "B1",
+      "row": 0,
+      "type": "io",
+      "seq": 10,
+      "label": "IO:Query",
+      "cite": "run_graphmemix_release.py:141-220 — per-question\nnode/ecv/select/prune/reader loop",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "c_r_qemb",
+      "stage": "B1",
+      "row": 1,
+      "type": "alg",
+      "seq": 11,
+      "label": "NLP:Embed — query — per-view units, text-only-if-no-media",
+      "cite": "_question_units concrete_memix.py:544-556\n:556 text unit is a fallback (same pattern as C9)",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "c_r_qcap",
+      "stage": "B1",
+      "row": 2,
+      "type": "llm",
+      "seq": 14,
+      "state": "degraded",
+      "label": "LLM:Caption — query-image caption, only when the question image lacks a dataset caption",
+      "cite": "caption_question_images score_graphmemix_verifier.py:83-115\ncall site :280-282, cached into node_scores.jsonl",
+      "prim": "P-CAPTION"
+    },
+    {
+      "id": "c_r2",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 12,
+      "state": "differs",
+      "label": "Retrieval:Emb — per-view FAISS search, max-pool by memory_id, top-200",
+      "cite": "run_memix_main_track_retrieval.py:196 → _source_detail\nconcrete_memix.py:558-579, max-pool :574, cut :575\nsource_top_k=200 (graphmemix.json:29) — no paper\ncounterpart, paper goes straight to L=24 (D5)",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "c_r3",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": 13,
+      "label": "Retrieval:Graph — candidate_pool: seeds=[:24], 1-hop expand, cap 48",
+      "cite": "graphmemix_core.py:83-105\nseeds :89, 1-hop :94-97, cap :103-104\nsort key (-similarity,...) — explicit edges rank first\nonly because their similarity is a fixed 0.99 (C25),\nnot an explicit type-priority rule",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "c_r4",
+      "stage": "B4",
+      "row": 0,
+      "type": "llm",
+      "seq": 15,
+      "label": "LLM:Rerank — listwise node verifier, raw v_i∈[0,5] over 48 candidates",
+      "cite": "score_graphmemix_verifier.py:255-343\npayload :285-314, output_schema :313\nmax 3 retries; missing candidate → 0",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "c_r5",
+      "stage": "B4",
+      "row": 1,
+      "type": "llm",
+      "seq": 17,
+      "label": "LLM:VerifyEdge — ECV listwise call, direct_support forced 0, edge-only contract",
+      "cite": "score_graphmemix_ecv.py:500-600, prompt :525-567\ndirect_support forced 0: :35-42,552\nsix roles :30-31,533\neligible edges only when --edge-only (prod default):\n:203-216,459-466,479,499",
+      "prim": "P-EDGEVERIFY"
+    },
+    {
+      "id": "c_r6",
+      "stage": "B5",
+      "row": 0,
+      "type": "alg",
+      "seq": 16,
+      "label": "Deterministic anchor selection — anchor_mode=atomic, top-10 by candidate order",
+      "cite": "score_graphmemix_ecv.py:424-425,452\nanchor_mode default \"atomic\" :263, anchor_count=10 :272\nrun_graphmemix_release.py:159-174 passes --anchor-count only",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "c_r7a",
+      "stage": "B4",
+      "row": 2,
+      "type": "fusion",
+      "seq": 18,
+      "state": "differs",
+      "label": "Fusion:Add — node utility p_i = sigmoid(a·atomic + b·verifier + c), calibrated coefficients",
+      "cite": "evaluate_graphmemix_ecv.py:48-55,77-78\ncoefficients from shared_dev.json:7-11\n(a=4.0541, b=0.2254, c=-3.7113 — does not equal the\npaper's stated equivalence, D7)\nmissing_atomic_floor for graph-only candidates:\ngraphmemix_core.py:114-119\nstandardization fields in shared_dev.json:12-21 never\nread by anything (D9)",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "c_r7",
+      "stage": "B5",
+      "row": 2,
+      "type": "fusion",
+      "seq": 19,
+      "label": "Fusion:Forest — best-improvement 1-swap from Top-10, Kruskal recomputes max-weight forest each step",
+      "cite": "probe_graphmemix_pcsf.py:196-231 (1-swap loop)\nKruskal max-forest inside forest(): :188-200\n(code-architecture.md wrongly cited :203-215, C35)\nroot_cost=0.2, edge_weight=0.1 (graphmemix.json:35-36)\ndiagnostic \"exact\": False :249",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "c_r8",
+      "stage": "B5",
+      "row": 3,
+      "type": "fusion",
+      "seq": 20,
+      "label": "Fusion:Forest — bounded exact refinement, exhaustive 2^10-1 subsets, Kruskal per subset",
+      "cite": "evaluate_graphmemix_exact_pruning.py:50-124\nenumerate :78-108, Kruskal :89-97, n>20 guard :62-63\ntie-break :103-107\nroot_cost overridden to 0.12 (run_graphmemix_release.py\n:199, graphmemix.json:37); search space is 2^10-1=1023\nin production, not the defensive 2^20 upper bound",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "c_r9",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 21,
+      "label": "IO:Context — reader builds Evidence blocks from the order computed during select",
+      "cite": "component root+BFS ordering computed once during\nselect: probe_graphmemix_pcsf.py:225-242\nprune only mask-filters, no re-sort:\nevaluate_graphmemix_exact_pruning.py:110 (D10)\nreader assembly: concrete_memix.py:759-800+",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "c_r10",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 22,
+      "label": "LLM:Answer — reader stage generation, same backbone, outside the boundary",
+      "cite": "run_memix_answers_from_retrieval.py:753,773,792\nconcrete_memix.py:759 _generate_answer\nno chat/completion calls anywhere in the ingest path\n(C12); vendor/memix-core required to CONSTRUCT this\nclass, but _generate_answer never touches self.core",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "c_w0",
+      "to": "c_w1",
+      "state": "degraded",
+      "label": "sidecar consumed as native caption field, h2hmem only"
+    },
+    {
+      "from": "c_w1",
+      "to": "c_w2"
+    },
+    {
+      "from": "c_w2",
+      "to": "c_w3"
+    },
+    {
+      "from": "c_w3",
+      "to": "c_w7"
+    },
+    {
+      "from": "c_w1",
+      "to": "c_w4",
+      "label": "record metadata"
+    },
+    {
+      "from": "c_w1",
+      "to": "c_w4b",
+      "state": "code_only",
+      "label": "record metadata; thresholds=0 → no-op"
+    },
+    {
+      "from": "c_w7",
+      "to": "c_w5",
+      "label": "canonical unit vectors reconstructed from checkpoint"
+    },
+    {
+      "from": "c_w4",
+      "to": "c_w8"
+    },
+    {
+      "from": "c_w4b",
+      "to": "c_w8",
+      "state": "code_only"
+    },
+    {
+      "from": "c_w5",
+      "to": "c_w8"
+    },
+    {
+      "from": "c_w7",
+      "to": "c_r2",
+      "label": "FAISS index"
+    },
+    {
+      "from": "c_w8",
+      "to": "c_r3",
+      "label": "relation store, 1-hop neighbors"
+    },
+    {
+      "from": "c_w8",
+      "to": "c_r5",
+      "label": "schema edges only (explicit_relations)"
+    },
+    {
+      "from": "c_query",
+      "to": "c_r_qemb"
+    },
+    {
+      "from": "c_r_qemb",
+      "to": "c_r2"
+    },
+    {
+      "from": "c_r2",
+      "to": "c_r3",
+      "state": "differs",
+      "label": "top-200 → seeds=[:24] inside candidate_pool"
+    },
+    {
+      "from": "c_r3",
+      "to": "c_r4",
+      "label": "48 candidates"
+    },
+    {
+      "from": "c_query",
+      "to": "c_r_qcap",
+      "state": "degraded",
+      "label": "conditional: missing dataset caption"
+    },
+    {
+      "from": "c_r_qcap",
+      "to": "c_r4",
+      "label": "caption text in verifier prompt"
+    },
+    {
+      "from": "c_r4",
+      "to": "c_r6",
+      "label": "required cache: candidate_ids + query_captions — contradicts paper's \"parallel\" claim (D6)"
+    },
+    {
+      "from": "c_r6",
+      "to": "c_r5",
+      "label": "anchors"
+    },
+    {
+      "from": "c_r4",
+      "to": "c_r7a",
+      "label": "verifier score v_i"
+    },
+    {
+      "from": "c_r2",
+      "to": "c_r7a",
+      "label": "atomic/retrieval score s_i"
+    },
+    {
+      "from": "c_r7a",
+      "to": "c_r7",
+      "label": "node utility p_i"
+    },
+    {
+      "from": "c_r5",
+      "to": "c_r7",
+      "label": "positive + top-3-role edges → weight 0.99·(inc/5)"
+    },
+    {
+      "from": "c_r7",
+      "to": "c_r8"
+    },
+    {
+      "from": "c_r8",
+      "to": "c_r9",
+      "label": "mask-filtered, order preserved from select's BFS — no re-sort (D10)"
+    },
+    {
+      "from": "c_r9",
+      "to": "c_r10"
+    }
+  ]
+}

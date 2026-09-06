@@ -1,0 +1,341 @@
+{
+  "system": "memharness",
+  "view": "paper",
+  "title": "MemHarness — paper view",
+  "subtitle": "The mechanism as Wu et al. describe it: a unified policy pi_theta that retrieves, critiques-and-reconstructs, then acts, cold-start SFT'd before episode-level GRPO. Lane = canonical stage (METHODOLOGY-SKELETON SS2.2); B3/B5 are the only empty lanes.",
+  "source": "Wu et al. 2026, MemHarness (arXiv:2607.28272)   ·   every anchor re-located in Wu-2026-MemHarness.txt during verification",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "Cold-start SFT (SS4.1 / Appx A.4) is a full offline training phase before RL ever starts — both original architecture docs skipped it entirely; drawn here feeding the GRPO node in A6.",
+    "MemHarness fills A6 INTERNALIZE while ALSO keeping the full B1-B2/B4/B6-B8 retrieval pipeline — unlike TransMem/LiveMem/Memory Decoder, it does not trade retrieval away for parameterization; it does both with one shared policy.",
+    "B1 CUE is degraded because the paper never settles on one retrieval-trigger policy: SS3.2 frames it as a per-step agent decision, Appendix A.3 says retrieval happens \"at each step\" unconditionally.",
+    "P-UTILITY appears twice by design: once in A3 (episode-outcome success/fail counting that feeds the pruning threshold) and once in B4 (per-retrieval-hit usage counting) — the same Laplace-smoothed score, written from two different triggers."
+  ],
+  "nodes": [
+    {
+      "id": "cs_extract",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "seq": 1,
+      "label": "LLM:Extract — cold-start data: GPT-5.1 distills AgentGym trajectories into (query, guidance) pairs, offline only",
+      "cite": "Appx A.4 txt:1286-1307\n200+200 examples, txt:1288-1301\n\"not involved in RL training\", txt:1305-1307",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "cs_sft",
+      "stage": "A6",
+      "row": 0,
+      "type": "learn",
+      "seq": 2,
+      "label": "Learn:ColdStartSFT — align retrieval/reconstruction protocol before RL, 2 epochs, lr 1e-5, eff. batch 2",
+      "cite": "SS4.1 txt:569-574\nAppx A.4 txt:1286-1307\ncold-start-only model scores 7.6%, txt:720-721",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "loop",
+      "stage": "B8",
+      "row": 0,
+      "type": "sched",
+      "seq": 3,
+      "label": "Sched:ToolLoop — per-step agent-environment loop across the episode",
+      "cite": "SS1 five-stage cycle, txt:58-62\ncollapsed to 3 stages, SS3.2 txt:182-192\nG=8 rollouts/prompt, 128 parallel env, Appx A.2",
+      "prim": "P-TOOLLOOP"
+    },
+    {
+      "id": "qdecide",
+      "stage": "B1",
+      "row": 0,
+      "type": "llm",
+      "seq": 4,
+      "state": "degraded",
+      "label": "LLM:Query — agent decides whether to retrieve, same sampling call as think/action",
+      "cite": "SS3.2 Step 1, txt:186-188\n\"same pi_theta sampling\" — see legend_notes\nAppx A.3 txt:1261-1262 contradicts with\n\"at each step\" (unconditional)",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "dense",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 5,
+      "label": "Retrieval:Emb — E_t = R(q_t, B), top-k=3, cosine similarity",
+      "cite": "Eq.1 txt:157-165\nSS4.1 txt:580-581 (k=3)\nAppx A.3 txt:1261-1262",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "rdedup",
+      "stage": "A3",
+      "row": 3,
+      "type": "nlp",
+      "seq": 6,
+      "label": "NLP:EmbDedup — retrieval-time: wider candidate pool, greedy embedding dedup, truncate to top-k",
+      "cite": "Appx A.3 txt:1276-1278\nstage pinned to A3 by its P-DEDUP\nprimitive (SKELETON SS2.3), not by\nwhen it runs — same rule mragent uses",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "uhit",
+      "stage": "B4",
+      "row": 0,
+      "type": "nlp",
+      "seq": 7,
+      "label": "NLP:UtilityScore — usage-count increment on retrieval hit, s(p)=(c_succ+1)/(c_use+2)",
+      "cite": "SS3.1/Appx A.3 txt:1278-1281\nEvolveR-style Laplace smoothing, [27]\nP-UTILITY [NEW] — see legend_notes",
+      "prim": "P-UTILITY"
+    },
+    {
+      "id": "assemble",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 8,
+      "label": "IO:Context — x_recon = T (+) h_t (+) union of k retrieved (e,osrc) pairs (Eq.3)",
+      "cite": "Eq.3 txt:205-215\nsource observations compare historical\nvs current state, txt:162",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "reconstruct",
+      "stage": "B6",
+      "row": 1,
+      "type": "llm",
+      "seq": 9,
+      "label": "LLM:Reconstruct — Critique & Contextual Memory Reconstruction: g_t ~ pi_theta(.|x_recon) or <EMPTY>",
+      "cite": "Eq.4 txt:220-221, SS3.3\n\"critique folded into reconstruction\",\ntxt:182-185\nprompt = Figure 8, txt:1428-1445",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "fallback",
+      "stage": "B6",
+      "row": 2,
+      "type": "io",
+      "seq": 10,
+      "label": "IO:Context — fallback g~_t = p_self when g_t = <EMPTY> (Eq.5)",
+      "cite": "Eq.5 txt:224-231\nFigure 7",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "actgen",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 11,
+      "label": "LLM:Act — a_t ~ pi_theta(.|T,h_t,g~_t) (Eq.6), outside MemHarness's own memory boundary",
+      "cite": "Eq.6 txt:232-235\n[AGENT] boundary — reconstruction and\naction share params theta, txt:238",
+      "prim": "P-GENERATE"
+    },
+    {
+      "id": "intake",
+      "stage": "A1",
+      "row": 0,
+      "type": "nlp",
+      "seq": 12,
+      "label": "NLP:BalancedSample — retain 50% of a GRPO group's trajectories, success/fail balanced",
+      "cite": "Appx A.3 txt:1267-1271\nP-INTAKE",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "distill",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "seq": 13,
+      "label": "LLM:Extract — Memory Initialization: distill trajectory into (e_i, osrc_i), same running pi_theta",
+      "cite": "SS3.1/Appx A.3 txt:1263-1267\n\"the actual policy model pi_theta\"\nprompt = Figure 9, txt:1449-1477",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "embed",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "seq": 14,
+      "label": "NLP:Embed — each entry — BGE-M3, dense vector",
+      "cite": "SS4.1 txt:580-581\nAppx A.3 txt:1260-1261 (章节锚点\n论文原文写成 SS4.1，见 P17)",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "wdedup",
+      "stage": "A3",
+      "row": 0,
+      "type": "nlp",
+      "seq": 15,
+      "state": "degraded",
+      "label": "NLP:EmbDedup — write-time: skip insert if max cosine similarity exceeds theta_sim=0.85 (WebShop only, off on ALFWorld)",
+      "cite": "Appx A.3 txt:1273-1276\n\"exceeds theta_sim\" (>) — see diff D-cmp",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "persist",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 16,
+      "label": "Store:Vector — insert into B, Milvus vector database [37]",
+      "cite": "SS3.1 txt:149-165\nAppx A.3 txt:1257 (Milvus [37])",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "uepisode",
+      "stage": "A3",
+      "row": 1,
+      "type": "nlp",
+      "seq": 17,
+      "label": "NLP:UtilityScore — episode-outcome increment, s(p)=(c_succ+1)/(c_use+2)",
+      "cite": "SS3.1/Appx A.3 txt:1278-1281\nP-UTILITY [NEW] — see legend_notes",
+      "prim": "P-UTILITY"
+    },
+    {
+      "id": "prune",
+      "stage": "A3",
+      "row": 2,
+      "type": "sched",
+      "seq": null,
+      "state": "degraded",
+      "label": "Sched:Evict — periodically remove entries with s(p) < theta_prune=0.3 and c_use >= min_uses=3",
+      "cite": "Appx A.3 txt:1278-1281\nperiod never given a value (P47)",
+      "prim": "P-EVICT"
+    },
+    {
+      "id": "grpo",
+      "stage": "A6",
+      "row": 1,
+      "type": "learn",
+      "seq": 19,
+      "label": "Learn:GRPO — R(tau)=R_outcome+0.1*R_format (Eq.9-10); advantage A_i shared equally across thinking/reconstruction/action tokens (Eq.7)",
+      "cite": "Eq.7 txt:263, 268-269\nreward txt:251-255\ng_t is an unlabeled latent, no\ndirect supervision, txt:238-240",
+      "prim": "P-TRAIN"
+    }
+  ],
+  "edges": [
+    {
+      "from": "cs_extract",
+      "to": "cs_sft"
+    },
+    {
+      "from": "cs_sft",
+      "to": "grpo"
+    },
+    {
+      "from": "grpo",
+      "to": "qdecide",
+      "label": "shared weights pi_theta"
+    },
+    {
+      "from": "grpo",
+      "to": "reconstruct",
+      "label": "shared weights, same credit (Eq.7)"
+    },
+    {
+      "from": "grpo",
+      "to": "actgen",
+      "label": "shared weights, same credit (Eq.7)"
+    },
+    {
+      "from": "grpo",
+      "to": "distill",
+      "label": "same pi_theta distills trajectories"
+    },
+    {
+      "from": "actgen",
+      "to": "grpo",
+      "label": "episode reward R(tau)"
+    },
+    {
+      "from": "loop",
+      "to": "qdecide"
+    },
+    {
+      "from": "qdecide",
+      "to": "dense",
+      "label": "q_t, if triggered"
+    },
+    {
+      "from": "qdecide",
+      "to": "actgen",
+      "label": "no query this step: h_t direct to action"
+    },
+    {
+      "from": "dense",
+      "to": "rdedup"
+    },
+    {
+      "from": "rdedup",
+      "to": "uhit",
+      "label": "on hit"
+    },
+    {
+      "from": "rdedup",
+      "to": "assemble",
+      "label": "k retrieved pairs"
+    },
+    {
+      "from": "assemble",
+      "to": "reconstruct"
+    },
+    {
+      "from": "reconstruct",
+      "to": "fallback",
+      "label": "g_t = <EMPTY>"
+    },
+    {
+      "from": "reconstruct",
+      "to": "actgen",
+      "label": "g~_t = g_t"
+    },
+    {
+      "from": "fallback",
+      "to": "actgen",
+      "label": "g~_t = p_self"
+    },
+    {
+      "from": "actgen",
+      "to": "loop",
+      "label": "next step"
+    },
+    {
+      "from": "actgen",
+      "to": "intake",
+      "label": "episode complete, batch collected"
+    },
+    {
+      "from": "intake",
+      "to": "distill"
+    },
+    {
+      "from": "distill",
+      "to": "embed"
+    },
+    {
+      "from": "embed",
+      "to": "wdedup"
+    },
+    {
+      "from": "wdedup",
+      "to": "persist"
+    },
+    {
+      "from": "persist",
+      "to": "dense",
+      "label": "top-3 over stored experiences"
+    },
+    {
+      "from": "persist",
+      "to": "prune"
+    },
+    {
+      "from": "uhit",
+      "to": "prune",
+      "label": "feeds s(p)"
+    },
+    {
+      "from": "uepisode",
+      "to": "prune",
+      "label": "feeds s(p)"
+    },
+    {
+      "from": "actgen",
+      "to": "uepisode",
+      "label": "episode success/fail known"
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "system": "memharness",
+  "view": "diff",
+  "title": "MemHarness — where the paper and the code part ways",
+  "subtitle": "Only the divergent steps are drawn. Each node states both sides; the lane says which stage of the pipeline the divergence sits in.",
+  "source": "paper arXiv:2607.28272  ×  repo KnowledgeXLab/MemHarness @ 31329e8   ·   servers/memharness/verification.md §5, 17 divergences found, 10 drawn here",
+  "footer": "memory-bench · methodology flow · paper ↔ code divergence",
+  "legend_notes": [
+    "Headline (D1): §3.4 says the trajectory-level advantage is shared equally across thinking, reconstruction and action tokens. Under the exact config both training scripts use (use_actor_rollout_wg=true), train_memory_adaptor_enabled() returns False -> the reconstruction completion enters zero gradient updates, from either path.",
+    "A6 doubles down: not only is reconstruction's credit cut off from the main GRPO update, a fully separate, independently-trainable adaptor-GRPO loop exists in the code (D9) — and neither training script enables it either. In the runs that produced the paper's numbers, reconstruction's own parameters most likely receive no task-reward gradient from anywhere.",
+    "B6 quietly does two things the paper doesn't describe: it reconstructs with a placeholder even when nothing was retrieved (D7), and it only ever shows the reconstruction model 1 of the k=3 hits it fetched — matching the paper's own Appendix C template over its own main-text Eq.3 (D6).",
+    "Not drawn (real findings, no stage-lane fit): D2 tag word order (<retrieve_memory> vs code's <memory_retrieve>); D3/D4 format-reward component weighting and think-block cardinality (reward-shaping internals, not a memory-pipeline step); D14 num_memories_per_trajectory=1 (paper gives no number); D16/D17 embedding-backend requirement and dedupe comparator (>= vs >)."
+  ],
+  "nodes": [
+    {
+      "id": "d1",
+      "stage": "A6",
+      "row": 0,
+      "type": "learn",
+      "state": "differs",
+      "label": "Credit assignment for the reconstruction token",
+      "cite": "paper: §3.4 txt:268-269, Ai shared equally\nacross thinking/reconstruction/action\ncode: mem_adaptor_training.py:336-337 returns False\nwhen use_actor_rollout_wg=true -> adaptor_train_buf=\nNone (rollout_loop.py:534-539) -> ray_trainer.py:1890\nwhole adaptor-GRPO block skipped; both training\nscripts use exactly this config"
+    },
+    {
+      "id": "d2",
+      "stage": "A6",
+      "row": 1,
+      "type": "learn",
+      "state": "code_only",
+      "label": "Independent adaptor-GRPO training loop",
+      "cite": "paper: §3.1/§3.2 only describes a single unified\npolicy, no second training loop anywhere\ncode: mem_adaptor_training.py (492 lines) — own\nWorkerGroup, own KL anchor, english/identical/step\nreward shaping (yaml:644-670); requires\nuse_actor_rollout_wg=false + train_memory_adaptor=true;\nneither train_alfworld.sh nor train_webshop.sh sets this"
+    },
+    {
+      "id": "d3",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "state": "differs",
+      "label": "Who distills trajectories into memory",
+      "cite": "paper: A.3 txt:1263-1267, \"the actual policy\nmodel pi_theta\" — no alternative mentioned\ncode: base default experience_summarizer.mode=none\n(yaml:419, writes nothing); mode=self reuses actor\n(:785); mode=teacher hits an external OpenAI-compatible\nAPI instead (:659); both training scripts use self"
+    },
+    {
+      "id": "d4",
+      "stage": "A3",
+      "row": 0,
+      "type": "sched",
+      "state": "differs",
+      "label": "Pruning threshold and schedule",
+      "cite": "paper: A.3 txt:1278-1281, theta_prune=0.3 given\nas the operative default, no schedule caveat\ncode: base prune_score_threshold=0.35 (yaml:462),\nprune_every_n_global_steps=0 = disabled (yaml:461);\ntrain_alfworld.sh:71-72/train_webshop.sh:69-70\noverride to 20 steps / 0.3"
+    },
+    {
+      "id": "d5",
+      "stage": "A3",
+      "row": 1,
+      "type": "nlp",
+      "state": "differs",
+      "label": "Retrieval-time dedup is also off on ALFWorld",
+      "cite": "paper: A.3 txt:1276-1278 frames retrieval-time\ndedup as unconditional (only write-time dedup is\ndocumented as WebShop-only)\ncode: train_alfworld.sh:135 sets\nmemory_text_retrieval_dedupe_similarity_threshold=null,\noff exactly like write-time dedup on that environment"
+    },
+    {
+      "id": "d6",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "state": "code_only",
+      "label": "Memory record schema far exceeds the paper's tuple",
+      "cite": "paper: §2 txt:149-155, mi = (e_i, osrc_i), a\nplain two-field tuple\ncode: MemoryRecord types.py:12-31 also stores\naction_text, reward, success, retrieval_count,\nlast_used_step, value, value_source —\nMilvus schema is 19 fields (milvus_store.py:793-811)"
+    },
+    {
+      "id": "d7",
+      "stage": "B1",
+      "row": 0,
+      "type": "llm",
+      "state": "differs",
+      "label": "Retrieval trigger: agentic decision vs unconditional",
+      "cite": "paper: internally split — §3.2 Step 1 (txt:186-188)\nframes it as a per-step agent decision, but A.3\n(txt:1261-1262) says \"at each step\" unconditionally\ncode: implements both — yaml:389 base default\nretrieval_mode=fixed (unconditional, no LLM call);\ntrain_alfworld.sh:46/train_webshop.sh:43 override\nto agentic (LLM decides, memory_manager.py:389)"
+    },
+    {
+      "id": "d8",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "state": "code_only",
+      "label": "Retrieval indexes memory_text, not the source observation",
+      "cite": "paper: Eq.1 txt:158-165, R(q_t, B) never specifies\nwhich side of a stored pair is the retrieval key\ncode: yaml:478 retrieve_key=memory_text (default);\nmilvus_store.py:325 embeds that field — the\nalternative state_text field is a code-only option\nthe paper doesn't distinguish"
+    },
+    {
+      "id": "d9",
+      "stage": "B6",
+      "row": 0,
+      "type": "llm",
+      "state": "differs",
+      "label": "Reconstruction sees 1 hit, not the union of k=3",
+      "cite": "paper: main text Eq.3 txt:205-215, x_recon\nincludes union_{i=1..k} of retrieved pairs\nbut Appendix C Figure 8 template (txt:1433-1437)\nonly has a single {s_old}/{p_old} slot\ncode: yaml:557 retrieval_top_k=1 — matches the\nappendix template, not the main-text equation"
+    },
+    {
+      "id": "d10",
+      "stage": "B6",
+      "row": 1,
+      "type": "llm",
+      "state": "code_only",
+      "label": "Zero-hit turns still trigger a reconstruction call",
+      "cite": "paper: §3.2 Step 1 txt:186-188, reconstruction\nfollows only \"If triggered, retrieval returns\nrelevant experiences Et\" — implies a hit is needed\ncode: memory_manager.py:432-440 injects an\nempty_retrieval_message placeholder on zero hits,\nmaking `injected` truthy -> mem_adaptor_rollout.py:\n192-207,636-640 still fires the adaptor call"
+    }
+  ],
+  "edges": []
+}

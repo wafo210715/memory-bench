@@ -1,0 +1,354 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1980" height="1522" viewBox="0 0 1980 1522" font-family="Inter, -apple-system, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Noto Sans SC&quot;, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="24" y="30" font-size="19" font-weight="700" fill="#111827">Letta / MemGPT — code view</text>
+<text x="24" y="50" font-size="11.5" fill="#4b5563">What origin/archive @ 56ba9c25 actually executes for the default letta_v1_agent → LettaAgentV3. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes mean the stage does not exist here.</text>
+<text x="24" y="66" font-size="9.5" fill="#9ca3af" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">repo letta @ origin/archive 56ba9c25 (pyproject.toml v0.16.8, 2026-08-13) — main was emptied 2026-08-15 by 87fd37aab; read only via `git show origin/archive:&lt;path&gt;`, never checked out  ·  verified against servers/letta/verification.md (83 code-side assertions, 60 ✓ / 4 ✗ / 19 ◐)</text>
+<circle cx="1411" cy="44" r="8" fill="#111827"/>
+<text x="1411" y="47.3" font-size="9" font-weight="700" text-anchor="middle" fill="#ffffff">n</text>
+<text x="1426" y="47.5" font-size="10" fill="#6b7280">true execution order — lanes are canonical stages, not sequence</text>
+<rect x="14" y="100" width="1276" height="712.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="93" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">A · MEMORY FORMATION  (query-independent)</text>
+<rect x="18" y="104" width="196" height="700.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="116.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A1 INTAKE</text>
+<rect x="230" y="104" width="196" height="700.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="328.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A2 DISTILL</text>
+<rect x="442" y="104" width="196" height="700.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="540.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A3 ADMIT</text>
+<rect x="654" y="104" width="196" height="700.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="752.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A4 INDEX</text>
+<rect x="866" y="104" width="196" height="700.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="964.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A5 COMMIT</text>
+<rect x="1078" y="104" width="196" height="700.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="1176.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A6 INTERNALIZE</text>
+<text x="1176.0" y="469.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="14" y="1002.0" width="1700" height="490.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="995.0" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">B · MEMORY MOBILIZATION  (query-conditioned)</text>
+<rect x="18" y="1006.0" width="196" height="478.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="116.0" y="1023.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B1 CUE</text>
+<rect x="230" y="1006.0" width="196" height="478.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="328.0" y="1023.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B2 RECALL</text>
+<rect x="442" y="1006.0" width="196" height="478.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="540.0" y="1023.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B3 EXPAND</text>
+<text x="540.0" y="1260.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="654" y="1006.0" width="196" height="478.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="752.0" y="1023.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B4 APPRAISE</text>
+<text x="752.0" y="1260.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="866" y="1006.0" width="196" height="478.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="964.0" y="1023.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B5 SELECT</text>
+<text x="964.0" y="1260.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="1078" y="1006.0" width="196" height="478.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1176.0" y="1023.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B6 DELIVER</text>
+<rect x="1290" y="1006.0" width="196" height="478.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1388.0" y="1023.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B7 GENERATE</text>
+<rect x="1502" y="1006.0" width="196" height="478.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1600.0" y="1023.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B8 LOOP</text>
+<path d="M 208.0 186.0 L 540.0 186.0 Q 548.0 186.0 548.0 178.0 L 548.0 188.0 Q 548.0 180.0 556.0 180.0 L 884.0 180.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(884.0,180.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 208.0 186.0 L 334.0 186.0 Q 342.0 186.0 342.0 194.0 L 342.0 449.5 Q 342.0 457.5 350.0 457.5 L 460.0 457.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(460.0,457.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 546.0 380.0 L 546.0 332.5 L 334.0 332.5 L 334.0 277.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(334.0,277.0) rotate(270)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 334.0 277.0 L 334.0 818.0 L 1156.0 818.0 L 1156.0 1036.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1156.0,1036.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 546.0 535.0 C 546.0 620.0 334.0 620.0 334.0 595.0" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(334.0,595.0) rotate(270)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<rect x="364.8" y="606.5" width="150.4" height="13" rx="3" fill="#ffffff" stroke="#78716c" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="440.0" y="616.0" font-size="8.5" text-anchor="middle" fill="#78716c">LettaAgentV2 / legacy only</text>
+<path d="M 334.0 595.0 L 334.0 839.5 L 1182.0 839.5 L 1182.0 1036.0" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(1182.0,1036.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<path d="M 208.0 186.0 L 328.0 186.0 Q 336.0 186.0 336.0 194.0 L 336.0 238.0 Q 336.0 246.0 344.0 246.0 L 460.0 246.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(460.0,246.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 546.0 358.0 L 546.0 861.0 L 1208.0 861.0 L 1208.0 1036.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1208.0,1036.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 546.0 358.0 L 546.0 882.5 L 1182.0 882.5 L 1182.0 1237.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1182.0,1237.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 632.0 246.0 L 752.0 246.0 Q 760.0 246.0 760.0 254.0 L 760.0 698.5 Q 760.0 706.5 768.0 706.5 L 884.0 706.5" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(884.0,706.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<path d="M 208.0 186.0 L 440.0 186.0 Q 448.0 186.0 448.0 194.0 L 448.0 227.5 Q 448.0 235.5 456.0 235.5 L 672.0 235.5" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(672.0,235.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<path d="M 844.0 235.5 L 870.0 235.5 Q 878.0 235.5 878.0 243.5 L 878.0 437.5 Q 878.0 445.5 886.0 445.5 L 884.0 445.5" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(884.0,445.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<path d="M 122.0 238.0 L 122.0 904.0 L 122.0 904.0 L 122.0 1036.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(122.0,1036.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 208.0 1088.0 L 228.0 1088.0 Q 236.0 1088.0 236.0 1096.0 L 236.0 1099.5 Q 236.0 1107.5 244.0 1107.5 L 248.0 1107.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(248.0,1107.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 208.0 1088.0 L 234.0 1088.0 Q 242.0 1088.0 242.0 1096.0 L 242.0 1348.5 Q 242.0 1356.5 250.0 1356.5 L 248.0 1356.5" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(248.0,1356.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<path d="M 970.0 226.0 L 970.0 925.5 L 334.0 925.5 L 334.0 1036.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(334.0,1036.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 970.0 511.0 L 970.0 947.0 L 334.0 947.0 L 334.0 1237.0" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(334.0,1237.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<path d="M 420.0 1107.5 L 764.0 1107.5 Q 772.0 1107.5 772.0 1115.5 L 772.0 1276.5 Q 772.0 1284.5 780.0 1284.5 L 1096.0 1284.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1096.0,1284.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 420.0 1356.5 L 752.0 1356.5 Q 760.0 1356.5 760.0 1348.5 L 760.0 1292.5 Q 760.0 1284.5 768.0 1284.5 L 1096.0 1284.5" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(1096.0,1284.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<path d="M 1268.0 1113.5 L 1288.0 1113.5 Q 1296.0 1113.5 1296.0 1105.5 L 1296.0 1084.0 Q 1296.0 1076.0 1304.0 1076.0 L 1308.0 1076.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1308.0,1076.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="1258.6" y="1085.25" width="74.80000000000001" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="1296.0" y="1094.75" font-size="8.5" text-anchor="middle" fill="#4b5563">no tool call</text>
+<path d="M 1268.0 1284.5 L 1400.0 1284.5 Q 1408.0 1284.5 1408.0 1276.5 L 1408.0 1133.5 Q 1408.0 1125.5 1416.0 1125.5 L 1520.0 1125.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1520.0,1125.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 1606.0 1215.0 L 1606.0 968.5 L 122.0 968.5 L 122.0 134.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(122.0,134.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="802.3" y="953.0" width="123.4" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="864.0" y="962.5" font-size="8.5" text-anchor="middle" fill="#4b5563">tool called: continue</text>
+<rect x="36.0" y="134.0" width="172" height="104" rx="52.0" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.6"/>
+<text x="122.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Message — user /</text>
+<text x="122.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">assistant / tool</text>
+<text x="47.0" y="187.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">message_manager.py:477</text>
+<text x="47.0" y="199.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">create_many_messages_async</text>
+<text x="47.0" y="211.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">letta_agent_v3.py:1935</text>
+<text x="47.0" y="223.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">messages_to_persist assembly</text>
+<circle cx="37.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="37.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">1</text>
+<rect x="460.0" y="134.0" width="172" height="224" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="546.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">LLM:SelfEdit — Block</text>
+<text x="546.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">append/replace</text>
+<text x="471.0" y="187.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">core_tool_executor.py:328-345</text>
+<text x="471.0" y="199.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">core_memory_replace —</text>
+<text x="471.0" y="211.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">NOT unique: only checks</text>
+<text x="471.0" y="223.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">old_content in current_value</text>
+<text x="471.0" y="235.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(:339-340),</text>
+<text x="471.0" y="247.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">then str.replace ALL</text>
+<text x="471.0" y="259.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">occurrences (:341)</text>
+<text x="471.0" y="271.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">:346-401</text>
+<text x="471.0" y="283.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">memory_replace/memory_insert —</text>
+<text x="471.0" y="295.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">unique-checked successor</text>
+<text x="471.0" y="307.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">agent_manager.py:1747-1795</text>
+<text x="471.0" y="319.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">update_memory_if_changed_async</text>
+<text x="471.0" y="331.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">,</text>
+<text x="471.0" y="343.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">no LLM here</text>
+<circle cx="461.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="461.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">3</text>
+<rect x="460.0" y="380.0" width="172" height="155" rx="7" fill="#fef3c7" stroke="#b45309" stroke-width="1.6"/>
+<text x="546.0" y="402.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Sched:Evict —</text>
+<text x="546.0" y="417.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">compaction threshold</text>
+<text x="546.0" y="432.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">check</text>
+<text x="471.0" y="448.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">letta_agent_v3.py:75 import</text>
+<text x="471.0" y="460.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">get_compaction_trigger_thresho</text>
+<text x="471.0" y="472.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ld</text>
+<text x="471.0" y="484.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">→ :938 call</text>
+<text x="471.0" y="496.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">thresholds.py:27-41  non-GPT-5</text>
+<text x="471.0" y="508.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">= 100%, GPT-5 family = 90%</text>
+<text x="471.0" y="520.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">of context window</text>
+<circle cx="461.0" cy="381.0" r="9.5" fill="#111827"/>
+<text x="461.0" y="384.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
+<rect x="248.0" y="134.0" width="172" height="143" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="334.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">LLM:Summarize —</text>
+<text x="334.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">compact_messages</text>
+<text x="334.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(default)</text>
+<text x="259.0" y="202.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">letta_agent_v3.py:72 import</text>
+<text x="259.0" y="214.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">compact_messages → :2109 call</text>
+<text x="259.0" y="226.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">summarizer/compact.py:42-131</text>
+<text x="259.0" y="238.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">build_summarizer_llm_config —</text>
+<text x="259.0" y="250.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">summary model is swappable to</text>
+<text x="259.0" y="262.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">a cheaper model</text>
+<circle cx="249.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="249.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">5</text>
+<rect x="248.0" y="380.0" width="172" height="215" rx="7" fill="#dbeafe" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="334.0" y="402.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">LLM:Summarize —</text>
+<text x="334.0" y="417.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Summarizer 30% evict</text>
+<text x="334.0" y="432.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(non-default)</text>
+<text x="259.0" y="448.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">settings.py:78</text>
+<text x="259.0" y="460.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mode=PARTIAL_EVICT_MESSAGE_BUF</text>
+<text x="259.0" y="472.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">FER,</text>
+<text x="259.0" y="484.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">:86 = 0.30</text>
+<text x="259.0" y="496.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">summarizer.py:136-203</text>
+<text x="259.0" y="508.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">simple_summary(), synchronous</text>
+<text x="259.0" y="520.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">only constructed by</text>
+<text x="259.0" y="532.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">letta_agent_v2.py:124 and</text>
+<text x="259.0" y="544.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">legacy</text>
+<text x="259.0" y="556.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">letta_agent.py:141 —</text>
+<text x="259.0" y="568.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">LettaAgentV3 has zero</text>
+<text x="259.0" y="580.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">`Summarizer(` sites</text>
+<circle cx="409.0" cy="391.0" r="8" fill="#78716c"/>
+<text x="409.0" y="394.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<rect x="672.0" y="134.0" width="172" height="203" rx="7" fill="#ffedd5" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="758.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">NLP:Embed — archival</text>
+<text x="758.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">insert (dead by</text>
+<text x="758.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">default)</text>
+<text x="683.0" y="202.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">core_tool_executor.py:307</text>
+<text x="683.0" y="214.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">archival_memory_insert →</text>
+<text x="683.0" y="226.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">passage_manager.py:543</text>
+<text x="683.0" y="238.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">insert_passage</text>
+<text x="683.0" y="250.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">constants.py:93</text>
+<text x="683.0" y="262.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">MAX_EMBEDDING_DIM=4096, pad</text>
+<text x="683.0" y="274.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">happens</text>
+<text x="683.0" y="286.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">downstream in</text>
+<text x="683.0" y="298.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">create_agent_passage(s)_async:</text>
+<text x="683.0" y="310.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">148-159/234-239</text>
+<text x="683.0" y="322.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(pgvector path only)</text>
+<circle cx="833.0" cy="145.0" r="8" fill="#78716c"/>
+<text x="833.0" y="148.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<path d="M 884.0 141.0 a 86.0 7 0 0 1 172 0 v 78 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.6"/>
+<path d="M 884.0 141.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#6b7280" stroke-width="1.2800000000000002"/>
+<text x="970.0" y="157.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Store:Database —</text>
+<text x="970.0" y="172.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Message ORM rows</text>
+<text x="895.0" y="188.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">message_manager.py:477</text>
+<text x="895.0" y="200.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">orm/message.py:23-47</text>
+<circle cx="885.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">2</text>
+<path d="M 884.0 387.0 a 86.0 7 0 0 1 172 0 v 117 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<path d="M 884.0 387.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#78716c" stroke-width="1.7600000000000002"/>
+<text x="970.0" y="403.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Store:Vector — Passage</text>
+<text x="970.0" y="418.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">+ PassageTag (dead by</text>
+<text x="970.0" y="433.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">default)</text>
+<text x="895.0" y="449.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">passage_manager.py:55-79</text>
+<text x="895.0" y="461.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">PassageTag junction table</text>
+<text x="895.0" y="473.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">+ :590-597 JSON tags column —</text>
+<text x="895.0" y="485.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">double write</text>
+<circle cx="1045.0" cy="391.0" r="8" fill="#78716c"/>
+<text x="1045.0" y="394.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<path d="M 884.0 624.0 a 86.0 7 0 0 1 172 0 v 165 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<path d="M 884.0 624.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#78716c" stroke-width="1.7600000000000002"/>
+<text x="970.0" y="640.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Store:Git — per-agent</text>
+<text x="970.0" y="655.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Block history</text>
+<text x="970.0" y="670.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(optional)</text>
+<text x="895.0" y="686.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">block_manager_git.py:188-238</text>
+<text x="895.0" y="698.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">update_block_async —</text>
+<text x="895.0" y="710.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">commits to git first, then</text>
+<text x="895.0" y="722.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">syncs Postgres</text>
+<text x="895.0" y="734.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">server.py:155-167 wiring;</text>
+<text x="895.0" y="746.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">gated on agent tag</text>
+<text x="895.0" y="758.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">GIT_MEMORY_ENABLED_TAG</text>
+<text x="895.0" y="770.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(block_manager_git.py:52-70)</text>
+<circle cx="1045.0" cy="628.0" r="8" fill="#78716c"/>
+<text x="1045.0" y="631.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<rect x="36.0" y="1036.0" width="172" height="104" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="122.0" y="1058.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">LLM:SelfEdit — writes</text>
+<text x="122.0" y="1073.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">search tool-call args</text>
+<text x="47.0" y="1089.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">function_sets/base.py:87</text>
+<text x="47.0" y="1101.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">conversation_search docstring</text>
+<text x="47.0" y="1113.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">:164 archival_memory_search</text>
+<text x="47.0" y="1125.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">signature</text>
+<circle cx="37.0" cy="1037.0" r="9.5" fill="#111827"/>
+<text x="37.0" y="1040.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">6</text>
+<rect x="248.0" y="1036.0" width="172" height="143" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="334.0" y="1058.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Retrieval:Substring —</text>
+<text x="334.0" y="1073.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">conversation_search</text>
+<text x="334.0" y="1088.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(ILIKE/LIKE)</text>
+<text x="259.0" y="1104.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">message_manager.py:895</text>
+<text x="259.0" y="1116.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">list_messages, :977-993</text>
+<text x="259.0" y="1128.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Postgres ILIKE / SQLite</text>
+<text x="259.0" y="1140.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">JSON_EXTRACT LIKE —</text>
+<text x="259.0" y="1152.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">no term weighting, no score</text>
+<text x="259.0" y="1164.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(combined_score: None)</text>
+<circle cx="249.0" cy="1037.0" r="9.5" fill="#111827"/>
+<text x="249.0" y="1040.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">7</text>
+<rect x="248.0" y="1237.0" width="172" height="239" rx="7" fill="#ffedd5" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="334.0" y="1259.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Retrieval:Emb —</text>
+<text x="334.0" y="1274.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">archival_memory_search</text>
+<text x="334.0" y="1289.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(dead by default)</text>
+<text x="259.0" y="1305.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">agent_manager.py:2416-2480</text>
+<text x="259.0" y="1317.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">query_agent_passages_async —</text>
+<text x="259.0" y="1329.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Native pgvector/SQLite cosine</text>
+<text x="259.0" y="1341.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">top-k, or</text>
+<text x="259.0" y="1353.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">lower(text) LIKE fallback</text>
+<text x="259.0" y="1365.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(agent_manager_helper.py:1259-</text>
+<text x="259.0" y="1377.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">1260)</text>
+<text x="259.0" y="1389.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">removed from BASE_TOOLS by</text>
+<text x="259.0" y="1401.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">default</text>
+<text x="259.0" y="1413.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(constants.py:115-116);</text>
+<text x="259.0" y="1425.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">live exception:</text>
+<text x="259.0" y="1437.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">enable_sleeptime branch</text>
+<text x="259.0" y="1449.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(agent_manager.py:404-405,</text>
+<text x="259.0" y="1461.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">constants.py:133)</text>
+<circle cx="409.0" cy="1248.0" r="8" fill="#78716c"/>
+<text x="409.0" y="1251.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<path d="M 1096.0 1043.0 a 86.0 7 0 0 1 172 0 v 141 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.6"/>
+<path d="M 1096.0 1043.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#6b7280" stroke-width="1.2800000000000002"/>
+<text x="1182.0" y="1059.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Context —</text>
+<text x="1182.0" y="1074.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Memory.compile()</text>
+<text x="1182.0" y="1089.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">renders Blocks</text>
+<text x="1107.0" y="1105.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">schemas/memory.py:688</text>
+<text x="1107.0" y="1117.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">compile(); renderers at</text>
+<text x="1107.0" y="1129.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">:143/:175/:205</text>
+<text x="1107.0" y="1141.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(standard/line-numbered/git)</text>
+<text x="1107.0" y="1153.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">git mode: :122-130 only</text>
+<text x="1107.0" y="1165.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">renders system/* blocks</text>
+<circle cx="1097.0" cy="1037.0" r="9.5" fill="#111827"/>
+<text x="1097.0" y="1040.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">8</text>
+<path d="M 1096.0 1244.0 a 86.0 7 0 0 1 172 0 v 81 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.6"/>
+<path d="M 1096.0 1244.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#6b7280" stroke-width="1.2800000000000002"/>
+<text x="1182.0" y="1260.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Context — tool</text>
+<text x="1182.0" y="1275.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">result → Message → next</text>
+<text x="1182.0" y="1290.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">prompt</text>
+<text x="1182.0" y="1306.0" font-size="9" text-anchor="middle" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">letta_agent_v3.py:1915-1935</text>
+<circle cx="1097.0" cy="1238.0" r="9.5" fill="#111827"/>
+<text x="1097.0" y="1241.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">9</text>
+<rect x="1520.0" y="1036.0" width="172" height="179" rx="7" fill="#fef3c7" stroke="#b45309" stroke-width="1.6"/>
+<text x="1606.0" y="1058.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Sched:ToolLoop — tool</text>
+<text x="1606.0" y="1073.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">called → continue, else</text>
+<text x="1606.0" y="1088.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">stop</text>
+<text x="1531.0" y="1104.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">letta_agent_v3.py:1967-2036</text>
+<text x="1531.0" y="1116.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">_decide_continuation</text>
+<text x="1531.0" y="1128.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">:2071 request_heartbeat=False</text>
+<text x="1531.0" y="1140.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(flag not read)</text>
+<text x="1531.0" y="1152.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">legacy flag-reading still</text>
+<text x="1531.0" y="1164.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">lives in agent.py:563,834-842</text>
+<text x="1531.0" y="1176.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">and</text>
+<text x="1531.0" y="1188.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">letta_agent_v2.py:1126,1241-12</text>
+<text x="1531.0" y="1200.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">50</text>
+<circle cx="1521.0" cy="1037.0" r="9.5" fill="#111827"/>
+<text x="1521.0" y="1040.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">10</text>
+<rect x="1308.0" y="1036.0" width="172" height="80" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="1394.0" y="1058.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">LLM:Answer — plain text</text>
+<text x="1394.0" y="1073.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">= reply</text>
+<text x="1319.0" y="1089.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">server.py:968</text>
+<text x="1319.0" y="1101.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">text_is_assistant_message</text>
+<circle cx="1309.0" cy="1037.0" r="9.5" fill="#111827"/>
+<text x="1309.0" y="1040.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">11</text>
+<rect x="1726" y="100" width="208" height="1376.0" rx="9" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="1740" y="122" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NODE TYPE</text>
+<rect x="1740" y="130" width="16" height="11" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<text x="1763" y="138" font-size="10" fill="#4b5563">LLM call</text>
+<rect x="1740" y="147" width="16" height="11" rx="3" fill="#ffedd5" stroke="#ea580c" stroke-width="1.4"/>
+<text x="1763" y="155" font-size="10" fill="#4b5563">Retrieval / ranking</text>
+<rect x="1740" y="164" width="16" height="11" rx="3" fill="#fef3c7" stroke="#b45309" stroke-width="1.4"/>
+<text x="1763" y="172" font-size="10" fill="#4b5563">Scheduling</text>
+<rect x="1740" y="181" width="16" height="11" rx="3" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.4"/>
+<text x="1763" y="189" font-size="10" fill="#4b5563">Storage</text>
+<rect x="1740" y="198" width="16" height="11" rx="3" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.4"/>
+<text x="1763" y="206" font-size="10" fill="#4b5563">Input / output</text>
+<text x="1740" y="233" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">PAPER vs CODE</text>
+<rect x="1740" y="240" width="18" height="13" rx="3" fill="#ffffff" stroke="#78716c" stroke-width="2" stroke-dasharray="3 3"/>
+<circle cx="1766" cy="246" r="6.5" fill="#78716c"/>
+<text x="1766" y="249.6" font-size="8.5" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<text x="1779" y="249" font-size="9.5" fill="#4b5563">Present but degraded</text>
+<text x="1740" y="277" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NOTES</text>
+<text x="1740" y="292" font-size="9.5" fill="#4b5563">• B3 EXPAND / B4 APPRAISE / B5 SELECT</text>
+<text x="1740" y="303.5" font-size="9.5" fill="#4b5563">stay empty: with one active recall</text>
+<text x="1740" y="315.0" font-size="9.5" fill="#4b5563">channel (substring match) there is</text>
+<text x="1740" y="326.5" font-size="9.5" fill="#4b5563">nothing to fuse, rerank or select —</text>
+<text x="1740" y="338.0" font-size="9.5" fill="#4b5563">results return sorted by created_at,</text>
+<text x="1740" y="349.5" font-size="9.5" fill="#4b5563">capped by the caller's top_k.</text>
+<text x="1740" y="366.0" font-size="9.5" fill="#4b5563">• B2 RECALL is rated ◐ not because the</text>
+<text x="1740" y="377.5" font-size="9.5" fill="#4b5563">channel is inactive —</text>
+<text x="1740" y="389.0" font-size="9.5" fill="#4b5563">Retrieval:Substring runs on every</text>
+<text x="1740" y="400.5" font-size="9.5" fill="#4b5563">conversation_search call — but because</text>
+<text x="1740" y="412.0" font-size="9.5" fill="#4b5563">it is the ONLY channel and carries no</text>
+<text x="1740" y="423.5" font-size="9.5" fill="#4b5563">term weighting or relevance score,</text>
+<text x="1740" y="435.0" font-size="9.5" fill="#4b5563">despite the tool's own docstring</text>
+<text x="1740" y="446.5" font-size="9.5" fill="#4b5563">promising &quot;hybrid search (text +</text>
+<text x="1740" y="458.0" font-size="9.5" fill="#4b5563">semantic similarity)&quot;.</text>
+<text x="1740" y="474.5" font-size="9.5" fill="#4b5563">• A4 INDEX's only occupant (archival</text>
+<text x="1740" y="486.0" font-size="9.5" fill="#4b5563">embedding) is dead by default:</text>
+<text x="1740" y="497.5" font-size="9.5" fill="#4b5563">DEPRECATED_LETTA_TOOLS strips</text>
+<text x="1740" y="509.0" font-size="9.5" fill="#4b5563">archival_memory_insert/search from</text>
+<text x="1740" y="520.5" font-size="9.5" fill="#4b5563">BASE_TOOLS. The one live exception is</text>
+<text x="1740" y="532.0" font-size="9.5" fill="#4b5563">agent_create.enable_sleeptime, whose</text>
+<text x="1740" y="543.5" font-size="9.5" fill="#4b5563">branch runs before the letta_v1_agent</text>
+<text x="1740" y="555.0" font-size="9.5" fill="#4b5563">branch and keeps</text>
+<text x="1740" y="566.5" font-size="9.5" fill="#4b5563">archival_memory_search attached.</text>
+<text x="1740" y="583.0" font-size="9.5" fill="#4b5563">• Two internally-inconsistent</text>
+<text x="1740" y="594.5" font-size="9.5" fill="#4b5563">compaction paths coexist in the same</text>
+<text x="1740" y="606.0" font-size="9.5" fill="#4b5563">repo: default LettaAgentV3 uses</text>
+<text x="1740" y="617.5" font-size="9.5" fill="#4b5563">compact_messages (token-based,</text>
+<text x="1740" y="629.0" font-size="9.5" fill="#4b5563">100%/90% of context window), while</text>
+<text x="1740" y="640.5" font-size="9.5" fill="#4b5563">non-default LettaAgentV2/legacy uses</text>
+<text x="1740" y="652.0" font-size="9.5" fill="#4b5563">Summarizer (message-count based, 30%</text>
+<text x="1740" y="663.5" font-size="9.5" fill="#4b5563">evict) — same job, different</text>
+<text x="1740" y="675.0" font-size="9.5" fill="#4b5563">thresholds, different default</text>
+<text x="1740" y="686.5" font-size="9.5" fill="#4b5563">reachability.</text>
+<text x="24" y="1506.0" font-size="9" fill="#9ca3af">memory-bench · methodology flow · code view · every citation re-opened and confirmed during verification · this snapshot is a retired Letta V1 server, not the current Letta product</text>
+</svg>

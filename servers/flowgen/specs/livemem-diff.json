@@ -1,0 +1,61 @@
+{
+  "system": "livemem",
+  "view": "diff",
+  "title": "LiveMem — where the paper and the code part ways",
+  "subtitle": "Only the divergent steps are drawn. Each node states both sides; the lane says which stage of the pipeline the divergence sits in.",
+  "source": "paper arXiv:2608.02515v2  ×  repo LiveMem @ 71a6a8b   ·   servers/livemem/verification.md, 98 assertions checked (76 ✓ / 3 ✗ / 18 ◐ / 1 ?)",
+  "footer": "memory-bench · methodology flow · paper ↔ code divergence",
+  "legend_notes": [
+    "The headline divergence: paper Appx C.2 promises deterministic fixed-stride serving; the actual benchmark server (serve_livemem.sh) never sets MEM_EVICT_MODE, so it silently runs message-mode chunking. Only RL rollout is genuinely fixed-stride — and even then its RULE_TABLE parameters (max window 8192, chunk 512) don't match the benchmark's own override (chunk 1024, budget 8K/32K), so the code-architecture.md claim that the two modes 'coincide at 8k/32k' is also false.",
+    "Design Y (write-masked gated read/write) is a complete, tested implementation with its own synthetic dataset, sitting entirely unused — every released checkpoint is Design X. Worth flagging for anyone trying to reproduce 'the LiveMem mechanism' from the repo without reading the yaml configs.",
+    "Two independent defaults for the same flag point in opposite directions: the training-side Python Config defaults to Design Y, the vLLM serving Config defaults to Design X — a model built without an explicit yaml override would train as Y and serve as X."
+  ],
+  "nodes": [
+    {
+      "id": "d1",
+      "stage": "B6",
+      "row": 0,
+      "type": "sched",
+      "state": "differs",
+      "label": "Serving chunk/eviction mode",
+      "cite": "paper: Appx C.2, txt:1683-1685\n\"serving ... deterministic\nfixed-stride chunks\"\ncode: serve_livemem.sh never sets\nMEM_EVICT_MODE -> evict_registry.py:67\ndefaults \"message\"; chunking.py:17-36\nsplits on <|im_start|>. Only RL rollout\n(run_grpo_dev.sh:124) is fixed-stride,\nand its RULE_TABLE (eviction_policy.py:\n57-64, max window 8192, chunk 512)\ndoes NOT match the benchmark override\n(chunk 1024, budget 8K/32K)"
+    },
+    {
+      "id": "d2",
+      "stage": "A6",
+      "row": 0,
+      "type": "learn",
+      "state": "code_only",
+      "label": "Design Y — write_mask-gated read/write",
+      "cite": "paper: zero hits for \"design x/y\",\n\"write_mask\", \"gated read\", \"read-only\"\ncode: memory_gdn2.py:12-14,128-133\nmodeling_memory_qwen3.py:219-222\ndedicated synth dataset,\ndata.py:321-326,354\n-- never in any released yaml"
+    },
+    {
+      "id": "d3",
+      "stage": "A6",
+      "row": 1,
+      "type": "learn",
+      "state": "differs",
+      "label": "memory_design default value",
+      "cite": "paper + all 3 released yaml: X\ntraining-side Config default:\nconfiguration_memory_qwen3.py:20 = Y\nmodeling_memory_qwen3.py:460 = Y\nvLLM serving Config default:\nvllm/.../configuration_memory_qwen3.py:\n45 = X"
+    },
+    {
+      "id": "d4",
+      "stage": "A6",
+      "row": 2,
+      "type": "learn",
+      "state": "code_only",
+      "label": "mem_layers ignored by the serving path",
+      "cite": "paper: txt:194 \"each attention layer\",\nno partial-coverage option discussed\ntraining: configuration_memory_qwen3.py:\n75-77 supports memory_layer_indices\nserving: grep 'mem_layers|memory_layer_\nindices' models/vllm/ -> 0 hits;\nvllm/modeling_memory_qwen3.py:92-94\nunconditionally attaches every layer"
+    },
+    {
+      "id": "d5",
+      "stage": "B6",
+      "row": 1,
+      "type": "sched",
+      "state": "paper_only",
+      "label": "Two-part request teardown",
+      "cite": "paper: txt:1712-1714 \"removes the\nrequest's turnover record AND the\nstate manager releases its recurrent\nslot\"\ncode: evict_registry.py:266-275 only\nclears the turnover-record table;\ngrep 'release.*slot|free.*ssm_state'\nmodels/vllm/ -> 0 hits"
+    }
+  ],
+  "edges": []
+}

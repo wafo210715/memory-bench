@@ -1,0 +1,519 @@
+{
+  "system": "plugmem",
+  "view": "paper",
+  "title": "PlugMem — paper view",
+  "subtitle": "The mechanism as Yang et al. describe it: three graphs G_E/G_S/G_P, Structuring → Retrieval → Reasoning. Lane = canonical stage; empty lanes (A6, B5) mean the paper defines no such step.",
+  "source": "Yang et al. 2026, PlugMem (arXiv:2603.03296v1, ICML 2026)   ·   every anchor re-located in the paper text during verification (83 paper-side assertions: 65 ✓ / 1 ✗ / 17 ◐)",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "The headline: the paper writes multi-hop retrieval (stop-check ↔ query reformulation, B8↔B1) as the Retrieval Module's default behaviour, iterating to a hop cap — not an optional add-on. Compare the code view, where B8 is empty.",
+    "A6 INTERNALIZE and B5 SELECT are both empty by design: PlugMem never trains parameters, and RerankPrune's top-K cut is the only selection rule — no combinatorial optimizer.",
+    "The paper is internally inconsistent about whether one query can hit more than one memory type: Table 14 allows F⊆{E,S,P} but Listing 8's own prompt instructs the router to pick 'only one' (see mode_select).",
+    "Return scoring (ρ∈[1,10], an independent LLM judge) is a real, explicitly-described mechanism here — and the single biggest paper-only gap once you compare against code (see diff graph D2)."
+  ],
+  "nodes": [
+    {
+      "id": "turn",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:TurnPair — (o_t, a_t) raw step",
+      "cite": "W1  txt:482-484",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "get_state",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "seq": 2,
+      "label": "LLM:Summarize — rolling state s_t from (s_t-1, a_t-1, o_t)",
+      "cite": "W1 Get_State  txt:482-483",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "get_subgoal",
+      "stage": "A2",
+      "row": 2,
+      "type": "llm",
+      "seq": 3,
+      "label": "LLM:Extract — subgoal g_t",
+      "cite": "W1 Get_Subgoal  txt:483-484",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "get_reward",
+      "stage": "A2",
+      "row": 3,
+      "type": "llm",
+      "seq": 3,
+      "label": "LLM:Judge — action-validity r_t (NL statement, not a score)",
+      "cite": "W1 Get_Reward  txt:483-484\nC-13 \"NL reward statement, not a score\"",
+      "prim": "P-META"
+    },
+    {
+      "id": "commit_epi",
+      "stage": "A5",
+      "row": 3,
+      "type": "store",
+      "seq": 4,
+      "label": "Store:Graph — G_E: aggregate [e_t] into episodic trajectory M_epi",
+      "cite": "W2  aggregate e_t → M_epi",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "sem_extract",
+      "stage": "A2",
+      "row": 4,
+      "type": "llm",
+      "seq": 5,
+      "label": "LLM:Extract — Get_Semantic: ≤ N_max=10 (proposition, concepts) pairs",
+      "cite": "W3  §3.1.2/C.2 txt:2331\nListing 5, N_max=10 txt:2321",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "embed_props",
+      "stage": "A4",
+      "row": 4,
+      "type": "alg",
+      "seq": 6,
+      "label": "NLP:Embed — propositions + concept tags",
+      "cite": "W4  §3.1.2/C.2",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "link_semantic_edges",
+      "stage": "A4",
+      "row": 5,
+      "type": "nlp",
+      "seq": 7,
+      "label": "NLP:SchemaLink — Link — membership (p→c) + provenance (p→e_t) + sibling",
+      "cite": "W5  membership txt:2326, provenance\ntxt:2327-2328, sibling txt:2328",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "trajseg",
+      "stage": "A2",
+      "row": 6,
+      "type": "alg",
+      "seq": 8,
+      "label": "NLP:Segment — adjacent-subgoal cosine < threshold → segment cut",
+      "cite": "W6  §3.1.2 txt:638-640\nC.2 txt:2420-2422 (doc cited\n2437-2438, which is Listing 6's\ntitle line — verification.md item 2-15)",
+      "prim": "P-NLPEXTRACT"
+    },
+    {
+      "id": "proc_extract",
+      "stage": "A2",
+      "row": 7,
+      "type": "llm",
+      "seq": 9,
+      "label": "LLM:Extract — Get_Procedural: (intent u, prescription π) per segment",
+      "cite": "W7  §3.1.2/C.2 txt:2437-2439\nListing 6",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "return_score",
+      "stage": "A2",
+      "row": 8,
+      "type": "llm",
+      "seq": 10,
+      "label": "LLM:Judge — Get_Return: ρ ∈ [1,10], independent evaluator",
+      "cite": "W8  txt:728-730, 2426-2427\nListing 3 @2236/2238",
+      "prim": "P-META"
+    },
+    {
+      "id": "embed_intent",
+      "stage": "A4",
+      "row": 7,
+      "type": "alg",
+      "seq": 11,
+      "label": "NLP:Embed — intent u",
+      "cite": "W9  C.2 txt:2428-2429",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "intent_dedup_probe",
+      "stage": "A3",
+      "row": 8,
+      "type": "alg",
+      "seq": 12,
+      "label": "Retrieval:Emb — cosine vs existing intent nodes, threshold θ_equal",
+      "cite": "W9  C.2 txt:2428-2431\nθ_equal never given a value (5-3)",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "intent_merge",
+      "stage": "A3",
+      "row": 9,
+      "type": "llm",
+      "seq": 13,
+      "label": "LLM:Dedup — Get_New_Subgoal: merge + refresh embedding",
+      "cite": "W9  Get_New_Subgoal, C.2\ntxt:2429-2431",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "link_procedural_edges",
+      "stage": "A4",
+      "row": 9,
+      "type": "nlp",
+      "seq": 14,
+      "label": "NLP:SchemaLink — Link — hierarchical u→π (unidirectional) + provenance π→all source e_t",
+      "cite": "W10  hierarchical txt:744-748,\n\"unidirectional\" txt:2433,\n\"for all et∈M(i)epi\" txt:2435",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "update_merge",
+      "stage": "A3",
+      "row": 10,
+      "type": "llm",
+      "seq": null,
+      "state": "degraded",
+      "label": "LLM:Dedup — Merge_Semantic: shared-tag neighbours, manual trigger",
+      "cite": "W11  Table 13 txt:2138-2139,\nC.5 txt:2767-2866; not evaluated\nin main results, txt:815-817",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "delete_evict",
+      "stage": "A3",
+      "row": 11,
+      "type": "sched",
+      "seq": null,
+      "state": "degraded",
+      "label": "Sched:Evict — decay low-utility + compress old episodic",
+      "cite": "W12  Table 13 txt:2142-2143\nno formula/algorithm anywhere (5-6)",
+      "prim": "P-EVICT"
+    },
+    {
+      "id": "q",
+      "stage": "B1",
+      "row": 0,
+      "type": "io",
+      "seq": 15,
+      "label": "IO:Query Q",
+      "cite": "§3.2 txt:781, no retrieval-timing\nprotocol given (3-1)",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "mode_select",
+      "stage": "B1",
+      "row": 1,
+      "type": "llm",
+      "seq": 16,
+      "label": "LLM:Route — GET MODE: episodic / semantic / procedural",
+      "cite": "R1  C.3 Listing 8 txt:2560\n\"only one\" — contradicts Table 14\nF⊆{E,S,P} txt:2683 (D11)",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "qemb",
+      "stage": "B1",
+      "row": 2,
+      "type": "alg",
+      "seq": 17,
+      "label": "NLP:Embed — query → q",
+      "cite": "R2  §3.3-1 txt:735-739",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "abstract_query",
+      "stage": "B1",
+      "row": 3,
+      "type": "llm",
+      "seq": 19,
+      "label": "LLM:Query — GET PLAN: abstract query q_t^a per hop",
+      "cite": "R4  C.3 Listing 9, GET PLAN\ntxt:2523, 2536",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "init_c0",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 18,
+      "label": "Retrieval:Emb — score q vs ALL low-level nodes → C0",
+      "cite": "R2  txt:735-739 \"scoring against\nall low-level nodes\"",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "embed_channel",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "seq": 19,
+      "label": "Retrieval:Emb — dense channel per hop",
+      "cite": "R5  C.3 txt:2527-2528",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "link_channel",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": 19,
+      "label": "Retrieval:Graph — high-level match → activate linked low-level nodes",
+      "cite": "R6  C.3 txt:2528-2530",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "toepisodic",
+      "stage": "B3",
+      "row": 1,
+      "type": "alg",
+      "seq": 24,
+      "label": "Retrieval:Graph — ToEpisodic: provenance reverse-hop",
+      "cite": "R10  Table 14 txt:2696+2702 /\n§3.2 txt:732-734",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "merge_union",
+      "stage": "B4",
+      "row": 0,
+      "type": "fusion",
+      "seq": 20,
+      "label": "Fusion:Union — dense ∩ link candidates",
+      "cite": "R7  C.3 txt:2530 \"union\"",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "rerank_prune",
+      "stage": "B4",
+      "row": 1,
+      "type": "alg",
+      "seq": 21,
+      "label": "Retrieval:Rerank — value fn (relevance, +importance/recency) → top-K",
+      "cite": "R8  §3.2 txt:754-755 / C.3\ntxt:2530-2531; no closed-form\nformula anywhere (5-1)",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "stopctrl",
+      "stage": "B8",
+      "row": 0,
+      "type": "sched",
+      "seq": 22,
+      "label": "Sched:ToolLoop — MULTI HOP CTRL: {enough, top_node_ids}",
+      "cite": "R3  C.3 Listing 10 txt:2533-2535,\ncapped by n_facts_new_query txt:2650",
+      "prim": "P-TOOLLOOP"
+    },
+    {
+      "id": "nexthop_query",
+      "stage": "B8",
+      "row": 1,
+      "type": "sched",
+      "seq": 23,
+      "label": "Sched:ToolLoop — next-hop query: concat (default) / LLM rewrite (opt)",
+      "cite": "R9  C.3 txt:2538-2540, default\nconcat, LLM rewrite optional",
+      "prim": "P-TOOLLOOP"
+    },
+    {
+      "id": "reasoning",
+      "stage": "B6",
+      "row": 0,
+      "type": "llm",
+      "seq": 25,
+      "label": "LLM:MemReader — Reasoning Module: per-type refined memory tokens",
+      "cite": "R11  §3.3/C.4 Listing 11-13\ncost: Acc -2.7pt, tokens ×26\nwithout it (3-26)",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "answer",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 26,
+      "label": "LLM:Answer — base agent, outside the boundary",
+      "cite": "R12  outside the PlugMem boundary\nper §4 system diagram",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "turn",
+      "to": "get_state"
+    },
+    {
+      "from": "turn",
+      "to": "get_subgoal"
+    },
+    {
+      "from": "turn",
+      "to": "get_reward"
+    },
+    {
+      "from": "get_state",
+      "to": "commit_epi"
+    },
+    {
+      "from": "get_subgoal",
+      "to": "commit_epi"
+    },
+    {
+      "from": "get_reward",
+      "to": "commit_epi"
+    },
+    {
+      "from": "commit_epi",
+      "to": "sem_extract"
+    },
+    {
+      "from": "sem_extract",
+      "to": "embed_props"
+    },
+    {
+      "from": "embed_props",
+      "to": "link_semantic_edges"
+    },
+    {
+      "from": "get_subgoal",
+      "to": "trajseg",
+      "label": "reuses W1 subgoal emb."
+    },
+    {
+      "from": "commit_epi",
+      "to": "trajseg"
+    },
+    {
+      "from": "trajseg",
+      "to": "proc_extract"
+    },
+    {
+      "from": "proc_extract",
+      "to": "return_score"
+    },
+    {
+      "from": "proc_extract",
+      "to": "embed_intent"
+    },
+    {
+      "from": "embed_intent",
+      "to": "intent_dedup_probe"
+    },
+    {
+      "from": "intent_dedup_probe",
+      "to": "intent_merge",
+      "label": "cos > θ_equal"
+    },
+    {
+      "from": "proc_extract",
+      "to": "link_procedural_edges"
+    },
+    {
+      "from": "intent_dedup_probe",
+      "to": "link_procedural_edges",
+      "label": "cos ≤ θ_equal — new node"
+    },
+    {
+      "from": "intent_merge",
+      "to": "link_procedural_edges",
+      "label": "merged node"
+    },
+    {
+      "from": "link_semantic_edges",
+      "to": "update_merge",
+      "state": "degraded"
+    },
+    {
+      "from": "update_merge",
+      "to": "link_semantic_edges",
+      "state": "degraded",
+      "label": "merge replaces originals"
+    },
+    {
+      "from": "link_semantic_edges",
+      "to": "delete_evict",
+      "state": "degraded"
+    },
+    {
+      "from": "link_procedural_edges",
+      "to": "delete_evict",
+      "state": "degraded"
+    },
+    {
+      "from": "link_semantic_edges",
+      "to": "init_c0",
+      "label": "G_S low-level nodes"
+    },
+    {
+      "from": "link_procedural_edges",
+      "to": "init_c0",
+      "label": "G_P low-level nodes"
+    },
+    {
+      "from": "commit_epi",
+      "to": "toepisodic",
+      "label": "provenance source"
+    },
+    {
+      "from": "q",
+      "to": "mode_select"
+    },
+    {
+      "from": "q",
+      "to": "qemb"
+    },
+    {
+      "from": "mode_select",
+      "to": "init_c0",
+      "label": "gates E/S/P scope"
+    },
+    {
+      "from": "qemb",
+      "to": "init_c0"
+    },
+    {
+      "from": "init_c0",
+      "to": "abstract_query"
+    },
+    {
+      "from": "abstract_query",
+      "to": "embed_channel"
+    },
+    {
+      "from": "abstract_query",
+      "to": "link_channel"
+    },
+    {
+      "from": "embed_channel",
+      "to": "merge_union"
+    },
+    {
+      "from": "link_channel",
+      "to": "merge_union"
+    },
+    {
+      "from": "merge_union",
+      "to": "rerank_prune"
+    },
+    {
+      "from": "rerank_prune",
+      "to": "stopctrl"
+    },
+    {
+      "from": "stopctrl",
+      "to": "nexthop_query",
+      "label": "not enough"
+    },
+    {
+      "from": "nexthop_query",
+      "to": "abstract_query",
+      "label": "next hop"
+    },
+    {
+      "from": "stopctrl",
+      "to": "reasoning",
+      "label": "enough — exit loop"
+    },
+    {
+      "from": "rerank_prune",
+      "to": "toepisodic",
+      "label": "if E ∈ F"
+    },
+    {
+      "from": "toepisodic",
+      "to": "reasoning"
+    },
+    {
+      "from": "reasoning",
+      "to": "answer"
+    }
+  ]
+}

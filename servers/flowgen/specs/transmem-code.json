@@ -1,0 +1,195 @@
+{
+  "system": "transmem",
+  "view": "code",
+  "title": "TransMem — code view",
+  "subtitle": "What the released repo (@ 6d7a612) actually executes at training time (5 separate entry scripts) and inference time (one forward hook on the last 4 layers). Same 4-lane-plus-boundary footprint as the paper view.",
+  "source": "repo TransMem @ 6d7a612 (github.com/Haodong-Lei-Ray/TransMem, HEAD commit message \"vanish\")   ·   verified against servers/transmem/verification.md (71 code-side assertions: 51 correct / 1 wrong / 17 partial / 2 unverifiable)",
+  "footer": "memory-bench · methodology flow · code view · every citation re-opened and confirmed during verification",
+  "legend_notes": [
+    "The only real storage in the whole system is training-side: Stage-0 teacher-rollout .pt shards (extract_features.py atomic_save) and the mem-only checkpoint. Full-repo grep finds zero faiss/chromadb/bm25/networkx/neo4j dependencies — there is nothing to index or retrieve at inference time.",
+    "5 training entry points exist (train_inloop.py=ECSD headline, train_offpolicy.py=SFT, train_onpolicy.py=OPD, train_grpo.py+rl.py=GRPO, train_layered.py=archived v3), matching the paper's own Table 5 four-objective ablation — a confirmed match, not a divergence (D11).",
+    "The default shipped config (config_layered.json, gate_mode=\"constant\") is weaker than any ablation the paper reports: it fixes the gate to g=1 AND only injects into layer 35 (Last-1, inject_layers:[35]) — reproducing the paper's headline Last-4 dynamic-gate number requires overriding both CONFIG and --inject_layers/-D by hand (C49/C68).",
+    "Memory-slot selection (Sched:MemSelect) defaults to hm_mode=\"floor\", which can miss the context's true last token h_L by up to N-1 positions; the formula that actually matches the paper (\"frac\") is only ever forced on the rarely-triggered overflow path — see diff view D3."
+  ],
+  "nodes": [
+    {
+      "id": "query",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "state": "degraded",
+      "label": "IO:Prompt — caller-rendered chat prompt, chunking, resume state",
+      "cite": "eval_locomo.py:161-170 (progress\njsonl)\noutside the memory-system boundary\n(system starts at the forward hook,\nverification §4 \"系统边界\")",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "ptcache",
+      "stage": "A5",
+      "row": 1,
+      "type": "store",
+      "seq": 2,
+      "label": "Store:Plaintext — Stage-0 teacher-rollout .pt shards (atomic_save)",
+      "cite": "extract_features.py:135-147\natomic_save\nonly thing that truly persists\nacross requests (verification C3/S0)",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "teacherforced",
+      "stage": "A6",
+      "row": 0,
+      "type": "learn",
+      "seq": 3,
+      "label": "Learn:TeacherForced — in-loop forward: hm gather + side-path + inject, backbone in the loop",
+      "cite": "layered.py:572 -> _teacher_forced_\nforward_with_handles, :608\nhm_idx=hm_positions(...), :625\nqpos=arange(len_cq-1,len_cq+M-1), :627\nX=cat([hm,hq]), :640\nreplace_query_positions(...correct...),\n:649-650",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "distillloss",
+      "stage": "A6",
+      "row": 1,
+      "type": "learn",
+      "seq": 4,
+      "label": "Learn:DistillLoss — forward KL (+ optional MSE reg.), backbone frozen",
+      "cite": "objectives.py:63 DistillLoss\nforward_kl -> KL(P_tea||P_stu)*T^2,\n:94-95, 100\noptional reg_weight*MSE, :105-107\nmodel.requires_grad_(False),\ntrain_inloop.py:366",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "otherobj",
+      "stage": "A6",
+      "row": 2,
+      "type": "learn",
+      "seq": null,
+      "state": "both",
+      "label": "Learn:OtherObjectives — SFT / GRPO / OPD via separate scripts (not the headline ECSD path)",
+      "cite": "train_offpolicy.py --loss ce\n(SFT-on-golden), :329, 720\ntrain_grpo.py + rl.py (GRPO)\ntrain_onpolicy.py (OPD)\nmatches paper Table 5's 4 objectives\n-- confirmed present, not a\ndivergence (D11)",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "ckpt",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 6,
+      "label": "Store:Parametric — mem-only checkpoint (nvme/S3)",
+      "cite": "train_inloop.py:457-464\noptimizer only takes\nself.mem.parameters()\ngrad clip only on self.mem, :584",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "chunk",
+      "stage": "B6",
+      "row": 0,
+      "type": "sched",
+      "seq": null,
+      "state": "degraded",
+      "label": "Sched:Chunk — overflow chunking, caller-driven and default off",
+      "cite": "eval_memory_agent_bench.py:937-947\n(chunking + concat)\n--retain_overflow_hm store_true,\ndefault False, :1214\nrequires --mode=paired, :1264-1265\neval_locomo.py never passes\noverflow_memory -> LoCoMo never\ntriggers this (D6)",
+      "prim": "P-ORCHESTRATE"
+    },
+    {
+      "id": "memselect",
+      "stage": "B6",
+      "row": 1,
+      "type": "sched",
+      "seq": 8,
+      "state": "differs",
+      "label": "Sched:MemSelect — hm_positions(len_cl, n_mem=4, \"floor\")",
+      "cite": "layered.py:467\nfloor: seg=len_cl//N, idx=(i+1)*seg-1,\nextract_features.py:126-127\nfrac (paper-matching) only forced on\noverflow path, layered.py:357-359\n(see diff D3)",
+      "prim": "P-ACTSELECT"
+    },
+    {
+      "id": "transmemblock",
+      "stage": "B6",
+      "row": 2,
+      "type": "learn",
+      "seq": 9,
+      "label": "Learn:TransMem — block(X, past_key_values, use_cache=True) -> (ms, gate)",
+      "cite": "hm=source[0,hm_idx] (+overflow\nprepend, :489-492), hq=source[:,-1,:],\n:494\nX=cat([hm,hq]), :496-498\nblock(...), transmem.py:293-366\n(1-layer Qwen3 decoder block,\ncausal=True)",
+      "prim": "P-INJECT"
+    },
+    {
+      "id": "add",
+      "stage": "B6",
+      "row": 3,
+      "type": "fusion",
+      "seq": 10,
+      "state": "differs",
+      "label": "Fusion:Inject — block.correct(): h[:,-1,:] = hidden + gate*MS",
+      "cite": "transmem.py:359-366\nlayered.py:512 (prefill write-back)\ninjects from len_cq-1 (last prompt\ntoken), not Eq.7's literal t>=L+1\n(see diff D4)",
+      "prim": "P-INJECT"
+    },
+    {
+      "id": "backbone",
+      "stage": "B7",
+      "row": 0,
+      "type": "learn",
+      "seq": 7,
+      "label": "Learn:Backbone — hook registered (:519-520) before prefill (:528); decode loop (:534-558); lm_head (:532,558)",
+      "cite": "LayeredRollout.generate_from_ids,\nlayered.py:453\nhook already reads H_M + writes\ncorrection during prefill — not an\nintervention-free pass (see diff\nfor the doc's wrong claim)\ndecode: incremental [1,1,dim] into\nTransMem KV cache, :501-503, 555-556",
+      "prim": "P-FROZENFWD"
+    }
+  ],
+  "edges": [
+    {
+      "from": "query",
+      "to": "backbone",
+      "label": "cq_ids"
+    },
+    {
+      "from": "query",
+      "to": "memselect",
+      "label": "len_cl"
+    },
+    {
+      "from": "ptcache",
+      "to": "teacherforced",
+      "label": "cached teacher rollout"
+    },
+    {
+      "from": "teacherforced",
+      "to": "distillloss",
+      "label": "student/teacher logits"
+    },
+    {
+      "from": "distillloss",
+      "to": "ckpt",
+      "label": "grad step, mem-only"
+    },
+    {
+      "from": "otherobj",
+      "to": "ckpt",
+      "state": "both",
+      "label": "alternate-objective checkpoints"
+    },
+    {
+      "from": "ckpt",
+      "to": "transmemblock",
+      "label": "trained weights"
+    },
+    {
+      "from": "chunk",
+      "to": "transmemblock",
+      "state": "degraded",
+      "label": "prepended overflow slots"
+    },
+    {
+      "from": "memselect",
+      "to": "transmemblock",
+      "label": "hm_idx"
+    },
+    {
+      "from": "backbone",
+      "to": "transmemblock",
+      "label": "hook: source[layer]"
+    },
+    {
+      "from": "transmemblock",
+      "to": "add",
+      "label": "(ms, gate)"
+    },
+    {
+      "from": "add",
+      "to": "backbone",
+      "label": "corrected hidden -> next layer (x4, 32-35)"
+    }
+  ]
+}

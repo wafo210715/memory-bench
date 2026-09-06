@@ -1,0 +1,637 @@
+{
+  "system": "atommem",
+  "view": "code",
+  "title": "AtomMem — code view",
+  "subtitle": "What the MINE-USTC/AtomMem repo actually executes in the benchmarked LoCoMo pipeline. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes mean the stage does not exist here.",
+  "source": "repo AtomMem @ 776f880   ·   verified against servers/atommem/verification.md (124 assertions: 101 ✓ / 2 ✗ / 20 ◐ / 1 ?)",
+  "footer": "memory-bench · methodology flow · code view · every citation re-opened and confirmed during verification",
+  "legend_notes": [
+    "A6 is drawn paper_only: no weight files, no torch/transformers/peft in requirements.txt. A2's 'ext' node (the Fact Executor itself) is drawn paper_only too — the benchmarked pipeline reads pre-extracted facts straight off disk (evaluate_locomo.py:744), it never calls the extractor.",
+    "B6's event_contexts is computed every query (_build_event_contexts, run_atommem_pipeline.py:399) and explicitly discarded three lines later (query_response.py:195/198/234) — a built-then-thrown-away step, not a missing one.",
+    "A3 runs two independent similarity searches per fact: one for conflict detection (α/β=0.7/0.3, threshold 0.6, top-5) and an unrelated second one for event attribution (weights 0.7/0.3 from a different config pair, top-10) — neither reuses the other's candidates or scores.",
+    "B5 SELECT exists here (GRAPH_MAX_SEED_FACTS=10) with no paper counterpart; the graph subsystem (B3/B4) is nominally optional via --disable-graph but runs by default in the benchmarked config."
+  ],
+  "nodes": [
+    {
+      "id": "load",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:Load — pre-extracted facts from conv-NN.json (external artifact)",
+      "cite": "preextracted_pipeline.py:49\ncalled by evaluate_locomo.py:744",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "ext",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "seq": null,
+      "state": "paper_only",
+      "label": "LLM:Extract — Fact Executor, never called in the benchmarked pipeline",
+      "cite": "run_atommem_pipeline.py:105 FactExtractor,\n--extract-facts only; run_demo_server.py:118\ndemo only; evaluate_locomo.py: 0 references",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "meta",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "seq": 2,
+      "label": "LLM:Tag — metadata: people/keywords/time/needs_profile_extraction",
+      "cite": "preextracted_pipeline.py:67, call_type=metadata_extraction\nkeywords normalized+capped 5 (fact_seeded_event_pipeline.py:17)",
+      "prim": "P-META"
+    },
+    {
+      "id": "eroute",
+      "stage": "A2",
+      "row": 2,
+      "type": "llm",
+      "seq": 10,
+      "state": "differs",
+      "label": "LLM:Tag — event attribution, inline prompt (not the prompt file)",
+      "cite": "event_level_pipeline.py:166, inline system_prompt\n171-192, call_type=event_attribution",
+      "prim": "P-META"
+    },
+    {
+      "id": "eupdate",
+      "stage": "A2",
+      "row": 3,
+      "type": "llm",
+      "seq": 11,
+      "label": "LLM:Summarize — rewrite summary/keywords per matched event, or create new event per singleton",
+      "cite": "_update_event_info event_manager.py:267-327\n(doc mislabels 242-286); _create_new_event:185",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "profgate",
+      "stage": "A2",
+      "row": 4,
+      "type": "sched",
+      "seq": 13,
+      "state": "differs",
+      "label": "Sched:Batch — trigger at pending≥10, counted across session boundaries",
+      "cite": "profile_manager.py:27, trigger line 41\nPROFILE_BATCH_TRIGGER=10, config.py:66",
+      "prim": "P-ORCHESTRATE"
+    },
+    {
+      "id": "profagg",
+      "stage": "A2",
+      "row": 5,
+      "type": "llm",
+      "seq": 14,
+      "state": "differs",
+      "label": "LLM:Extract — per-person profile extraction, N calls per batch",
+      "cite": "incremental_temporal_profile.py:134,\nprompt profile_extraction_prompt.txt, one call per person",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "dedup",
+      "stage": "A3",
+      "row": 0,
+      "type": "nlp",
+      "seq": 4,
+      "state": "differs",
+      "label": "NLP:HashDedup — cosine > 0.95, zero LLM, whole fact discarded on hit",
+      "cite": "_is_duplicate fact_storage.py:138-165\nDUPLICATE_THRESHOLD=0.95, config.py:59",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "conflictfilter",
+      "stage": "A3",
+      "row": 1,
+      "type": "alg",
+      "seq": 5,
+      "state": "differs",
+      "label": "Retrieval:SymFilter — people-compatibility gate (temporal filter is a no-op)",
+      "cite": "_detect_conflict fact_storage.py:167-226\ntime branch is `pass` at :189-195 (D7)",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "conflictretrieve",
+      "stage": "A3",
+      "row": 2,
+      "type": "alg",
+      "seq": 6,
+      "label": "Retrieval:Hybrid — Sh(0.7/0.3) > 0.6, top-5 candidates",
+      "cite": "fact_storage.py:213 (>0.6), :222 ([:5])\nα/β config.py:79-80",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "conflictllm",
+      "stage": "A3",
+      "row": 3,
+      "type": "llm",
+      "seq": 7,
+      "state": "differs",
+      "label": "LLM:Resolve — binary has_conflict + conflict_fact_id, hard 4-field overwrite",
+      "cite": "_llm_detect_conflict fact_storage.py:228-273\noverwrite fact/embedding/keywords/time, :79-82",
+      "prim": "P-CONFLICT"
+    },
+    {
+      "id": "eventretrieve",
+      "stage": "A3",
+      "row": 4,
+      "type": "alg",
+      "seq": 9,
+      "label": "Retrieval:Hybrid — independent top-10 candidate search for event attribution",
+      "cite": "_retrieve_top_similar_facts fact_seeded_event_pipeline.py:132-159\nEVENT_ATTRIBUTION_TOP_K=10, config.py:62 (D3)",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "profretrieve",
+      "stage": "A3",
+      "row": 5,
+      "type": "alg",
+      "seq": 15,
+      "label": "Retrieval:Hybrid — Sh(α/β) top-8 existing profiles",
+      "cite": "_retrieve_candidates temporal_profile_version_chain.py:229-250\nPROFILE_TEMPORAL_TOP_K=8, config.py:68",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "profdecide",
+      "stage": "A3",
+      "row": 6,
+      "type": "llm",
+      "seq": 16,
+      "label": "LLM:Resolve — confirm / update_current / update_history / new",
+      "cite": "score<0.55 or exact-text match → no LLM\n(:95-98, _direct_decision:252); else _llm_decide:284",
+      "prim": "P-CONFLICT"
+    },
+    {
+      "id": "embed",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "seq": 3,
+      "label": "NLP:Embed — all-MiniLM-L6-v2, 384-dim",
+      "cite": "preextracted_pipeline.py:153",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "factstore",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 8,
+      "label": "Store:File — facts_<conv>.json",
+      "cite": "save_facts fact_storage.py:93-94",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "eventstore",
+      "stage": "A5",
+      "row": 1,
+      "type": "store",
+      "seq": 12,
+      "label": "Store:File — events; fact.event_ids back-referenced",
+      "cite": "process_event_attribution, event_level_pipeline.py:18-57",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "profversion",
+      "stage": "A5",
+      "row": 2,
+      "type": "store",
+      "seq": 17,
+      "label": "Store:File — profile history H (clone-then-overwrite, matches §3.3's non-destructive design)",
+      "cite": "clone_current_to_history:131, _apply_update_current:410\nonly versioned layer — facts (D2) get hard overwrite instead",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "profstore",
+      "stage": "A5",
+      "row": 3,
+      "type": "store",
+      "seq": 18,
+      "label": "Store:File — profiles_<conv>.json + finalize at conversation end",
+      "cite": "force_profile_extraction preextracted_pipeline.py:362\nsave_memory_snapshot incremental_temporal_profile.py:324",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "train",
+      "stage": "A6",
+      "row": 0,
+      "type": "learn",
+      "seq": null,
+      "state": "paper_only",
+      "label": "Learn:FactExecutor — SFT (LoRA), never runs: no weights, no training code",
+      "cite": "find *.pt/*.ckpt/*.bin/*.safetensors/*.pth → 0 results\nrequirements.txt: no torch/transformers/peft",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "q",
+      "stage": "B1",
+      "row": 0,
+      "type": "io",
+      "seq": 19,
+      "label": "IO:Query",
+      "cite": "AtomMemGraphQueryResponder.answer_query,\nrun_atommem_pipeline.py:296",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "qintent",
+      "stage": "B1",
+      "row": 1,
+      "type": "llm",
+      "seq": 20,
+      "state": "differs",
+      "label": "LLM:Query — query intent parsing; needs_specific hardcoded True",
+      "cite": "_extract_query_intent query_response.py:138-172\n(doc mislabels 157-179), call_type=query_intent",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "qemb",
+      "stage": "B1",
+      "row": 2,
+      "type": "alg",
+      "seq": 21,
+      "label": "NLP:Embed — query",
+      "cite": "run_atommem_pipeline.py:308",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "mainfilter",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 22,
+      "label": "Retrieval:SymFilter — people/time filter (Primary Recall)",
+      "cite": "_filter_facts retrieval.py:267",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "mainrecall",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "seq": 23,
+      "label": "Retrieval:Hybrid — Sh(0.7/0.3) top-5 → main facts",
+      "cite": "_main_recall_facts retrieval.py:137-162\n(doc mislabels 150-173), MAIN_RECALL_TOP_K=5, config.py:73",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "eventfilter",
+      "stage": "B2",
+      "row": 2,
+      "type": "alg",
+      "seq": 24,
+      "label": "Retrieval:SymFilter — filter events (Compensatory Recall)",
+      "cite": "_filter_events retrieval.py:309",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "eventrecall",
+      "stage": "B2",
+      "row": 3,
+      "type": "alg",
+      "seq": 25,
+      "label": "Retrieval:Hybrid — Sh(E,Q) top-5 events → expand to member facts, skip main_fact_ids",
+      "cite": "_retrieve_events retrieval.py:241-274\n(doc mislabels 252-274), EVENT_RECALL_TOP_K=5, config.py:74",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "profrecall",
+      "stage": "B2",
+      "row": 4,
+      "type": "alg",
+      "seq": 33,
+      "state": "degraded",
+      "label": "Retrieval:Hybrid — Sh top-5 profiles, only when need_attribute=True",
+      "cite": "_retrieve_profiles retrieval.py:57-90\nPROFILE_RECALL_TOP_K=5, config.py:77",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "localgraph",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": 28,
+      "label": "Retrieval:Graph — hop-limited (2 hops, ≤180 nodes); skippable via --disable-graph",
+      "cite": "_build_local_node_set multichannel_graph.py:288-326",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "adjacency",
+      "stage": "B3",
+      "row": 1,
+      "type": "alg",
+      "seq": 29,
+      "label": "Diffusion:EdgeWeight — Multichannel edge weights — keyword/event/turn, computed at query time, people-gated",
+      "cite": "_build_channel_adjacency:366; keyword:518,\nevent:532, turn:546; gates :558-572 (D8)",
+      "prim": "P-DIFFUSE"
+    },
+    {
+      "id": "seedscore",
+      "stage": "B3",
+      "row": 2,
+      "type": "alg",
+      "seq": 30,
+      "label": "Diffusion:SeedPrior — score+0.05/(rank+1), 5th-power, normalize",
+      "cite": "_build_seed_scores graph_rerank.py:83-114",
+      "prim": "P-DIFFUSE"
+    },
+    {
+      "id": "ppr",
+      "stage": "B3",
+      "row": 3,
+      "type": "alg",
+      "seq": 31,
+      "label": "Diffusion:MultichannelPPR — η=0.34, ≤20 iters, tol 1e-6, sink reflow",
+      "cite": "_run_ppr multichannel_graph.py:426-486",
+      "prim": "P-DIFFUSE"
+    },
+    {
+      "id": "comprecall",
+      "stage": "B4",
+      "row": 0,
+      "type": "fusion",
+      "seq": 26,
+      "label": "Fusion:Add — 0.7·event score + 0.3·fact score, top-5",
+      "cite": "_compensation_recall_facts retrieval.py:164-249\n(doc mislabels 189-249), config.py:81",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "rerank",
+      "stage": "B4",
+      "row": 1,
+      "type": "alg",
+      "seq": 32,
+      "label": "Retrieval:Rerank — sort all local nodes by activation, cut to top-10",
+      "cite": "graph_rerank.py:167-170, GRAPH_FINAL_TOP_K=10",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "seedselect",
+      "stage": "B5",
+      "row": 0,
+      "type": "alg",
+      "seq": 27,
+      "label": "Threshold cutoff — merge main+compensation, cut to top-10 seeds",
+      "cite": "run_atommem_pipeline.py:339\nGRAPH_MAX_SEED_FACTS=10, config.py:102",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "eventctx",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": null,
+      "state": "differs",
+      "label": "IO:Context — event_contexts computed but never reaches the prompt (dead code)",
+      "cite": "_build_event_contexts run_atommem_pipeline.py:399\ndiscarded at query_response.py:195,198,234 (D5)",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "catprompt",
+      "stage": "B6",
+      "row": 1,
+      "type": "io",
+      "seq": 34,
+      "label": "IO:Context — select template by LoCoMo category (cat2/cat3/default)",
+      "cite": "_load_category_prompt query_response.py:46-58\n(doc mislabels def line 44)",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "assemble",
+      "stage": "B6",
+      "row": 2,
+      "type": "io",
+      "seq": 35,
+      "state": "differs",
+      "label": "IO:Context — Query + Selected Profiles + Selected Facts (event_contexts dropped)",
+      "cite": "_format_profiles/_format_facts query_response.py:219-249",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "ans",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 36,
+      "label": "LLM:Answer — same LLMInterface/model as all internal calls",
+      "cite": "_generate_answer query_response.py:174-217\ncall_type=answer_generation, response_format=text",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "train",
+      "to": "ext",
+      "state": "paper_only"
+    },
+    {
+      "from": "ext",
+      "to": "load",
+      "state": "paper_only",
+      "label": "would produce the facts read here; never invoked"
+    },
+    {
+      "from": "load",
+      "to": "meta"
+    },
+    {
+      "from": "meta",
+      "to": "embed"
+    },
+    {
+      "from": "embed",
+      "to": "dedup"
+    },
+    {
+      "from": "dedup",
+      "to": "conflictfilter"
+    },
+    {
+      "from": "conflictfilter",
+      "to": "conflictretrieve"
+    },
+    {
+      "from": "conflictretrieve",
+      "to": "conflictllm"
+    },
+    {
+      "from": "conflictllm",
+      "to": "factstore"
+    },
+    {
+      "from": "factstore",
+      "to": "conflictretrieve",
+      "label": "existing pool"
+    },
+    {
+      "from": "factstore",
+      "to": "eventretrieve"
+    },
+    {
+      "from": "eventretrieve",
+      "to": "eroute"
+    },
+    {
+      "from": "eroute",
+      "to": "eupdate"
+    },
+    {
+      "from": "eupdate",
+      "to": "eventstore"
+    },
+    {
+      "from": "factstore",
+      "to": "profgate"
+    },
+    {
+      "from": "profgate",
+      "to": "profagg"
+    },
+    {
+      "from": "profagg",
+      "to": "profretrieve"
+    },
+    {
+      "from": "profretrieve",
+      "to": "profdecide"
+    },
+    {
+      "from": "profdecide",
+      "to": "profversion",
+      "label": "update_current only"
+    },
+    {
+      "from": "profdecide",
+      "to": "profstore"
+    },
+    {
+      "from": "profversion",
+      "to": "profstore"
+    },
+    {
+      "from": "profstore",
+      "to": "profretrieve",
+      "label": "existing pool"
+    },
+    {
+      "from": "q",
+      "to": "qintent"
+    },
+    {
+      "from": "qintent",
+      "to": "qemb"
+    },
+    {
+      "from": "qintent",
+      "to": "mainfilter"
+    },
+    {
+      "from": "qintent",
+      "to": "eventfilter"
+    },
+    {
+      "from": "qintent",
+      "to": "profrecall",
+      "state": "degraded",
+      "label": "need_attribute=True only"
+    },
+    {
+      "from": "qemb",
+      "to": "mainrecall"
+    },
+    {
+      "from": "qemb",
+      "to": "eventrecall"
+    },
+    {
+      "from": "qemb",
+      "to": "profrecall",
+      "state": "degraded"
+    },
+    {
+      "from": "factstore",
+      "to": "mainfilter"
+    },
+    {
+      "from": "factstore",
+      "to": "eventfilter"
+    },
+    {
+      "from": "eventstore",
+      "to": "eventfilter"
+    },
+    {
+      "from": "mainfilter",
+      "to": "mainrecall"
+    },
+    {
+      "from": "eventfilter",
+      "to": "eventrecall"
+    },
+    {
+      "from": "mainrecall",
+      "to": "comprecall",
+      "label": "exclude main_fact_ids"
+    },
+    {
+      "from": "eventrecall",
+      "to": "comprecall"
+    },
+    {
+      "from": "mainrecall",
+      "to": "seedselect"
+    },
+    {
+      "from": "comprecall",
+      "to": "seedselect"
+    },
+    {
+      "from": "seedselect",
+      "to": "localgraph"
+    },
+    {
+      "from": "localgraph",
+      "to": "adjacency"
+    },
+    {
+      "from": "seedselect",
+      "to": "seedscore"
+    },
+    {
+      "from": "adjacency",
+      "to": "ppr"
+    },
+    {
+      "from": "seedscore",
+      "to": "ppr"
+    },
+    {
+      "from": "ppr",
+      "to": "rerank"
+    },
+    {
+      "from": "rerank",
+      "to": "eventctx",
+      "state": "differs",
+      "label": "computed, then discarded"
+    },
+    {
+      "from": "rerank",
+      "to": "assemble"
+    },
+    {
+      "from": "profrecall",
+      "to": "assemble"
+    },
+    {
+      "from": "q",
+      "to": "catprompt",
+      "label": "LoCoMo category"
+    },
+    {
+      "from": "catprompt",
+      "to": "assemble"
+    },
+    {
+      "from": "assemble",
+      "to": "ans"
+    }
+  ]
+}

@@ -1,0 +1,395 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1980" height="2338" viewBox="0 0 1980 2338" font-family="Inter, -apple-system, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Noto Sans SC&quot;, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="24" y="30" font-size="19" font-weight="700" fill="#111827">Mandol — where the paper and the code part ways</text>
+<text x="24" y="50" font-size="11.5" fill="#4b5563">Only the divergent steps are drawn. Each node states both sides; the lane says which stage of the pipeline the divergence sits in.</text>
+<text x="24" y="66" font-size="9.5" fill="#9ca3af" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper arXiv:2606.29778v1  ×  repo AgentCombo/Mandol @ 6d7af4f + memory-bench @ 947c136   ·   servers/mandol/verification.md §6.1 (paper↔upstream, 15 items) + §6.2 (upstream↔adapter, 15 items)</text>
+<rect x="14" y="100" width="1276" height="991.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="93" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">A · MEMORY FORMATION  (query-independent)</text>
+<rect x="18" y="104" width="196" height="979.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="116.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A1 INTAKE</text>
+<text x="116.0" y="608.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="230" y="104" width="196" height="979.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="328.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A2 DISTILL</text>
+<rect x="442" y="104" width="196" height="979.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="540.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A3 ADMIT</text>
+<text x="540.0" y="608.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="654" y="104" width="196" height="979.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="752.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A4 INDEX</text>
+<rect x="866" y="104" width="196" height="979.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="964.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A5 COMMIT</text>
+<text x="964.0" y="608.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="1078" y="104" width="196" height="979.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="1176.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A6 INTERNALIZE</text>
+<text x="1176.0" y="608.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="14" y="1149.0" width="1700" height="1159.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="1142.0" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">B · MEMORY MOBILIZATION  (query-conditioned)</text>
+<rect x="18" y="1153.0" width="196" height="1147.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="116.0" y="1170.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B1 CUE</text>
+<rect x="230" y="1153.0" width="196" height="1147.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="328.0" y="1170.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B2 RECALL</text>
+<rect x="442" y="1153.0" width="196" height="1147.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="540.0" y="1170.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B3 EXPAND</text>
+<rect x="654" y="1153.0" width="196" height="1147.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="752.0" y="1170.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B4 APPRAISE</text>
+<rect x="866" y="1153.0" width="196" height="1147.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="964.0" y="1170.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B5 SELECT</text>
+<rect x="1078" y="1153.0" width="196" height="1147.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="1176.0" y="1170.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B6 DELIVER</text>
+<text x="1176.0" y="1741.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="1290" y="1153.0" width="196" height="1147.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1388.0" y="1170.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B7 GENERATE</text>
+<rect x="1502" y="1153.0" width="196" height="1147.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="1600.0" y="1170.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B8 LOOP</text>
+<text x="1600.0" y="1741.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="248.0" y="134.0" width="172" height="203" rx="7" fill="#dbeafe" stroke="#dc2626" stroke-width="2.2" stroke-dasharray="6 4"/>
+<text x="334.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Emotional memory /</text>
+<text x="334.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">preference-evolution</text>
+<text x="334.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">chains never built</text>
+<text x="259.0" y="202.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: §3.1.2/§4</text>
+<text x="259.0" y="214.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">txt:285-288,755-758, 4</text>
+<text x="259.0" y="226.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">separate</text>
+<text x="259.0" y="238.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mentions of a 4th memory</text>
+<text x="259.0" y="250.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">source</text>
+<text x="259.0" y="262.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code:</text>
+<text x="259.0" y="274.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">hierarchical_prompts.py:35-38</text>
+<text x="259.0" y="286.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">locomo_types()=[STRUCTURED];</text>
+<text x="259.0" y="298.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">longmemeval_types() also</text>
+<text x="259.0" y="310.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">excludes it (:40-43) —</text>
+<text x="259.0" y="322.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">verification #89</text>
+<circle cx="409.0" cy="145.0" r="8" fill="#dc2626"/>
+<text x="409.0" y="148.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">P</text>
+<path d="M 672.0 141.0 a 86.0 7 0 0 1 172 0 v 174 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#dc2626" stroke-width="2.2" stroke-dasharray="6 4"/>
+<path d="M 672.0 141.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#dc2626" stroke-width="1.7600000000000002"/>
+<text x="758.0" y="157.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">DuckDB persistence</text>
+<text x="758.0" y="172.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">backend does not exist</text>
+<text x="683.0" y="188.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: §3.2/§4/Table 1, 3</text>
+<text x="683.0" y="200.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">separate declarations</text>
+<text x="683.0" y="212.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">txt:220,437-439,797-801</text>
+<text x="683.0" y="224.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: zero &quot;duckdb&quot; hits</text>
+<text x="683.0" y="236.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">repo-wide (incl.</text>
+<text x="683.0" y="248.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">pyproject/docs/website,</text>
+<text x="683.0" y="260.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">excl. lockfile); actual</text>
+<text x="683.0" y="272.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">backend is rocksdict==0.3.29</text>
+<text x="683.0" y="284.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(rocksdb_payload_store.py) —</text>
+<text x="683.0" y="296.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">diff A1</text>
+<circle cx="833.0" cy="145.0" r="8" fill="#dc2626"/>
+<text x="833.0" y="148.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">P</text>
+<rect x="672.0" y="359.0" width="172" height="221" rx="7" fill="#ffedd5" stroke="#dc2626" stroke-width="2.2" stroke-dasharray="6 4"/>
+<text x="758.0" y="381.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Table 2's three core</text>
+<text x="758.0" y="396.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">APIs are absent:</text>
+<text x="758.0" y="411.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">quantitative_search /</text>
+<text x="758.0" y="426.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">search_unit /</text>
+<text x="758.0" y="441.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">build_memory_from_raw</text>
+<text x="683.0" y="457.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: txt:706-716 (Table 2)</text>
+<text x="683.0" y="469.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: zero occurrences of all</text>
+<text x="683.0" y="481.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">three names, repo-wide.</text>
+<text x="683.0" y="493.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">What exists instead:</text>
+<text x="683.0" y="505.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">traverse_explicit_nodes</text>
+<text x="683.0" y="517.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(semantic_graph.py:1337),</text>
+<text x="683.0" y="529.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">traverse_implicit_nodes</text>
+<text x="683.0" y="541.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(:1434), add_relationship</text>
+<text x="683.0" y="553.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(:610), save_graph (:1626) —</text>
+<text x="683.0" y="565.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">diff A2</text>
+<circle cx="833.0" cy="370.0" r="8" fill="#dc2626"/>
+<text x="833.0" y="373.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">P</text>
+<rect x="672.0" y="602.0" width="172" height="230" rx="7" fill="#ecfccb" stroke="#b45309" stroke-width="2.2"/>
+<text x="758.0" y="624.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">KG relations extracted</text>
+<text x="758.0" y="639.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(5,208) but 0 edges</text>
+<text x="758.0" y="654.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">land — a four-layer bug</text>
+<text x="758.0" y="669.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">chain</text>
+<text x="683.0" y="685.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: entity graph with</text>
+<text x="683.0" y="697.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">reference/attribute edges,</text>
+<text x="683.0" y="709.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§4 txt:751-755</text>
+<text x="683.0" y="721.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: candidate list omits</text>
+<text x="683.0" y="733.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">entity_id</text>
+<text x="683.0" y="745.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(towers/kg.py:90-111);</text>
+<text x="683.0" y="757.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">load_kg reads wrong keys</text>
+<text x="683.0" y="769.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(towers/load.py:223-234);</text>
+<text x="683.0" y="781.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">relations</text>
+<text x="683.0" y="793.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">resolved by name-lookup miss;</text>
+<text x="683.0" y="805.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">marker kg.edges=0 for</text>
+<text x="683.0" y="817.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">conv-41…50 — diff B4</text>
+<circle cx="833.0" cy="613.0" r="8" fill="#b45309"/>
+<text x="833.0" y="616.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="672.0" y="854.0" width="172" height="221" rx="7" fill="#ecfccb" stroke="#b45309" stroke-width="2.2"/>
+<text x="758.0" y="876.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">source_unit_uids</text>
+<text x="758.0" y="891.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">traceback links —</text>
+<text x="758.0" y="906.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">paper's unified links</text>
+<text x="758.0" y="921.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">vs. three separate</text>
+<text x="758.0" y="936.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">per-tower graphs</text>
+<text x="683.0" y="952.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: §3.1.2 txt:289-292,</text>
+<text x="683.0" y="964.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">traceable links back</text>
+<text x="683.0" y="976.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">to base units</text>
+<text x="683.0" y="988.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: base/episodic/kg live in</text>
+<text x="683.0" y="1000.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">three separate graphs;</text>
+<text x="683.0" y="1012.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">cross-graph add_relationship</text>
+<text x="683.0" y="1024.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">silently returns False</text>
+<text x="683.0" y="1036.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(semantic_graph.py:644-649) →</text>
+<text x="683.0" y="1048.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">0 traceback edges for episodic</text>
+<text x="683.0" y="1060.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">and kg — diff B5</text>
+<circle cx="833.0" cy="865.0" r="8" fill="#b45309"/>
+<text x="833.0" y="868.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="36.0" y="1183.0" width="172" height="317" rx="7" fill="#ffedd5" stroke="#b45309" stroke-width="2.2"/>
+<text x="122.0" y="1205.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Query-adaptive routing:</text>
+<text x="122.0" y="1220.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">online intent</text>
+<text x="122.0" y="1235.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">classifier (paper) vs.</text>
+<text x="122.0" y="1250.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">dataset gold category</text>
+<text x="122.0" y="1265.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(code)</text>
+<text x="47.0" y="1281.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: §3.3.1 txt:461-472,</text>
+<text x="47.0" y="1293.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">lightweight intent classifier</text>
+<text x="47.0" y="1305.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">from query features (time</text>
+<text x="47.0" y="1317.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">expressions, entity mentions),</text>
+<text x="47.0" y="1329.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">no LLM</text>
+<text x="47.0" y="1341.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code:</text>
+<text x="47.0" y="1353.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">locomo_triple_router.py:1177</text>
+<text x="47.0" y="1365.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">category=qa_item.get(&quot;category</text>
+<text x="47.0" y="1377.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&quot;,1)</text>
+<text x="47.0" y="1389.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">→</text>
+<text x="47.0" y="1401.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">locomo_tower_router.py:106-119</text>
+<text x="47.0" y="1413.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">static table; for the paper's</text>
+<text x="47.0" y="1425.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">best</text>
+<text x="47.0" y="1437.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">backbone (GPT-4.1-mini) all 5</text>
+<text x="47.0" y="1449.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">categories map to the same</text>
+<text x="47.0" y="1461.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">config</text>
+<text x="47.0" y="1473.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(identity routing — no</text>
+<text x="47.0" y="1485.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">differentiation) — diff A3/A4</text>
+<circle cx="197.0" cy="1194.0" r="8" fill="#b45309"/>
+<text x="197.0" y="1197.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="248.0" y="1183.0" width="172" height="326" rx="7" fill="#ffedd5" stroke="#b45309" stroke-width="2.2"/>
+<text x="334.0" y="1205.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">P2's &quot;100% L0</text>
+<text x="334.0" y="1220.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">evidence&quot;: structural</text>
+<text x="334.0" y="1235.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">exclusion, not a</text>
+<text x="334.0" y="1250.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">ranking failure</text>
+<text x="259.0" y="1266.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ARCHITECTURE.md claimed: dense</text>
+<text x="259.0" y="1278.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">kNN ranked L1/L2 too low to</text>
+<text x="259.0" y="1290.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">surface</text>
+<text x="259.0" y="1302.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: server.py:281 retrieve()</text>
+<text x="259.0" y="1314.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">passes ms_names=[conv_id];</text>
+<text x="259.0" y="1326.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">L1/L2 units</text>
+<text x="259.0" y="1338.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">only ever join</text>
+<text x="259.0" y="1350.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">hierarchical_memory:L1_Summary</text>
+<text x="259.0" y="1362.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">/:L2_Insight</text>
+<text x="259.0" y="1374.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">spaces,</text>
+<text x="259.0" y="1386.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">never the conv space.</text>
+<text x="259.0" y="1398.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Measured: conv-26 space =</text>
+<text x="259.0" y="1410.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">419/419 uids, all L0,</text>
+<text x="259.0" y="1422.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">child_space_names=[] — the</text>
+<text x="259.0" y="1434.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">FAISS candidate set never</text>
+<text x="259.0" y="1446.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">contained an</text>
+<text x="259.0" y="1458.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">abstraction to rank</text>
+<text x="259.0" y="1470.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(semantic_map.py:2186-2192,253</text>
+<text x="259.0" y="1482.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">9-2557)</text>
+<text x="259.0" y="1494.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">— verification #15</text>
+<circle cx="409.0" cy="1194.0" r="8" fill="#b45309"/>
+<text x="409.0" y="1197.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="460.0" y="1183.0" width="172" height="215" rx="7" fill="#ffedd5" stroke="#dc2626" stroke-width="2.2" stroke-dasharray="6 4"/>
+<text x="546.0" y="1205.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Selective subgraph</text>
+<text x="546.0" y="1220.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">expansion is dead on</text>
+<text x="546.0" y="1235.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">the benchmarked route</text>
+<text x="471.0" y="1251.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: §3.3.1 txt:477-480, key</text>
+<text x="471.0" y="1263.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">multi-hop evidence-completion</text>
+<text x="471.0" y="1275.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mechanism</text>
+<text x="471.0" y="1287.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code:</text>
+<text x="471.0" y="1299.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">locomo_tower_router.py:66-74</text>
+<text x="471.0" y="1311.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">_cfg_full() sets topk_graph=0,</text>
+<text x="471.0" y="1323.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">use_entity_relation=False;</text>
+<text x="471.0" y="1335.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">locomo_triple.py:3359 gates</text>
+<text x="471.0" y="1347.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">the traversal</text>
+<text x="471.0" y="1359.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">call on topk_graph&gt;0 —</text>
+<text x="471.0" y="1371.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">entity_retriever.search()</text>
+<text x="471.0" y="1383.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">never executes — diff A6</text>
+<circle cx="621.0" cy="1194.0" r="8" fill="#dc2626"/>
+<text x="621.0" y="1197.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">P</text>
+<rect x="672.0" y="1183.0" width="172" height="278" rx="7" fill="#fef9c3" stroke="#b45309" stroke-width="2.2"/>
+<text x="758.0" y="1205.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Tri-tower fusion:</text>
+<text x="758.0" y="1220.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">upstream unifies +</text>
+<text x="758.0" y="1235.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">prefilters; the adapter</text>
+<text x="758.0" y="1250.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">just concatenates</text>
+<text x="683.0" y="1266.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">upstream:</text>
+<text x="683.0" y="1278.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">locomo_triple_router_quantific</text>
+<text x="683.0" y="1290.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ation.py:690</text>
+<text x="683.0" y="1302.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">reranker.rerank()</text>
+<text x="683.0" y="1314.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">over all 75 merged candidates,</text>
+<text x="683.0" y="1326.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">then tower_separate keeps ~35</text>
+<text x="683.0" y="1338.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(:698-710) — rows C23-C24</text>
+<text x="683.0" y="1350.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">adapter:</text>
+<text x="683.0" y="1362.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">towers/retrieve.py:282-289</text>
+<text x="683.0" y="1374.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">concatenates 15+30+30=75</text>
+<text x="683.0" y="1386.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">straight</text>
+<text x="683.0" y="1398.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">into the cascade, no</text>
+<text x="683.0" y="1410.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">cross-tower rerank or weight —</text>
+<text x="683.0" y="1422.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">row A29</text>
+<text x="683.0" y="1434.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(measured cascade.stage1_in =</text>
+<text x="683.0" y="1446.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">75, always) — diff B1</text>
+<circle cx="833.0" cy="1194.0" r="8" fill="#b45309"/>
+<text x="833.0" y="1197.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="884.0" y="1183.0" width="172" height="281" rx="7" fill="#fef9c3" stroke="#b45309" stroke-width="2.2"/>
+<text x="970.0" y="1205.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Eq.(3)'s λ has no paper</text>
+<text x="970.0" y="1220.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">value; the code's</text>
+<text x="970.0" y="1235.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">default (0.6) is what</text>
+<text x="970.0" y="1250.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">got mis-attributed to</text>
+<text x="970.0" y="1265.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">the paper</text>
+<text x="895.0" y="1281.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: Eq.3 txt:680, λ appears</text>
+<text x="895.0" y="1293.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">only as a symbol, no number</text>
+<text x="895.0" y="1305.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">anywhere in the paper (grep</text>
+<text x="895.0" y="1317.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">for &quot;0.6&quot; near λ: no hits)</text>
+<text x="895.0" y="1329.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code:</text>
+<text x="895.0" y="1341.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">cascade_pruner.py:191,1133</text>
+<text x="895.0" y="1353.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">default λ=0.6; production</text>
+<text x="895.0" y="1365.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">script</text>
+<text x="895.0" y="1377.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">passes 0.7</text>
+<text x="895.0" y="1389.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(run_reproduction_suite.sh:355</text>
+<text x="895.0" y="1401.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">);</text>
+<text x="895.0" y="1413.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ARCHITECTURE.md wrote</text>
+<text x="895.0" y="1425.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&quot;paper Eq.(1) κ=2.5/λ=0.6&quot; — λ</text>
+<text x="895.0" y="1437.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">isn't even in Eq.(1) —</text>
+<text x="895.0" y="1449.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">verification #75, diff A8</text>
+<circle cx="1045.0" cy="1194.0" r="8" fill="#b45309"/>
+<text x="1045.0" y="1197.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="884.0" y="1531.0" width="172" height="197" rx="7" fill="#fef9c3" stroke="#b45309" stroke-width="2.2"/>
+<text x="970.0" y="1553.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Eq.(1)'s κ: paper</text>
+<text x="970.0" y="1568.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">states 2.5, the script</text>
+<text x="970.0" y="1583.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">that produced the</text>
+<text x="970.0" y="1598.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">paper's numbers uses</text>
+<text x="970.0" y="1613.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">3.0</text>
+<text x="895.0" y="1629.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: Eq.1 txt:657,672, κ=2.5</text>
+<text x="895.0" y="1641.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: cascade_pruner.py:186</text>
+<text x="895.0" y="1653.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">default also 2.5, but</text>
+<text x="895.0" y="1665.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">run_reproduction_suite.sh:354(</text>
+<text x="895.0" y="1677.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">+13</text>
+<text x="895.0" y="1689.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">more sites) passes</text>
+<text x="895.0" y="1701.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">--cascade-mad-multiplier 3.0</text>
+<text x="895.0" y="1713.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">for every section — diff A7</text>
+<circle cx="1045.0" cy="1542.0" r="8" fill="#b45309"/>
+<text x="1045.0" y="1545.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="884.0" y="1750.0" width="172" height="266" rx="7" fill="#fef9c3" stroke="#b45309" stroke-width="2.2"/>
+<text x="970.0" y="1772.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Query-time temporal</text>
+<text x="970.0" y="1787.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">decay is live in P3,</text>
+<text x="970.0" y="1802.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">contradicting the &quot;no</text>
+<text x="970.0" y="1817.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">decay&quot; claim</text>
+<text x="895.0" y="1833.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ARCHITECTURE.md claimed:</text>
+<text x="895.0" y="1845.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">query-time temporal reasoning</text>
+<text x="895.0" y="1857.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">does not decay</text>
+<text x="895.0" y="1869.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code:</text>
+<text x="895.0" y="1881.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">cascade_pruner.py:637-644</text>
+<text x="895.0" y="1893.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">stage2 arbitration score</text>
+<text x="895.0" y="1905.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">includes</text>
+<text x="895.0" y="1917.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">temporal_bonus=exp(−Δh/tempora</text>
+<text x="895.0" y="1929.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">l_decay_hours),</text>
+<text x="895.0" y="1941.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">decay_hours default</text>
+<text x="895.0" y="1953.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">720h (:194), weight</text>
+<text x="895.0" y="1965.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">w_temporal=0.2 — participates</text>
+<text x="895.0" y="1977.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">in every P3</text>
+<text x="895.0" y="1989.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">cross-tower conflict decision</text>
+<text x="895.0" y="2001.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">— verification #85</text>
+<circle cx="1045.0" cy="1761.0" r="8" fill="#b45309"/>
+<text x="1045.0" y="1764.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="884.0" y="2038.0" width="172" height="254" rx="7" fill="#fef9c3" stroke="#0f766e" stroke-width="2.2"/>
+<text x="970.0" y="2060.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Token budget: script</text>
+<text x="970.0" y="2075.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">specifies 1500-2000,</text>
+<text x="970.0" y="2090.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">the cascade pruner</text>
+<text x="970.0" y="2105.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">never receives it</text>
+<text x="895.0" y="2121.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">upstream script:</text>
+<text x="895.0" y="2133.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">run_reproduction_suite.sh:358</text>
+<text x="895.0" y="2145.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">etc.,</text>
+<text x="895.0" y="2157.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">--cascade-max-context-tokens</text>
+<text x="895.0" y="2169.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">1500/1800/2000</text>
+<text x="895.0" y="2181.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">adapter:</text>
+<text x="895.0" y="2193.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">towers/retrieve.py:297-302</text>
+<text x="895.0" y="2205.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">only passes</text>
+<text x="895.0" y="2217.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mode/mad/λ/abs_min,</text>
+<text x="895.0" y="2229.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">not max_tokens → falls back to</text>
+<text x="895.0" y="2241.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">class default 4096; measured</text>
+<text x="895.0" y="2253.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">cascade</text>
+<text x="895.0" y="2265.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">token median 2,682, 98.0% of</text>
+<text x="895.0" y="2277.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">queries exceed 1500 — diff B2</text>
+<circle cx="1045.0" cy="2049.0" r="8" fill="#0f766e"/>
+<text x="1045.0" y="2052.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">C</text>
+<rect x="1308.0" y="1183.0" width="172" height="284" rx="142.0" fill="#f3e8ff" stroke="#0f766e" stroke-width="2.2"/>
+<text x="1394.0" y="1205.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Gold-category prompt</text>
+<text x="1394.0" y="1220.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">injection: upstream's</text>
+<text x="1394.0" y="1235.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">own eval harness does</text>
+<text x="1394.0" y="1250.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">it, the paper never</text>
+<text x="1394.0" y="1265.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">mentions it, the</text>
+<text x="1394.0" y="1280.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">adapter doesn't either</text>
+<text x="1319.0" y="1296.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: §5.1, no mention of</text>
+<text x="1319.0" y="1308.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">category injection anywhere</text>
+<text x="1319.0" y="1320.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">upstream:</text>
+<text x="1319.0" y="1332.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">locomo_triple_router.py:2147-2</text>
+<text x="1319.0" y="1344.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">149</text>
+<text x="1319.0" y="1356.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">injects</text>
+<text x="1319.0" y="1368.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&quot;QUESTION CATEGORY: {category}</text>
+<text x="1319.0" y="1380.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">- {guidance}&quot; into the answer</text>
+<text x="1319.0" y="1392.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">prompt</text>
+<text x="1319.0" y="1404.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">adapter: bench/runner.py:276</text>
+<text x="1319.0" y="1416.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">answer_user(evidence_text,</text>
+<text x="1319.0" y="1428.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">question) —</text>
+<text x="1319.0" y="1440.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">no category, uniform across</text>
+<text x="1319.0" y="1452.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">all arms — diff A14</text>
+<circle cx="1469.0" cy="1194.0" r="8" fill="#0f766e"/>
+<text x="1469.0" y="1197.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">C</text>
+<rect x="1726" y="100" width="208" height="2192.0" rx="9" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="1740" y="122" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NODE TYPE</text>
+<rect x="1740" y="130" width="16" height="11" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<text x="1763" y="138" font-size="10" fill="#4b5563">LLM call</text>
+<rect x="1740" y="147" width="16" height="11" rx="3" fill="#ffedd5" stroke="#ea580c" stroke-width="1.4"/>
+<text x="1763" y="155" font-size="10" fill="#4b5563">Retrieval / ranking</text>
+<rect x="1740" y="164" width="16" height="11" rx="3" fill="#ecfccb" stroke="#4d7c0f" stroke-width="1.4"/>
+<text x="1763" y="172" font-size="10" fill="#4b5563">Deterministic NLP</text>
+<rect x="1740" y="181" width="16" height="11" rx="3" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.4"/>
+<text x="1763" y="189" font-size="10" fill="#4b5563">Fusion / gating</text>
+<rect x="1740" y="198" width="16" height="11" rx="3" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.4"/>
+<text x="1763" y="206" font-size="10" fill="#4b5563">Storage</text>
+<rect x="1740" y="215" width="16" height="11" rx="3" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.4"/>
+<text x="1763" y="223" font-size="10" fill="#4b5563">Input / output</text>
+<text x="1740" y="250" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">PAPER vs CODE</text>
+<rect x="1740" y="257" width="18" height="13" rx="3" fill="#ffffff" stroke="#dc2626" stroke-width="2" stroke-dasharray="6 4"/>
+<circle cx="1766" cy="263" r="6.5" fill="#dc2626"/>
+<text x="1766" y="266.6" font-size="8.5" font-weight="700" text-anchor="middle" fill="#ffffff">P</text>
+<text x="1779" y="266" font-size="9.5" fill="#4b5563">Paper only — not in code</text>
+<rect x="1740" y="277" width="18" height="13" rx="3" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+<circle cx="1766" cy="283" r="6.5" fill="#0f766e"/>
+<text x="1766" y="286.6" font-size="8.5" font-weight="700" text-anchor="middle" fill="#ffffff">C</text>
+<text x="1779" y="286" font-size="9.5" fill="#4b5563">Code only — not in paper</text>
+<rect x="1740" y="297" width="18" height="13" rx="3" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
+<circle cx="1766" cy="303" r="6.5" fill="#b45309"/>
+<text x="1766" y="306.6" font-size="8.5" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<text x="1779" y="306" font-size="9.5" fill="#4b5563">Both, but behave</text>
+<text x="1779" y="317" font-size="9.5" fill="#4b5563">differently</text>
+<text x="1740" y="345" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NOTES</text>
+<text x="1740" y="360" font-size="9.5" fill="#4b5563">• The headline mechanism error:</text>
+<text x="1740" y="371.5" font-size="9.5" fill="#4b5563">ARCHITECTURE.md called P2's '100% L0</text>
+<text x="1740" y="383.0" font-size="9.5" fill="#4b5563">evidence' a retrieval ranking failure.</text>
+<text x="1740" y="394.5" font-size="9.5" fill="#4b5563">It is not — retrieve() passes</text>
+<text x="1740" y="406.0" font-size="9.5" fill="#4b5563">ms_names=[conv_id], and L1/L2 units</text>
+<text x="1740" y="417.5" font-size="9.5" fill="#4b5563">are never assigned to that space in</text>
+<text x="1740" y="429.0" font-size="9.5" fill="#4b5563">the first place (measured: 419/419</text>
+<text x="1740" y="440.5" font-size="9.5" fill="#4b5563">uids in conv-26's space are L0). The</text>
+<text x="1740" y="452.0" font-size="9.5" fill="#4b5563">candidate set is structurally empty of</text>
+<text x="1740" y="463.5" font-size="9.5" fill="#4b5563">abstractions before any scoring</text>
+<text x="1740" y="475.0" font-size="9.5" fill="#4b5563">happens.</text>
+<text x="1740" y="491.5" font-size="9.5" fill="#4b5563">• Two of the numbers attached to the</text>
+<text x="1740" y="503.0" font-size="9.5" fill="#4b5563">paper don't belong to it: λ=0.6 is the</text>
+<text x="1740" y="514.5" font-size="9.5" fill="#4b5563">code's default (the paper's Eq.3 gives</text>
+<text x="1740" y="526.0" font-size="9.5" fill="#4b5563">λ no value at all), and the production</text>
+<text x="1740" y="537.5" font-size="9.5" fill="#4b5563">script's κ=3.0 overrides the paper's</text>
+<text x="1740" y="549.0" font-size="9.5" fill="#4b5563">own stated κ=2.5.</text>
+<text x="1740" y="565.5" font-size="9.5" fill="#4b5563">• Two whole paper claims have zero</text>
+<text x="1740" y="577.0" font-size="9.5" fill="#4b5563">code footprint anywhere in the</text>
+<text x="1740" y="588.5" font-size="9.5" fill="#4b5563">repository: the DuckDB persistence</text>
+<text x="1740" y="600.0" font-size="9.5" fill="#4b5563">backend (actual: rocksdict) and all</text>
+<text x="1740" y="611.5" font-size="9.5" fill="#4b5563">three Table 2 API names</text>
+<text x="1740" y="623.0" font-size="9.5" fill="#4b5563">(quantitative_search / search_unit /</text>
+<text x="1740" y="634.5" font-size="9.5" fill="#4b5563">build_memory_from_raw).</text>
+<text x="1740" y="651.0" font-size="9.5" fill="#4b5563">• The paper's headline multi-hop</text>
+<text x="1740" y="662.5" font-size="9.5" fill="#4b5563">mechanism (selective subgraph</text>
+<text x="1740" y="674.0" font-size="9.5" fill="#4b5563">expansion) and its 4th memory source</text>
+<text x="1740" y="685.5" font-size="9.5" fill="#4b5563">(emotional) are both paper_only — not</text>
+<text x="1740" y="697.0" font-size="9.5" fill="#4b5563">because they are unimplemented in the</text>
+<text x="1740" y="708.5" font-size="9.5" fill="#4b5563">abstract, but because the exact</text>
+<text x="1740" y="720.0" font-size="9.5" fill="#4b5563">reproduction config that produced the</text>
+<text x="1740" y="731.5" font-size="9.5" fill="#4b5563">paper's numbers (topk_graph=0,</text>
+<text x="1740" y="743.0" font-size="9.5" fill="#4b5563">locomo_types=[STRUCTURED]) turns them</text>
+<text x="1740" y="754.5" font-size="9.5" fill="#4b5563">off.</text>
+<text x="24" y="2322.0" font-size="9" fill="#9ca3af">memory-bench · methodology flow · paper ↔ code divergence</text>
+</svg>

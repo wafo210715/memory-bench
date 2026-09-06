@@ -1,0 +1,282 @@
+{
+  "system": "letta",
+  "view": "code",
+  "title": "Letta / MemGPT — code view",
+  "subtitle": "What origin/archive @ 56ba9c25 actually executes for the default letta_v1_agent → LettaAgentV3. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes mean the stage does not exist here.",
+  "source": "repo letta @ origin/archive 56ba9c25 (pyproject.toml v0.16.8, 2026-08-13) — main was emptied 2026-08-15 by 87fd37aab; read only via `git show origin/archive:<path>`, never checked out  ·  verified against servers/letta/verification.md (83 code-side assertions, 60 ✓ / 4 ✗ / 19 ◐)",
+  "footer": "memory-bench · methodology flow · code view · every citation re-opened and confirmed during verification · this snapshot is a retired Letta V1 server, not the current Letta product",
+  "legend_notes": [
+    "B3 EXPAND / B4 APPRAISE / B5 SELECT stay empty: with one active recall channel (substring match) there is nothing to fuse, rerank or select — results return sorted by created_at, capped by the caller's top_k.",
+    "B2 RECALL is rated ◐ not because the channel is inactive — Retrieval:Substring runs on every conversation_search call — but because it is the ONLY channel and carries no term weighting or relevance score, despite the tool's own docstring promising \"hybrid search (text + semantic similarity)\".",
+    "A4 INDEX's only occupant (archival embedding) is dead by default: DEPRECATED_LETTA_TOOLS strips archival_memory_insert/search from BASE_TOOLS. The one live exception is agent_create.enable_sleeptime, whose branch runs before the letta_v1_agent branch and keeps archival_memory_search attached.",
+    "Two internally-inconsistent compaction paths coexist in the same repo: default LettaAgentV3 uses compact_messages (token-based, 100%/90% of context window), while non-default LettaAgentV2/legacy uses Summarizer (message-count based, 30% evict) — same job, different thresholds, different default reachability."
+  ],
+  "nodes": [
+    {
+      "id": "msgin",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:Message — user / assistant / tool",
+      "cite": "message_manager.py:477 create_many_messages_async\nletta_agent_v3.py:1935 messages_to_persist assembly",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "coreedit",
+      "stage": "A3",
+      "row": 0,
+      "type": "llm",
+      "seq": 3,
+      "label": "LLM:SelfEdit — Block append/replace",
+      "cite": "core_tool_executor.py:328-345 core_memory_replace —\nNOT unique: only checks old_content in current_value (:339-340),\nthen str.replace ALL occurrences (:341)\n:346-401 memory_replace/memory_insert — unique-checked successor\nagent_manager.py:1747-1795 update_memory_if_changed_async, no LLM here",
+      "prim": "P-REVISE"
+    },
+    {
+      "id": "compactevict",
+      "stage": "A3",
+      "row": 1,
+      "type": "sched",
+      "seq": 4,
+      "label": "Sched:Evict — compaction threshold check",
+      "cite": "letta_agent_v3.py:75 import get_compaction_trigger_threshold\n→ :938 call\nthresholds.py:27-41  non-GPT-5 = 100%, GPT-5 family = 90%\nof context window",
+      "prim": "P-EVICT"
+    },
+    {
+      "id": "compactsummary",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "seq": 5,
+      "label": "LLM:Summarize — compact_messages (default)",
+      "cite": "letta_agent_v3.py:72 import compact_messages → :2109 call\nsummarizer/compact.py:42-131 build_summarizer_llm_config —\nsummary model is swappable to a cheaper model",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "summarizeralt",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "seq": null,
+      "state": "degraded",
+      "label": "LLM:Summarize — Summarizer 30% evict (non-default)",
+      "cite": "settings.py:78 mode=PARTIAL_EVICT_MESSAGE_BUFFER, :86 = 0.30\nsummarizer.py:136-203 simple_summary(), synchronous\nonly constructed by letta_agent_v2.py:124 and legacy\nletta_agent.py:141 — LettaAgentV3 has zero `Summarizer(` sites",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "archembed",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "seq": null,
+      "state": "degraded",
+      "label": "NLP:Embed — archival insert (dead by default)",
+      "cite": "core_tool_executor.py:307 archival_memory_insert →\npassage_manager.py:543 insert_passage\nconstants.py:93 MAX_EMBEDDING_DIM=4096, pad happens\ndownstream in create_agent_passage(s)_async:148-159/234-239\n(pgvector path only)",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "msgpersist",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 2,
+      "label": "Store:Database — Message ORM rows",
+      "cite": "message_manager.py:477\norm/message.py:23-47",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "archivestore",
+      "stage": "A5",
+      "row": 1,
+      "type": "store",
+      "seq": null,
+      "state": "degraded",
+      "label": "Store:Vector — Passage + PassageTag (dead by default)",
+      "cite": "passage_manager.py:55-79 PassageTag junction table\n+ :590-597 JSON tags column — double write",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "gitcommit",
+      "stage": "A5",
+      "row": 2,
+      "type": "store",
+      "seq": null,
+      "state": "degraded",
+      "label": "Store:Git — per-agent Block history (optional)",
+      "cite": "block_manager_git.py:188-238 update_block_async —\ncommits to git first, then syncs Postgres\nserver.py:155-167 wiring; gated on agent tag\nGIT_MEMORY_ENABLED_TAG (block_manager_git.py:52-70)",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "toolquery",
+      "stage": "B1",
+      "row": 0,
+      "type": "llm",
+      "seq": 6,
+      "label": "LLM:SelfEdit — writes search tool-call args",
+      "cite": "function_sets/base.py:87 conversation_search docstring\n:164 archival_memory_search signature",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "substrsearch",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 7,
+      "label": "Retrieval:Substring — conversation_search (ILIKE/LIKE)",
+      "cite": "message_manager.py:895 list_messages, :977-993\nPostgres ILIKE / SQLite JSON_EXTRACT LIKE —\nno term weighting, no score (combined_score: None)",
+      "prim": "P-SUBSTR"
+    },
+    {
+      "id": "archsearch",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "seq": null,
+      "state": "degraded",
+      "label": "Retrieval:Emb — archival_memory_search (dead by default)",
+      "cite": "agent_manager.py:2416-2480 query_agent_passages_async —\nNative pgvector/SQLite cosine top-k, or\nlower(text) LIKE fallback (agent_manager_helper.py:1259-1260)\nremoved from BASE_TOOLS by default (constants.py:115-116);\nlive exception: enable_sleeptime branch\n(agent_manager.py:404-405, constants.py:133)",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "compile",
+      "stage": "B6",
+      "row": 0,
+      "type": "store",
+      "seq": 8,
+      "label": "IO:Context — Memory.compile() renders Blocks",
+      "cite": "schemas/memory.py:688 compile(); renderers at\n:143/:175/:205 (standard/line-numbered/git)\ngit mode: :122-130 only renders system/* blocks",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "toolresult",
+      "stage": "B6",
+      "row": 1,
+      "type": "store",
+      "seq": 9,
+      "label": "IO:Context — tool result → Message → next prompt",
+      "cite": "letta_agent_v3.py:1915-1935",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "toolloop",
+      "stage": "B8",
+      "row": 0,
+      "type": "sched",
+      "seq": 10,
+      "label": "Sched:ToolLoop — tool called → continue, else stop",
+      "cite": "letta_agent_v3.py:1967-2036 _decide_continuation\n:2071 request_heartbeat=False (flag not read)\nlegacy flag-reading still lives in agent.py:563,834-842\nand letta_agent_v2.py:1126,1241-1250",
+      "prim": "P-TOOLLOOP"
+    },
+    {
+      "id": "ans",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 11,
+      "label": "LLM:Answer — plain text = reply",
+      "cite": "server.py:968 text_is_assistant_message",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "msgin",
+      "to": "msgpersist"
+    },
+    {
+      "from": "msgin",
+      "to": "compactevict"
+    },
+    {
+      "from": "compactevict",
+      "to": "compactsummary"
+    },
+    {
+      "from": "compactsummary",
+      "to": "compile"
+    },
+    {
+      "from": "compactevict",
+      "to": "summarizeralt",
+      "state": "degraded",
+      "label": "LettaAgentV2 / legacy only"
+    },
+    {
+      "from": "summarizeralt",
+      "to": "compile",
+      "state": "degraded"
+    },
+    {
+      "from": "msgin",
+      "to": "coreedit"
+    },
+    {
+      "from": "coreedit",
+      "to": "compile"
+    },
+    {
+      "from": "coreedit",
+      "to": "toolresult"
+    },
+    {
+      "from": "coreedit",
+      "to": "gitcommit",
+      "state": "degraded"
+    },
+    {
+      "from": "msgin",
+      "to": "archembed",
+      "state": "degraded"
+    },
+    {
+      "from": "archembed",
+      "to": "archivestore",
+      "state": "degraded"
+    },
+    {
+      "from": "msgin",
+      "to": "toolquery"
+    },
+    {
+      "from": "toolquery",
+      "to": "substrsearch"
+    },
+    {
+      "from": "toolquery",
+      "to": "archsearch",
+      "state": "degraded"
+    },
+    {
+      "from": "msgpersist",
+      "to": "substrsearch"
+    },
+    {
+      "from": "archivestore",
+      "to": "archsearch",
+      "state": "degraded"
+    },
+    {
+      "from": "substrsearch",
+      "to": "toolresult"
+    },
+    {
+      "from": "archsearch",
+      "to": "toolresult",
+      "state": "degraded"
+    },
+    {
+      "from": "compile",
+      "to": "ans",
+      "label": "no tool call"
+    },
+    {
+      "from": "toolresult",
+      "to": "toolloop"
+    },
+    {
+      "from": "toolloop",
+      "to": "msgin",
+      "label": "tool called: continue"
+    }
+  ]
+}

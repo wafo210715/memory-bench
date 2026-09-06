@@ -1,0 +1,487 @@
+{
+  "system": "memos",
+  "view": "code",
+  "title": "MemOS — code view",
+  "subtitle": "What the upstream MemOS REST service actually executes under the memory-bench deployment config (MemOS/.env). Lane = canonical stage; empty lanes mean the stage does not exist here.",
+  "source": "MemOS @ 8553242 (2026-08-18) + servers/memos/server.py   ·   verified against servers/memos/verification.md (108 code-side assertions: 73 ✓ / 10 ✗ / 25 ◐ / 0 ?)",
+  "footer": "memory-bench · methodology flow · code view · every citation re-opened and confirmed during verification",
+  "legend_notes": [
+    "A6 INTERNALIZE is empty: component_init.py:245-249 hardcodes act_mem=None, para_mem=None. P-TRANSMUTE, the primitive this paper exists to introduce, has zero code path.",
+    "The storage split runs backwards from the docs: Neo4jCommunityGraphDB pops `embedding` out of every node's metadata and ships it straight to Qdrant — vectors never touch Neo4j (C47).",
+    "The write-side reader is MultiModalStructMemReader, not SimpleStructMemReader as documented — 4 parallel LLM channels per scene (fact/tool/skill/preference), not \"one call per window\" (C15, C20).",
+    "Three mechanisms that look load-bearing are quietly dead: the reranker's level_weight is inert (level_field=\"background\" always the same value, C85), BM25/fulltext both default off, and the \"prefer chat_time\" timestamp fix always falls back to created_at because chat_time never leaves metadata.sources[] (C106)."
+  ],
+  "nodes": [
+    {
+      "id": "intake_adapter",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:Session — server.py forces async_mode=sync, whole session posted once",
+      "cite": "server.py:69-79\nAPIADDRequest.async_mode default \"async\"\n(product_models.py:642-643)",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "dispatch",
+      "stage": "A1",
+      "row": 1,
+      "type": "io",
+      "seq": 2,
+      "state": "degraded",
+      "label": "IO:Session — dispatch to MultiModalStructMemReader (doc said SimpleStruct)",
+      "cite": "server_router.py:128→134\nsingle_cube.py:59→662→703-717\napi/config.py:657, mem_reader/factory.py:22 (C15)",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "scene",
+      "stage": "A1",
+      "row": 2,
+      "type": "io",
+      "seq": 3,
+      "label": "IO:Stream — get_scene_data_info: multimodal reader does NOT window-split",
+      "cite": "multi_modal_struct.py:1257-1270 \"TODO: split\nmessages\"\nsimple_struct.py:857-866 (dead for this reader, C18)",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "agg",
+      "stage": "A2",
+      "row": 0,
+      "type": "sched",
+      "seq": 4,
+      "label": "Sched:Batch — token-window aggregation, max_tokens=1024, overlap=200",
+      "cite": "multi_modal_struct.py:194-196\nsimple_struct.py:207 (constant)\n_split_large_memory_item :115",
+      "prim": "P-ORCHESTRATE"
+    },
+    {
+      "id": "extract4",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "seq": 5,
+      "label": "LLM:Extract — 4 parallel channels: fact / tool-trajectory / skill / preference",
+      "cite": "multi_modal_struct.py:1020-1049\n_process_string_fine:615\n_process_tool_trajectory_fine:900",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "meta",
+      "stage": "A4",
+      "row": 2,
+      "type": "nlp",
+      "seq": 6,
+      "label": "NLP:SchemaLink — build TextualMemoryItem; type hardcoded \"fact\"",
+      "cite": "simple_struct.py:220-256\ntype_=\"fact\" :229  background=summary :250,423",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "embed",
+      "stage": "A4",
+      "row": 3,
+      "type": "alg",
+      "seq": 9,
+      "label": "NLP:Embed — value",
+      "cite": "simple_struct.py:247\nembedder.embed([value])[0]",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "filter_halluc",
+      "stage": "A3",
+      "row": 0,
+      "type": "llm",
+      "state": "degraded",
+      "label": "LLM:Dedup — filter_hallucination_in_memories, listwise per group, OFF by default",
+      "cite": "simple_struct.py:709-734\nSIMPLE_STRUCT_ADD_FILTER default \"false\" (:709)\none call per group, not per item (C31)",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "reorganize",
+      "stage": "A3",
+      "row": 1,
+      "type": "sched",
+      "state": "degraded",
+      "label": "Sched:Lifecycle — GraphStructureReorganizer (dedup/conflict/merge/link), OFF by default",
+      "cite": "component_init.py:223\napi/config.py:1234 MOS_ENABLE_REORGANIZE\nunset in .env → False",
+      "prim": "P-REVISE"
+    },
+    {
+      "id": "working_evict",
+      "stage": "A3",
+      "row": 2,
+      "type": "sched",
+      "state": "degraded",
+      "label": "Sched:Evict — WorkingMemory quota cleanup; set is never populated",
+      "cite": "manager.py:115-116,250 _cleanup_working_memory\ntree.py:83 quota=20\nmanager.py:239-241 TODO: WorkingMemory computed\nbut never submitted (bug)",
+      "prim": "P-EVICT"
+    },
+    {
+      "id": "vecindex",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 10,
+      "label": "Store:Vector — Qdrant; embedding popped out of node metadata before the Neo4j write",
+      "cite": "neo4j_community.py:151-165,194\ncollection=\"neo4j_vec_db\" cosine dim=2048\n(api/config.py:781-795)",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "graphpersist",
+      "stage": "A5",
+      "row": 3,
+      "type": "store",
+      "seq": 10,
+      "label": "Store:Graph — Neo4j node write, batch_size=5, ≤8 threads",
+      "cite": "single_cube.py:734→tree.py:114\nmanager.py:89,138 _add_memories_batch",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "schedule_task",
+      "stage": "A5",
+      "row": 1,
+      "type": "sched",
+      "seq": 11,
+      "label": "Sched:TaskQueue — ADD_TASK_LABEL enqueued (sync branch still schedules)",
+      "cite": "single_cube.py:762→549-561\ntask_schemas.py:33 ADD_TASK_LABEL\nregistry.py:52 → self.add",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "usage_writeback",
+      "stage": "A5",
+      "row": 2,
+      "type": "store",
+      "seq": 22,
+      "label": "Store:Graph — usage/access stats written back, 4 background threads; never read back into scoring",
+      "cite": "searcher.py:187,1343 _update_usage_history\n\"usage\" written, never read back for scoring",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "retrieve_adapter",
+      "stage": "B1",
+      "row": 0,
+      "type": "io",
+      "seq": 12,
+      "label": "IO:Query — explicit top_k + relativity=0.45 passed down",
+      "cite": "server.py:101-119",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "qembed",
+      "stage": "B1",
+      "row": 1,
+      "type": "alg",
+      "seq": 13,
+      "label": "NLP:Embed — query",
+      "cite": "searcher.py:349-351",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "dense",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 14,
+      "label": "Retrieval:Emb — dense vector search via Qdrant (through Neo4jCommunityGraphDB)",
+      "cite": "recall.py:81-98 docstring\nneo4j_community.py:293→360 = Qdrant search",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "symfilter",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "seq": 14,
+      "label": "Retrieval:SymFilter — user_name/status/session_id/id_filter, per path",
+      "cite": "searcher.py:355-501, 6 paths submitted here\n(Working/LongTerm+User/Internet(inert)/Tool/\nSkill/Preference)",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "fulltext_off",
+      "stage": "B2",
+      "row": 2,
+      "type": "alg",
+      "state": "degraded",
+      "label": "Retrieval:FTS — keyword full-text path, OFF",
+      "cite": "api/config.py:1245 FULLTEXT_CALL default \"false\"\nsearcher.py:429 use_fulltext",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "bm25enh_off",
+      "stage": "B2",
+      "row": 3,
+      "type": "alg",
+      "state": "degraded",
+      "label": "Retrieval:BM25 — EnhancedBM25 injection, OFF",
+      "cite": "api/config.py:1243 BM25_CALL default \"false\"\ntree.py:59-61 / simple_tree.py:52-56",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "graph_expand",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": 15,
+      "label": "Retrieval:Graph — graph lookup + vector search merged; Path B opens 3 more threads",
+      "cite": "recall.py:81-98 \"graph-based lookup + vector\nsimilarity search + merge\"\nsearcher.py Path B :817",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "rerank_local",
+      "stage": "B4",
+      "row": 0,
+      "type": "alg",
+      "state": "degraded",
+      "label": "Retrieval:Rerank — CosineLocalReranker, per path; level_weight always 1.0 (dead)",
+      "cite": "cosine_local.py:63-100\nlevel_field=\"background\" (:56) → weight always\nthe same value (C85); backend = MOS_RERANKER_\nBACKEND=cosine_local (.env:13), NOT tree.py:66\n(that fallback is dead code, C68)",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "fuse_concat",
+      "stage": "B4",
+      "row": 1,
+      "type": "fusion",
+      "seq": 17,
+      "label": "Fusion:Union — 6 paths simple-concatenated, no RRF / no weighting",
+      "cite": "searcher.py:496-498",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "dedup_text",
+      "stage": "B5",
+      "row": 0,
+      "type": "nlp",
+      "seq": 18,
+      "label": "Fusion:Dedup — by item.memory text, keep higher score on collision",
+      "cite": "searcher.py:1149-1155 _deduplicate_results",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "sort_trim",
+      "stage": "B5",
+      "row": 1,
+      "type": "fusion",
+      "seq": 19,
+      "label": "Fusion:Quota — sort + per-type bucket top_k cut, write score to metadata.relativity",
+      "cite": "searcher.py:1158-1185 _sort_and_trim",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "threshold",
+      "stage": "B5",
+      "row": 2,
+      "type": "alg",
+      "seq": 20,
+      "label": "Threshold gate — drop relativity < 0.45",
+      "cite": "search_handler.py:254-278, default 0.45\n(product_models.py:406-407)\n78/1986 queries return 0 results (C102)",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "mmr",
+      "stage": "B5",
+      "row": 3,
+      "type": "fusion",
+      "seq": 21,
+      "label": "Fusion:MMR — dedup=\"mmr\" default, over ×3 candidate pool",
+      "cite": "search_handler.py:90-92 (comment says 5x, code ×3)\n:113-115,331 MMR select",
+      "prim": "P-SELECT|P-FUSE",
+      "prim_note": "MMR 既可当重排器（graphiti 在 B4）也可当定选去重（MemOS 在 B5）；SKELETON §4④ 原文把 MemOS 的 MMR 归在 B5"
+    },
+    {
+      "id": "knowledge_rerank_dead",
+      "stage": "B4",
+      "row": 4,
+      "type": "alg",
+      "state": "degraded",
+      "label": "Retrieval:Rerank — rerank_knowledge_mem, body says \"# rerank set unuse\"",
+      "cite": "search_handler.py:119-125→formatters_handler.py\n:169-209  no RawFileMemory in this arm → near no-op",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "deliver_struct",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 23,
+      "label": "IO:Structured — envelope: memory_id/text/score=relativity/timestamp/raw_format",
+      "cite": "server.py:122-153\nRETURNED / TRUNCATED_BELOW_TOP_K (:147-153)",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "chat_time_bug",
+      "stage": "B6",
+      "row": 1,
+      "type": "io",
+      "state": "degraded",
+      "label": "IO:Structured — \"Prefer chat_time\" fix — always falls back to created_at, field never exists at top level",
+      "cite": "server.py:143 meta.get(\"chat_time\")\nitem.py:40 chat_time only inside metadata.\nsources[], never promoted (C106)",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "answer",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 24,
+      "label": "LLM:Answer — memory-bench backbone, outside the MemOS process",
+      "cite": "R15 — outside the MemOS boundary\nENABLE_CHAT_API=false (.env:21):\n/product/chat/* unused this arm",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "intake_adapter",
+      "to": "dispatch"
+    },
+    {
+      "from": "dispatch",
+      "to": "scene"
+    },
+    {
+      "from": "scene",
+      "to": "agg"
+    },
+    {
+      "from": "agg",
+      "to": "extract4"
+    },
+    {
+      "from": "extract4",
+      "to": "meta"
+    },
+    {
+      "from": "meta",
+      "to": "embed"
+    },
+    {
+      "from": "embed",
+      "to": "vecindex"
+    },
+    {
+      "from": "vecindex",
+      "to": "graphpersist"
+    },
+    {
+      "from": "graphpersist",
+      "to": "schedule_task"
+    },
+    {
+      "from": "extract4",
+      "to": "filter_halluc",
+      "state": "degraded",
+      "label": "if enabled"
+    },
+    {
+      "from": "meta",
+      "to": "reorganize",
+      "state": "degraded",
+      "label": "if enabled"
+    },
+    {
+      "from": "graphpersist",
+      "to": "working_evict",
+      "state": "degraded"
+    },
+    {
+      "from": "retrieve_adapter",
+      "to": "qembed"
+    },
+    {
+      "from": "qembed",
+      "to": "dense"
+    },
+    {
+      "from": "qembed",
+      "to": "symfilter"
+    },
+    {
+      "from": "qembed",
+      "to": "fulltext_off",
+      "state": "degraded"
+    },
+    {
+      "from": "qembed",
+      "to": "bm25enh_off",
+      "state": "degraded"
+    },
+    {
+      "from": "vecindex",
+      "to": "dense",
+      "label": "Qdrant"
+    },
+    {
+      "from": "graphpersist",
+      "to": "dense",
+      "label": "Neo4j fields"
+    },
+    {
+      "from": "graphpersist",
+      "to": "graph_expand"
+    },
+    {
+      "from": "dense",
+      "to": "graph_expand",
+      "label": "merge"
+    },
+    {
+      "from": "dense",
+      "to": "rerank_local"
+    },
+    {
+      "from": "symfilter",
+      "to": "rerank_local"
+    },
+    {
+      "from": "graph_expand",
+      "to": "rerank_local"
+    },
+    {
+      "from": "fulltext_off",
+      "to": "rerank_local",
+      "state": "degraded"
+    },
+    {
+      "from": "bm25enh_off",
+      "to": "rerank_local",
+      "state": "degraded"
+    },
+    {
+      "from": "rerank_local",
+      "to": "fuse_concat"
+    },
+    {
+      "from": "fuse_concat",
+      "to": "dedup_text"
+    },
+    {
+      "from": "dedup_text",
+      "to": "sort_trim"
+    },
+    {
+      "from": "sort_trim",
+      "to": "threshold"
+    },
+    {
+      "from": "threshold",
+      "to": "mmr"
+    },
+    {
+      "from": "mmr",
+      "to": "knowledge_rerank_dead"
+    },
+    {
+      "from": "knowledge_rerank_dead",
+      "to": "deliver_struct"
+    },
+    {
+      "from": "deliver_struct",
+      "to": "chat_time_bug"
+    },
+    {
+      "from": "chat_time_bug",
+      "to": "answer"
+    },
+    {
+      "from": "sort_trim",
+      "to": "usage_writeback",
+      "label": "post-query"
+    }
+  ]
+}

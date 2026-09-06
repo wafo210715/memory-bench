@@ -1,0 +1,125 @@
+{
+  "system": "amem",
+  "view": "diff",
+  "title": "A-MEM — where the paper and the upstream code part ways",
+  "subtitle": "Only paper ↔ upstream-code divergences are drawn (memory-bench's fixed arm is a separate comparison, not shown here). Each node states both sides.",
+  "source": "paper arXiv:2502.12110v11  ×  repo agiresearch/A-mem @ ceffb86   ·   servers/amem/verification.md §5.1, 13 paper↔upstream divergences (D1-D13)",
+  "footer": "memory-bench · methodology flow · paper ↔ upstream-code divergence",
+  "legend_notes": [
+    "The headline (hardest evidence in this recheck): note construction (Eq.2) never runs — analyze_content() has one call site in the whole repo, its own def. Every note's semantic fields sit at fallback defaults, indistinguishable from a successful call from outside.",
+    "Every LLM-driven semantic mechanism the paper names — construct, link, evolve — is broken in a different way in code; only the deterministic plumbing (persist, index, deliver) matches the paper's shape.",
+    "D9 ties a paper-side promise to a code-side silence: Fig.2's caption implies linked memories are kept, but the code computes them and then return memories[:k] throws away all of them.",
+    "D13 is a probable mislabel in verification.md's own table (tagged paper-only there): the fields in question exist only in the code, so this spec draws it as code_only — flagged for the parent session."
+  ],
+  "nodes": [
+    {
+      "id": "d1",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "state": "paper_only",
+      "label": "Note construction",
+      "cite": "paper: Eq.2, one LLM call per note (Ps1)\ntxt:351-353\ncode: analyze_content() zero call\nsites; add_note() uses defaults\nmemory_system.py:159,238"
+    },
+    {
+      "id": "d2",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "state": "differs",
+      "label": "Rich embedding (Eq.3)",
+      "cite": "paper: e_i = f_enc[concat(c_i,K_i,\nG_i,X_i)]  txt:358-360\ncode: add_document(note.content)\nonly — metadata not vectorized\nmemory_system.py:258"
+    },
+    {
+      "id": "d3",
+      "stage": "A3",
+      "row": 0,
+      "type": "alg",
+      "state": "differs",
+      "label": "Neighbor-probe query",
+      "cite": "paper: Eq.4 uses e_n, the rich\nembedding from Eq.3  txt:372-379\ncode: find_related_memories\n(note.content, k=5) — raw text\nmemory_system.py:605"
+    },
+    {
+      "id": "d4",
+      "stage": "A4",
+      "row": 1,
+      "type": "nlp",
+      "state": "differs",
+      "label": "Link generation (Eq.6)",
+      "cite": "paper: LLM sees the real M_near\nnotes  txt:388-392\ncode: prompt shows only \"memory\nindex:{i}\"  memory_system.py:307\n→ links hold positional strings,\nnot real note IDs"
+    },
+    {
+      "id": "d5",
+      "stage": "A3",
+      "row": 1,
+      "type": "nlp",
+      "state": "differs",
+      "label": "Evolution target (Eq.7)",
+      "cite": "paper: updates m_j ∈ M_near\ntxt:407-423\ncode: noteslist[indices[i]],\nindices[i]==i — rewrites the i-th\noldest note by insertion order\nmemory_system.py:687-716"
+    },
+    {
+      "id": "d6",
+      "stage": "A4",
+      "row": 2,
+      "type": "alg",
+      "state": "paper_only",
+      "label": "Re-embedding after evolution",
+      "cite": "paper: implied by Eq.3 + Eq.7,\nnever stated in text (no re-encode\ndescribed anywhere)\ncode: no add_document call after\nthe evolution write-back, either arm"
+    },
+    {
+      "id": "d7",
+      "stage": "A3",
+      "row": 2,
+      "type": "llm",
+      "state": "differs",
+      "label": "Prompts per note",
+      "cite": "paper: two separate prompts,\nPs2 (link) + Ps3 (evolve)\ntxt:3159-3170, 3177-3208\ncode: one merged call,\n_evolution_system_prompt\nmemory_system.py:127-157"
+    },
+    {
+      "id": "d8",
+      "stage": "A4",
+      "row": 3,
+      "type": "sched",
+      "state": "code_only",
+      "label": "Periodic full rebuild",
+      "cite": "paper: no consolidation step\nanywhere (grep consolidat*: 0 hits)\ncode: consolidate_memories() every\n100 successful evolutions\nmemory_system.py:97,124,260-286"
+    },
+    {
+      "id": "d9",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "state": "differs",
+      "label": "Linked-neighbor delivery",
+      "cite": "paper: Fig.2 caption implies\nlinked memories are kept\ntxt:296-297\ncode: computed and appended, then\nreturn memories[:k] discards all\nof them  memory_system.py:554-585"
+    },
+    {
+      "id": "d10",
+      "stage": "A3",
+      "row": 3,
+      "type": "llm",
+      "state": "paper_only",
+      "label": "prune / merge actions",
+      "cite": "paper: Ps3's own JSON example\nlists [\"strengthen\",\"merge\",\n\"prune\"]  txt:3203\ncode: only strengthen and\nupdate_neighbor are implemented\nmemory_system.py:151,679,684"
+    },
+    {
+      "id": "d12",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "state": "differs",
+      "label": "Retrieval k",
+      "cite": "paper: mainly k=10, tuned per\ncategory in Appx A.5\ntxt:907, 2844\ncode: search_agentic default k=5\nmemory_system.py:509"
+    },
+    {
+      "id": "d13",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "state": "code_only",
+      "label": "Dead bookkeeping fields",
+      "cite": "paper: Eq.1's note definition has\nno such fields  txt:342-343\ncode: retrieval_count /\nlast_accessed / evolution_history\nexist (:80-81) but are never\nincremented anywhere in the repo"
+    }
+  ],
+  "edges": []
+}

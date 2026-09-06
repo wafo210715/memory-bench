@@ -1,0 +1,229 @@
+{
+  "system": "livemem",
+  "view": "code",
+  "title": "LiveMem — code view",
+  "subtitle": "What the LiveMem repo actually executes at training time and serving time. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes do not exist in this system.",
+  "source": "repo LiveMem @ 71a6a8b (github.com/cafeii/LiveMem)   ·   verified against servers/livemem/verification.md",
+  "footer": "memory-bench · methodology flow · code view · every citation re-opened and confirmed during verification",
+  "legend_notes": [
+    "Same 5-lane footprint as the paper. The only genuinely code-only stage content is the offline SFT-data preprocessing pipeline (IO:Corpus, A1) and the fully-implemented-but-unselected Design Y write-gate (Learn:DesignY, A6, degraded — present in every training codepath, absent from all three released yaml configs).",
+    "The benchmarked serving path defaults to message-boundary chunking (MEM_EVICT_MODE=\"message\"), not the fixed-stride chunking the paper's Appx C.2 describes for \"serving\" — see the diff view for the full divergence.",
+    "o_side is gated (FusedRMSNormGated, driven by a learned sigmoid projection) before the residual add — matches the paper's Appx C.1 and corrects an earlier \"no gating\" architecture-doc claim."
+  ],
+  "nodes": [
+    {
+      "id": "ctx",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:Prompt — eval/prompt.py message assembly",
+      "cite": "eval/prompt.py:11-13 (header)\neval/prompt.py:73-77\noutside the memory-system boundary",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "corpus",
+      "stage": "A1",
+      "row": 1,
+      "type": "io",
+      "seq": null,
+      "state": "code_only",
+      "label": "IO:Corpus — SFT data preprocessing pipeline",
+      "cite": "tools/data_process/run_preprocess.py\n-> tokenize_train.py\n-> dataset/train/<ds>/*.arrow",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "sideinit",
+      "stage": "A6",
+      "row": 2,
+      "type": "learn",
+      "seq": 2,
+      "label": "Learn:SideInit — from_qwen3 + copy_init_side_branch",
+      "cite": "modeling_memory_qwen3.py:457-500\ncopy_init_side_branch: 529-590\n(not 395-450 — line no. corrected)",
+      "prim": "P-SIDEINIT"
+    },
+    {
+      "id": "sft",
+      "stage": "A6",
+      "row": 3,
+      "type": "learn",
+      "seq": 3,
+      "label": "Learn:LiveMemSFT — SFT stage1 (100) + stage2 (500)",
+      "cite": "livemem_sft_stage1.yaml\nlivemem_sft_stage2.yaml\nmake_memory_and_mask, modeling:55-56",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "designy",
+      "stage": "A6",
+      "row": 4,
+      "type": "learn",
+      "seq": null,
+      "state": "degraded",
+      "label": "Learn:DesignY — write-masked read/write (unused)",
+      "cite": "memory_gdn2.py:12-14,128-133\nmodeling_memory_qwen3.py:219-222\ndata.py:321-326,354 (synthetic gen)",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "grpo",
+      "stage": "A6",
+      "row": 5,
+      "type": "learn",
+      "seq": 4,
+      "label": "Learn:GRPO — verl RL rollout (stride mode)",
+      "cite": "train/rl/ + scripts/rl/run_grpo_dev.sh:124\nreward.py:82-100 (judge fallback :59-76)",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "ckpt",
+      "stage": "A5",
+      "row": 6,
+      "type": "store",
+      "seq": 5,
+      "label": "Store:Parametric — export_checkpoint.py output",
+      "cite": "tools/export_checkpoint.py:35-36,47,49-56",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "chunk",
+      "stage": "B6",
+      "row": 0,
+      "type": "sched",
+      "seq": 6,
+      "label": "Sched:Chunk — compute_chunk_spans (message mode)",
+      "cite": "evict_registry.py:67 default \"message\"\nevict_registry.py:183-199\nchunking.py:17-36 (split on <|im_start|>)",
+      "prim": "P-ORCHESTRATE"
+    },
+    {
+      "id": "backbone",
+      "stage": "B7",
+      "row": 1,
+      "type": "learn",
+      "seq": 7,
+      "label": "Learn:Backbone — self.self_attn + decode",
+      "cite": "vllm/modeling_memory_qwen3.py:119\ndecode: eval/pipeline.py generation loop\n(same backbone — no LLM boundary crossing)",
+      "prim": "P-FROZENFWD"
+    },
+    {
+      "id": "recur",
+      "stage": "B6",
+      "row": 2,
+      "type": "learn",
+      "seq": 7,
+      "label": "Learn:Recurrent — gdn2_paged_compute kernel",
+      "cite": "gdn2_side.py:51-126\nstate = (conv_state, ssm_state fp32)\n:193-209",
+      "prim": "P-INJECT"
+    },
+    {
+      "id": "gate",
+      "stage": "B6",
+      "row": 3,
+      "type": "fusion",
+      "seq": 8,
+      "label": "Fusion:Gate — FusedRMSNormGated(o_norm)",
+      "cite": "memory_gdn2.py:167,169 (o_norm/o_proj)\nthird_party/flash-linear-attention/fla/\nlayers/gdn2.py:197",
+      "prim": "P-INJECT"
+    },
+    {
+      "id": "add",
+      "stage": "B6",
+      "row": 4,
+      "type": "fusion",
+      "seq": 9,
+      "label": "Fusion:Inject — o_total = o_main + o_side",
+      "cite": "vllm/modeling_memory_qwen3.py:123-125 (serving)\nmodeling_memory_qwen3.py:137 (training, homolog)",
+      "prim": "P-INJECT"
+    },
+    {
+      "id": "evict",
+      "stage": "B6",
+      "row": 5,
+      "type": "sched",
+      "seq": 10,
+      "label": "Sched:KVWindow — remove_skipped_blocks",
+      "cite": "evict_manager.py:96-111\nFlashInfer builder drops kernel page",
+      "prim": "P-KVWINDOW"
+    },
+    {
+      "id": "reqend",
+      "stage": "B6",
+      "row": 6,
+      "type": "sched",
+      "seq": 11,
+      "label": "Sched:RequestEnd — pop_request / EVICT_REG.clear()",
+      "cite": "evict_registry.py:266-275\nclears turnover record only —\nstate slot itself: see diff X4",
+      "prim": "P-ORCHESTRATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "ctx",
+      "to": "chunk"
+    },
+    {
+      "from": "corpus",
+      "to": "sft",
+      "state": "code_only"
+    },
+    {
+      "from": "sideinit",
+      "to": "sft"
+    },
+    {
+      "from": "sideinit",
+      "to": "designy",
+      "state": "degraded",
+      "label": "shared skeleton, write_mask switch"
+    },
+    {
+      "from": "sft",
+      "to": "grpo"
+    },
+    {
+      "from": "grpo",
+      "to": "ckpt"
+    },
+    {
+      "from": "ckpt",
+      "to": "recur",
+      "label": "trained weights"
+    },
+    {
+      "from": "chunk",
+      "to": "backbone",
+      "label": "visible window"
+    },
+    {
+      "from": "chunk",
+      "to": "evict",
+      "label": "chunk boundary"
+    },
+    {
+      "from": "recur",
+      "to": "gate"
+    },
+    {
+      "from": "gate",
+      "to": "add"
+    },
+    {
+      "from": "backbone",
+      "to": "add",
+      "label": "a_t"
+    },
+    {
+      "from": "add",
+      "to": "backbone",
+      "label": "o_t -> next-layer h"
+    },
+    {
+      "from": "evict",
+      "to": "chunk",
+      "label": "next chunk"
+    },
+    {
+      "from": "evict",
+      "to": "reqend",
+      "label": "request finish"
+    }
+  ]
+}

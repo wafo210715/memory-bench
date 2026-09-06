@@ -1,0 +1,400 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1980" height="1552" viewBox="0 0 1980 1552" font-family="Inter, -apple-system, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Noto Sans SC&quot;, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="24" y="30" font-size="19" font-weight="700" fill="#111827">GraphMemix — paper view</text>
+<text x="24" y="50" font-size="11.5" fill="#4b5563">The mechanism as Li et al. describe it. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); A3 ADMIT, A6 and B8 are empty — the paper defines no such step.</text>
+<text x="24" y="66" font-size="9.5" fill="#9ca3af" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Li et al. 2026, GraphMemix (arXiv:2608.26983v1, MemoraX AI Research)   ·   verified against servers/graphmemix/verification.md (34 paper-side assertions: 24 ✓ / 3 ✗ / 7 ◐ / 0 ?)</text>
+<circle cx="1411" cy="44" r="8" fill="#111827"/>
+<text x="1411" y="47.3" font-size="9" font-weight="700" text-anchor="middle" fill="#ffffff">n</text>
+<text x="1426" y="47.5" font-size="10" fill="#6b7280">true execution order — lanes are canonical stages, not sequence</text>
+<rect x="14" y="100" width="1276" height="745.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="93" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">A · MEMORY FORMATION  (query-independent)</text>
+<rect x="18" y="104" width="196" height="733.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="116.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A1 INTAKE</text>
+<rect x="230" y="104" width="196" height="733.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="328.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A2 DISTILL</text>
+<rect x="442" y="104" width="196" height="733.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="540.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A3 ADMIT</text>
+<text x="540.0" y="485.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="654" y="104" width="196" height="733.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="752.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A4 INDEX</text>
+<rect x="866" y="104" width="196" height="733.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="964.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A5 COMMIT</text>
+<rect x="1078" y="104" width="196" height="733.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="1176.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A6 INTERNALIZE</text>
+<text x="1176.0" y="485.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="14" y="915.0" width="1700" height="607.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="908.0" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">B · MEMORY MOBILIZATION  (query-conditioned)</text>
+<rect x="18" y="919.0" width="196" height="595.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="116.0" y="936.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B1 CUE</text>
+<rect x="230" y="919.0" width="196" height="595.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="328.0" y="936.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B2 RECALL</text>
+<rect x="442" y="919.0" width="196" height="595.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="540.0" y="936.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B3 EXPAND</text>
+<rect x="654" y="919.0" width="196" height="595.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="752.0" y="936.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B4 APPRAISE</text>
+<rect x="866" y="919.0" width="196" height="595.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="964.0" y="936.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B5 SELECT</text>
+<rect x="1078" y="919.0" width="196" height="595.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1176.0" y="936.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B6 DELIVER</text>
+<rect x="1290" y="919.0" width="196" height="595.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1388.0" y="936.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B7 GENERATE</text>
+<rect x="1502" y="919.0" width="196" height="595.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="1600.0" y="936.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B8 LOOP</text>
+<text x="1600.0" y="1231.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<path d="M 208.0 193.5 L 222.0 193.5 Q 230.0 193.5 230.0 201.5 L 230.0 203.5 Q 230.0 211.5 238.0 211.5 L 248.0 211.5" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(248.0,211.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<rect x="179.1" y="193.0" width="101.80000000000001" height="13" rx="3" fill="#ffffff" stroke="#78716c" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="230.0" y="202.5" font-size="8.5" text-anchor="middle" fill="#78716c">H2HMem media only</text>
+<path d="M 208.0 193.5 L 440.0 193.5 Q 448.0 193.5 448.0 201.5 L 448.0 197.5 Q 448.0 205.5 456.0 205.5 L 672.0 205.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(672.0,205.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 420.0 211.5 L 552.0 211.5 Q 560.0 211.5 560.0 203.5 L 560.0 213.5 Q 560.0 205.5 568.0 205.5 L 672.0 205.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(672.0,205.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="495.6" y="199.0" width="128.8" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="560.0" y="208.5" font-size="8.5" text-anchor="middle" fill="#4b5563">caption becomes a view</text>
+<path d="M 208.0 193.5 L 434.0 193.5 Q 442.0 193.5 442.0 201.5 L 442.0 407.5 Q 442.0 415.5 450.0 415.5 L 672.0 415.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(672.0,415.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 758.0 277.0 L 758.0 403.5 L 758.0 403.5 L 758.0 530.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(758.0,530.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 758.0 508.0 L 758.0 603.0 L 745.0 603.0 L 745.0 698.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(745.0,698.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 758.0 676.0 L 758.0 687.0 L 771.0 687.0 L 771.0 698.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(771.0,698.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 844.0 205.5 L 864.0 205.5 Q 872.0 205.5 872.0 213.5 L 872.0 209.5 Q 872.0 217.5 880.0 217.5 L 884.0 217.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(884.0,217.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 844.0 763.5 L 870.0 763.5 Q 878.0 763.5 878.0 755.5 L 878.0 225.5 Q 878.0 217.5 886.0 217.5 L 884.0 217.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(884.0,217.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 970.0 301.0 L 970.0 851.0 L 334.0 851.0 L 334.0 949.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(334.0,949.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="606.5" y="835.5" width="91.0" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="652.0" y="845.0" font-size="8.5" text-anchor="middle" fill="#4b5563">persisted index</text>
+<path d="M 970.0 301.0 L 970.0 877.0 L 546.0 877.0 L 546.0 949.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(546.0,949.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="712.5" y="861.5" width="91.0" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="758.0" y="871.0" font-size="8.5" text-anchor="middle" fill="#4b5563">persisted graph</text>
+<path d="M 122.0 1038.0 L 122.0 1095.5 L 122.0 1095.5 L 122.0 1153.0" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(122.0,1153.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<path d="M 122.0 1038.0 L 122.0 1185.5 L 109.0 1185.5 L 109.0 1333.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(109.0,1333.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 122.0 1290.0 L 122.0 1311.5 L 135.0 1311.5 L 135.0 1333.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(135.0,1333.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="41.39999999999999" y="1298.0" width="161.20000000000002" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="122.0" y="1307.5" font-size="8.5" text-anchor="middle" fill="#4b5563">caption becomes a query view</text>
+<path d="M 208.0 1380.5 L 234.0 1380.5 Q 242.0 1380.5 242.0 1372.5 L 242.0 1018.0 Q 242.0 1010.0 250.0 1010.0 L 248.0 1010.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(248.0,1010.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 420.0 1010.0 L 434.0 1010.0 Q 442.0 1010.0 442.0 1018.0 L 442.0 1009.5 Q 442.0 1017.5 450.0 1017.5 L 460.0 1017.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(460.0,1017.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 632.0 1017.5 L 644.0 1017.5 L 644.0 1104.0 L 872.0 1104.0 L 872.0 1017.5 L 884.0 1017.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(884.0,1017.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="666.6" y="1089.5" width="182.8" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="758.0" y="1099.0" font-size="8.5" text-anchor="middle" fill="#4b5563">frozen retrieval+expansion order</text>
+<path d="M 632.0 1017.5 L 658.0 1017.5 Q 666.0 1017.5 666.0 1025.5 L 666.0 1032.0 Q 666.0 1040.0 674.0 1040.0 L 672.0 1040.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(672.0,1040.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="634.0" y="1019.25" width="64.0" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="666.0" y="1028.75" font-size="8.5" text-anchor="middle" fill="#4b5563">all of C_q</text>
+<path d="M 632.0 1017.5 L 646.0 1017.5 Q 654.0 1017.5 654.0 1025.5 L 654.0 1224.0 Q 654.0 1232.0 662.0 1232.0 L 672.0 1232.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(672.0,1232.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="581.5" y="1115.25" width="145.0" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="654.0" y="1124.75" font-size="8.5" text-anchor="middle" fill="#4b5563">eligible pairs within C_q</text>
+<path d="M 970.0 1086.0 L 970.0 1115.5 L 758.0 1115.5 L 758.0 1153.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(758.0,1153.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 844.0 1040.0 L 870.0 1040.0 Q 878.0 1040.0 878.0 1048.0 L 878.0 1213.5 Q 878.0 1221.5 886.0 1221.5 L 884.0 1221.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(884.0,1221.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="864.9" y="1121.25" width="26.200000000000003" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="878.0" y="1130.75" font-size="8.5" text-anchor="middle" fill="#4b5563">p_i</text>
+<path d="M 844.0 1232.0 L 858.0 1232.0 Q 866.0 1232.0 866.0 1224.0 L 866.0 1229.5 Q 866.0 1221.5 874.0 1221.5 L 884.0 1221.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(884.0,1221.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="801.6" y="1217.25" width="128.8" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="866.0" y="1226.75" font-size="8.5" text-anchor="middle" fill="#4b5563">w_ai / c_ai edge costs</text>
+<path d="M 970.0 1290.0 L 970.0 1311.5 L 970.0 1311.5 L 970.0 1333.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(970.0,1333.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 1056.0 1419.5 L 1082.0 1419.5 Q 1090.0 1419.5 1090.0 1411.5 L 1090.0 1028.5 Q 1090.0 1020.5 1098.0 1020.5 L 1096.0 1020.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1096.0,1020.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 1268.0 1020.5 L 1308.0 1020.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1308.0,1020.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="36.0" y="134.0" width="172" height="119" rx="59.5" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.6"/>
+<text x="122.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Corpus — user</text>
+<text x="122.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">multimodal memory</text>
+<text x="122.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">archive V = {e_i}</text>
+<text x="47.0" y="202.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.1 Eq.1 @txt:534</text>
+<text x="47.0" y="214.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">txt:520-533 — only defines V,</text>
+<text x="47.0" y="226.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">q, Π, M</text>
+<text x="47.0" y="238.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">no write process described</text>
+<circle cx="37.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="37.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">1</text>
+<rect x="248.0" y="134.0" width="172" height="155" rx="7" fill="#dbeafe" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="334.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">LLM:Caption — frozen</text>
+<text x="334.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">caption sidecar, H2HMem</text>
+<text x="334.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">only</text>
+<text x="259.0" y="202.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">A.1 txt:1826-1828</text>
+<text x="259.0" y="214.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Table 8 txt:1820 &quot;Qwen3-VL-8B</text>
+<text x="259.0" y="226.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">generated&quot;</text>
+<text x="259.0" y="238.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Qwen/Qwen3-VL-8B-Instruct,</text>
+<text x="259.0" y="250.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">temp 0, 32,768-ctx</text>
+<text x="259.0" y="262.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ATM/Mem-Gallery/MemEye use</text>
+<text x="259.0" y="274.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">dataset-native fields</text>
+<circle cx="409.0" cy="145.0" r="8" fill="#78716c"/>
+<text x="409.0" y="148.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<circle cx="249.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="249.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">2</text>
+<rect x="672.0" y="134.0" width="172" height="143" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="758.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">NLP:Embed — multi-view</text>
+<text x="758.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">U_i (raw / caption /</text>
+<text x="758.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">OCR / frames) → 1,536-d</text>
+<text x="683.0" y="202.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.1 Eq.3 @txt:558</text>
+<text x="683.0" y="214.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:552-559)</text>
+<text x="683.0" y="226.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&quot;shared multimodal encoder h&quot;</text>
+<text x="683.0" y="238.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">@txt:559</text>
+<text x="683.0" y="250.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§4.1 txt:1255-1256 frozen</text>
+<text x="683.0" y="262.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">gme-Qwen2-VL-2B-Instruct</text>
+<circle cx="673.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">3</text>
+<rect x="672.0" y="323.0" width="172" height="185" rx="7" fill="#ecfccb" stroke="#4d7c0f" stroke-width="1.6"/>
+<text x="758.0" y="345.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">NLP:SchemaLink — round</text>
+<text x="758.0" y="360.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">id / session position /</text>
+<text x="758.0" y="375.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">time / place</text>
+<text x="758.0" y="390.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(dataset-specific</text>
+<text x="758.0" y="405.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">rules)</text>
+<text x="683.0" y="421.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Eq.4 @txt:569 (E_schema)</text>
+<text x="683.0" y="433.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">A.1: ATM txt:1754-1757</text>
+<text x="683.0" y="445.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(event_bridge/same_record/</text>
+<text x="683.0" y="457.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">record_grounding),</text>
+<text x="683.0" y="469.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Mem-Gallery/MemEye txt:1764-</text>
+<text x="683.0" y="481.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">1765,1823-1824, H2HMem</text>
+<text x="683.0" y="493.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">txt:1833-1835</text>
+<circle cx="673.0" cy="324.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="327.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
+<rect x="672.0" y="530.0" width="172" height="146" rx="7" fill="#ecfccb" stroke="#4d7c0f" stroke-width="1.6"/>
+<text x="758.0" y="552.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">NLP:MutualKNN —</text>
+<text x="758.0" y="567.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">semantic edges E_sem,</text>
+<text x="758.0" y="582.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">mutual top-8 nearest</text>
+<text x="758.0" y="597.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">neighbor</text>
+<text x="683.0" y="613.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Eq.4 @txt:569 (E_sem, mutual</text>
+<text x="683.0" y="625.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">top-k)</text>
+<text x="683.0" y="637.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">k=8 @txt:1257</text>
+<text x="683.0" y="649.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">encoder tied to §4.1's shared</text>
+<text x="683.0" y="661.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">h via Eq.3 @txt:559</text>
+<circle cx="673.0" cy="531.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="534.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">5</text>
+<rect x="672.0" y="698.0" width="172" height="131" rx="7" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.6"/>
+<text x="758.0" y="720.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">NLP:ViewMerge —</text>
+<text x="758.0" y="735.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">discovery graph G_disc</text>
+<text x="758.0" y="750.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">= (V, E_schema ∪ E_sem)</text>
+<text x="683.0" y="766.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">txt:580-581</text>
+<text x="683.0" y="778.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">not query-conditioned — only</text>
+<text x="683.0" y="790.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Top-L seeds +</text>
+<text x="683.0" y="802.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">H-hop expansion (§3.3) makes</text>
+<text x="683.0" y="814.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">it query-relevant</text>
+<circle cx="673.0" cy="699.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="702.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">6</text>
+<path d="M 884.0 141.0 a 86.0 7 0 0 1 172 0 v 153 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.6"/>
+<path d="M 884.0 141.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#6b7280" stroke-width="1.2800000000000002"/>
+<text x="970.0" y="157.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Store:Unspecified —</text>
+<text x="970.0" y="172.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">backend for V and</text>
+<text x="970.0" y="187.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">G_disc never named</text>
+<text x="895.0" y="203.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">V &quot;a fixed set&quot; @txt:534, no</text>
+<text x="895.0" y="215.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">storage mechanism</text>
+<text x="895.0" y="227.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">given anywhere in</text>
+<text x="895.0" y="239.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§2/§3/Appendix (verification</text>
+<text x="895.0" y="251.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">P5)</text>
+<text x="895.0" y="263.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">matches the A5 &quot;~&quot; cell —</text>
+<text x="895.0" y="275.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">implied, not described</text>
+<circle cx="885.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">7</text>
+<rect x="36.0" y="949.0" width="172" height="89" rx="44.5" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.6"/>
+<text x="122.0" y="971.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Query</text>
+<text x="47.0" y="987.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.1 Eq.1 @txt:534 — q is an</text>
+<text x="47.0" y="999.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">explicit parameter</text>
+<text x="47.0" y="1011.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">no cross-question caching</text>
+<text x="47.0" y="1023.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">discussed (verification P17)</text>
+<circle cx="37.0" cy="950.0" r="9.5" fill="#111827"/>
+<text x="37.0" y="953.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">8</text>
+<rect x="36.0" y="1153.0" width="172" height="137" rx="7" fill="#dbeafe" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="122.0" y="1175.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">LLM:Caption —</text>
+<text x="122.0" y="1190.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">query-image caption,</text>
+<text x="122.0" y="1205.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">only when the question</text>
+<text x="122.0" y="1220.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">image lacks a dataset</text>
+<text x="122.0" y="1235.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">caption</text>
+<text x="47.0" y="1251.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">A.4 txt:1906-1908</text>
+<text x="47.0" y="1263.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">same verifier backbone</text>
+<text x="47.0" y="1275.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">generates it</text>
+<circle cx="197.0" cy="1164.0" r="8" fill="#78716c"/>
+<text x="197.0" y="1167.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<circle cx="37.0" cy="1154.0" r="9.5" fill="#111827"/>
+<text x="37.0" y="1157.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">9</text>
+<rect x="36.0" y="1333.0" width="172" height="95" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="122.0" y="1355.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">NLP:Embed — query —</text>
+<text x="122.0" y="1370.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">same shared encoder h</text>
+<text x="122.0" y="1385.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">as write-side</text>
+<text x="47.0" y="1401.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.1 Eq.3 @txt:558-559 &quot;shared</text>
+<text x="47.0" y="1413.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">multimodal encoder h&quot;</text>
+<circle cx="37.0" cy="1334.0" r="9.5" fill="#111827"/>
+<text x="37.0" y="1337.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">10</text>
+<rect x="248.0" y="949.0" width="172" height="122" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="334.0" y="971.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Retrieval:Emb —</text>
+<text x="334.0" y="986.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">multi-view max-sim</text>
+<text x="334.0" y="1001.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">s_i(q), Top-L=24 seeds</text>
+<text x="334.0" y="1016.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">R_q^(L)</text>
+<text x="259.0" y="1032.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.3 Eq.3 @txt:558</text>
+<text x="259.0" y="1044.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:552-559)</text>
+<text x="259.0" y="1056.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">L=24 @txt:1256</text>
+<circle cx="249.0" cy="950.0" r="9.5" fill="#111827"/>
+<text x="249.0" y="953.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">11</text>
+<rect x="460.0" y="949.0" width="172" height="137" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="546.0" y="971.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Retrieval:Graph — H=1</text>
+<text x="546.0" y="986.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">hop expansion over</text>
+<text x="546.0" y="1001.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">G_disc, rank by</text>
+<text x="546.0" y="1016.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">retrieval+relation</text>
+<text x="546.0" y="1031.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">order, Top-M=48 → C_q</text>
+<text x="471.0" y="1047.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.2 Eq.5 @txt:590</text>
+<text x="471.0" y="1059.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:580-592)</text>
+<text x="471.0" y="1071.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">H=1 / M=48 @txt:1256-1257</text>
+<circle cx="461.0" cy="950.0" r="9.5" fill="#111827"/>
+<text x="461.0" y="953.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">12</text>
+<rect x="884.0" y="949.0" width="172" height="137" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="970.0" y="971.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Deterministic anchor</text>
+<text x="970.0" y="986.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">selection A_q — top of</text>
+<text x="970.0" y="1001.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">frozen retrieval order,</text>
+<text x="970.0" y="1016.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">no verifier/ECV/gold</text>
+<text x="970.0" y="1031.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">used</text>
+<text x="895.0" y="1047.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">A.2 &quot;Anchor-set construction&quot;</text>
+<text x="895.0" y="1059.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">txt:1881-1885</text>
+<text x="895.0" y="1071.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(dedup, order-preserving)</text>
+<circle cx="885.0" cy="950.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="953.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">13</text>
+<rect x="672.0" y="949.0" width="172" height="182" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="758.0" y="971.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">LLM:Rerank — listwise</text>
+<text x="758.0" y="986.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">node verifier,</text>
+<text x="758.0" y="1001.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">v_i∈[0,5] over all of</text>
+<text x="758.0" y="1016.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">C_q → p_i</text>
+<text x="683.0" y="1032.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.3 Eq.6 @txt:609</text>
+<text x="683.0" y="1044.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:594-599)</text>
+<text x="683.0" y="1056.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Eq.14 @txt:1871</text>
+<text x="683.0" y="1068.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:1864-1870), Eq.15</text>
+<text x="683.0" y="1080.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">@txt:1879</text>
+<text x="683.0" y="1092.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(α,τ,δ)=(0.8,5.2,0.7), no</text>
+<text x="683.0" y="1104.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">per-dataset retuning</text>
+<text x="683.0" y="1116.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:1880)</text>
+<circle cx="673.0" cy="950.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="953.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">14</text>
+<rect x="672.0" y="1153.0" width="172" height="158" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="758.0" y="1175.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">LLM:VerifyEdge — ECV,</text>
+<text x="758.0" y="1190.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">best anchor +</text>
+<text x="758.0" y="1205.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">s^inc∈[0,5] + six-way</text>
+<text x="758.0" y="1220.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">role, schema edges only</text>
+<text x="683.0" y="1236.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.4 Eq.7-9 @txt:625/639/650</text>
+<text x="683.0" y="1248.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:617-649)</text>
+<text x="683.0" y="1260.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">claimed to &quot;execute in</text>
+<text x="683.0" y="1272.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">parallel&quot; with the verifier</text>
+<text x="683.0" y="1284.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(§4.1 txt:1314, §4.4.4</text>
+<text x="683.0" y="1296.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">txt:1647)</text>
+<circle cx="673.0" cy="1154.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="1157.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">14</text>
+<rect x="884.0" y="1153.0" width="172" height="137" rx="7" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.6"/>
+<text x="970.0" y="1175.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Fusion:Forest — 1-swap</text>
+<text x="970.0" y="1190.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">local search from</text>
+<text x="970.0" y="1205.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Top-K=10 seeds, Kruskal</text>
+<text x="970.0" y="1220.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">recomputes max-weight</text>
+<text x="970.0" y="1235.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">forest each step</text>
+<text x="895.0" y="1251.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§3.5 txt:1080-1090, κ_prop=0.2</text>
+<text x="895.0" y="1263.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">B_e = κ − λc_e, Eq.12</text>
+<text x="895.0" y="1275.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">@txt:1008</text>
+<circle cx="885.0" cy="1154.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="1157.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">15</text>
+<rect x="884.0" y="1333.0" width="172" height="173" rx="7" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.6"/>
+<text x="970.0" y="1355.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Fusion:Forest — bounded</text>
+<text x="970.0" y="1370.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">exact refinement,</text>
+<text x="970.0" y="1385.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">exhaustive nonempty</text>
+<text x="970.0" y="1400.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">subsets of S̄_q,</text>
+<text x="970.0" y="1415.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Kruskal per subset</text>
+<text x="895.0" y="1431.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Eq.13 @txt:1111, κ=0.12</text>
+<text x="895.0" y="1443.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">@txt:1313</text>
+<text x="895.0" y="1455.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&quot;globally optimal over all</text>
+<text x="895.0" y="1467.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">nonempty subsets of S̄_q&quot;</text>
+<text x="895.0" y="1479.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(not over all of C_q),</text>
+<text x="895.0" y="1491.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">txt:1113-1115</text>
+<circle cx="885.0" cy="1334.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="1337.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">16</text>
+<rect x="1096.0" y="949.0" width="172" height="143" rx="71.5" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.6"/>
+<text x="1182.0" y="971.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Context — Evidence</text>
+<text x="1182.0" y="986.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Serialization: root =</text>
+<text x="1182.0" y="1001.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">max-utility node per</text>
+<text x="1182.0" y="1016.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">component, sort</text>
+<text x="1182.0" y="1031.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">components by root</text>
+<text x="1182.0" y="1046.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">utility, BFS within</text>
+<text x="1182.0" y="1061.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">component, ≤K=10</text>
+<text x="1182.0" y="1077.0" font-size="9" text-anchor="middle" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">A.5 txt:2214-2218</text>
+<circle cx="1097.0" cy="950.0" r="9.5" fill="#111827"/>
+<text x="1097.0" y="953.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">17</text>
+<rect x="1308.0" y="949.0" width="172" height="143" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="1394.0" y="971.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">LLM:Answer — frozen</text>
+<text x="1394.0" y="986.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">multimodal generator, ŷ</text>
+<text x="1394.0" y="1001.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">= M(q, O_q)</text>
+<text x="1319.0" y="1017.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Eq.1 @txt:534 (M outside Π's</text>
+<text x="1319.0" y="1029.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">boundary)</text>
+<text x="1319.0" y="1041.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">§4.1 txt:1846-1848 — same</text>
+<text x="1319.0" y="1053.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">backbone as verifier/ECV</text>
+<text x="1319.0" y="1065.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">outside the GraphMemix</text>
+<text x="1319.0" y="1077.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">boundary</text>
+<circle cx="1309.0" cy="950.0" r="9.5" fill="#111827"/>
+<text x="1309.0" y="953.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">18</text>
+<rect x="1726" y="100" width="208" height="1406.0" rx="9" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="1740" y="122" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NODE TYPE</text>
+<rect x="1740" y="130" width="16" height="11" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<text x="1763" y="138" font-size="10" fill="#4b5563">LLM call</text>
+<rect x="1740" y="147" width="16" height="11" rx="3" fill="#ffedd5" stroke="#ea580c" stroke-width="1.4"/>
+<text x="1763" y="155" font-size="10" fill="#4b5563">Retrieval / ranking</text>
+<rect x="1740" y="164" width="16" height="11" rx="3" fill="#ecfccb" stroke="#4d7c0f" stroke-width="1.4"/>
+<text x="1763" y="172" font-size="10" fill="#4b5563">Deterministic NLP</text>
+<rect x="1740" y="181" width="16" height="11" rx="3" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.4"/>
+<text x="1763" y="189" font-size="10" fill="#4b5563">Fusion / gating</text>
+<rect x="1740" y="198" width="16" height="11" rx="3" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.4"/>
+<text x="1763" y="206" font-size="10" fill="#4b5563">Storage</text>
+<rect x="1740" y="215" width="16" height="11" rx="3" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.4"/>
+<text x="1763" y="223" font-size="10" fill="#4b5563">Input / output</text>
+<text x="1740" y="250" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">PAPER vs CODE</text>
+<rect x="1740" y="257" width="18" height="13" rx="3" fill="#ffffff" stroke="#78716c" stroke-width="2" stroke-dasharray="3 3"/>
+<circle cx="1766" cy="263" r="6.5" fill="#78716c"/>
+<text x="1766" y="266.6" font-size="8.5" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<text x="1779" y="266" font-size="9.5" fill="#4b5563">Present but degraded</text>
+<text x="1740" y="294" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NOTES</text>
+<text x="1740" y="309" font-size="9.5" fill="#4b5563">• A3 ADMIT is entirely empty by</text>
+<text x="1740" y="320.5" font-size="9.5" fill="#4b5563">design: no dedup, no conflict</text>
+<text x="1740" y="332.0" font-size="9.5" fill="#4b5563">resolution, no eviction anywhere in</text>
+<text x="1740" y="343.5" font-size="9.5" fill="#4b5563">the pipeline. The paper puts its whole</text>
+<text x="1740" y="355.0" font-size="9.5" fill="#4b5563">methodological bet on B4-B5 (node</text>
+<text x="1740" y="366.5" font-size="9.5" fill="#4b5563">verifier + edge verifier + exact</text>
+<text x="1740" y="378.0" font-size="9.5" fill="#4b5563">forest optimization) instead — the</text>
+<text x="1740" y="389.5" font-size="9.5" fill="#4b5563">inverse of the MIRIX/SGM/A-MEM</text>
+<text x="1740" y="401.0" font-size="9.5" fill="#4b5563">write-time-consolidation family it</text>
+<text x="1740" y="412.5" font-size="9.5" fill="#4b5563">argues against (§1, §2.1).</text>
+<text x="1740" y="429.0" font-size="9.5" fill="#4b5563">• B5 SELECT is a genuine 'solve</text>
+<text x="1740" y="440.5" font-size="9.5" fill="#4b5563">exactly' pipeline: Kruskal computes</text>
+<text x="1740" y="452.0" font-size="9.5" fill="#4b5563">the maximum-weight forest exactly at</text>
+<text x="1740" y="463.5" font-size="9.5" fill="#4b5563">every step of the 1-swap local search</text>
+<text x="1740" y="475.0" font-size="9.5" fill="#4b5563">(fixed cardinality K=10), then a</text>
+<text x="1740" y="486.5" font-size="9.5" fill="#4b5563">second bounded-exact stage enumerates</text>
+<text x="1740" y="498.0" font-size="9.5" fill="#4b5563">every nonempty subset of that proposal</text>
+<text x="1740" y="509.5" font-size="9.5" fill="#4b5563">to guarantee a global optimum within</text>
+<text x="1740" y="521.0" font-size="9.5" fill="#4b5563">it (Eq.13).</text>
+<text x="1740" y="537.5" font-size="9.5" fill="#4b5563">• The paper's implicit 'no generative</text>
+<text x="1740" y="549.0" font-size="9.5" fill="#4b5563">LLM at write time' framing does not</text>
+<text x="1740" y="560.5" font-size="9.5" fill="#4b5563">hold universally: H2HMem's 1,300</text>
+<text x="1740" y="572.0" font-size="9.5" fill="#4b5563">images get a one-time LLM-generated</text>
+<text x="1740" y="583.5" font-size="9.5" fill="#4b5563">caption sidecar</text>
+<text x="1740" y="595.0" font-size="9.5" fill="#4b5563">(Qwen/Qwen3-VL-8B-Instruct, A.1)</text>
+<text x="1740" y="606.5" font-size="9.5" fill="#4b5563">before indexing — the one dataset</text>
+<text x="1740" y="618.0" font-size="9.5" fill="#4b5563">where write-time pays a generation</text>
+<text x="1740" y="629.5" font-size="9.5" fill="#4b5563">cost.</text>
+<text x="1740" y="646.0" font-size="9.5" fill="#4b5563">• Node verifier and ECV are drawn as</text>
+<text x="1740" y="657.5" font-size="9.5" fill="#4b5563">two distinct primitives on purpose:</text>
+<text x="1740" y="669.0" font-size="9.5" fill="#4b5563">the verifier scores individual</text>
+<text x="1740" y="680.5" font-size="9.5" fill="#4b5563">candidates (P-RERANK), ECV scores</text>
+<text x="1740" y="692.0" font-size="9.5" fill="#4b5563">(anchor, candidate) EDGES with a</text>
+<text x="1740" y="703.5" font-size="9.5" fill="#4b5563">six-way role gate (P-EDGEVERIFY) and</text>
+<text x="1740" y="715.0" font-size="9.5" fill="#4b5563">produces a trusted edge set G_q^trust,</text>
+<text x="1740" y="726.5" font-size="9.5" fill="#4b5563">not a re-ranked list. Merging them</text>
+<text x="1740" y="738.0" font-size="9.5" fill="#4b5563">would erase the redundancy/conflict</text>
+<text x="1740" y="749.5" font-size="9.5" fill="#4b5563">semantics the forest solver depends</text>
+<text x="1740" y="761.0" font-size="9.5" fill="#4b5563">on.</text>
+<text x="24" y="1536.0" font-size="9" fill="#9ca3af">memory-bench · methodology flow · paper view</text>
+</svg>

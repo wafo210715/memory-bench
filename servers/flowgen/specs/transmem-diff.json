@@ -1,0 +1,71 @@
+{
+  "system": "transmem",
+  "view": "diff",
+  "title": "TransMem — where the paper and the code part ways",
+  "subtitle": "Only the divergent steps are drawn, all sitting inside the single forward-pass mechanism (B6/B7) since that's the only place this system's write+read logic lives.",
+  "source": "paper arXiv:2607.29032v1  x  repo TransMem @ 6d7a612   ·   servers/transmem/verification.md, 121 assertions checked (92 correct / 2 wrong / 25 partial / 2 unverifiable)",
+  "footer": "memory-bench · methodology flow · paper ↔ code divergence",
+  "legend_notes": [
+    "Prefill is not intervention-free. Paper Eq.1's prose (\"TransMem does not intervene in generation\" during prefill, txt:175-177) is contradicted by the code's own control flow: the forward hook is registered at layered.py:519-520 before the single prefill call at :528, and that call's prefill branch (:487-499) both reads H_M and writes the correction (:512) in the same pass. code-architecture.md repeats the wrong claim and even cites the wrong line number (:565).",
+    "Gate granularity is the one architecture-level mismatch neither source document caught: paper Eq.6-7 specify a per-dimension vector gate (W_g in R^(dxd), elementwise product); the code hard-locks gate_granularity to \"token_scalar\" (nn.Linear(dim,1)) — an order-of-magnitude parameter-count difference. Ironically the paper's own appendix (txt:1344-1347) already describes scalar-gate behavior; it's the paper's main text that is the outlier.",
+    "Three more mechanical parameters silently drift: memory-slot count (paper's stated optimum B=5 vs. code's B=4 everywhere), the segment-end position formula (paper's literal h_L vs. code's default floor-mode approximation), and the correction start position (paper's Eq.7 t>=L+1 vs. code's len_cq-1).",
+    "Chunk-wise overflow, presented in the paper as part of the method (txt:328-345), is entirely a caller-side, default-off feature in the code, and the benchmark's own LoCoMo eval script never triggers it at all — this answers a question the paper-architecture.md review had flagged as open (P50)."
+  ],
+  "nodes": [
+    {
+      "id": "d_prefill",
+      "stage": "B7",
+      "row": 0,
+      "type": "learn",
+      "state": "differs",
+      "label": "Prefill intervention: doc claim vs actual hook timing",
+      "cite": "paper: txt:175-177 \"TransMem does\nnot intervene in generation\" during\nprefill (Eq.1 area)\ncode: layered.py:519-520 hook\nregistered BEFORE the :528 forward;\nprefill branch (:487-499) reads H_M\n(:488) AND writes correction via\ncorrect() at :512 in that same call\n(code-architecture.md repeats the\nwrong claim and cites :565, also\nwrong — verification C12)"
+    },
+    {
+      "id": "d_gate",
+      "stage": "B6",
+      "row": 1,
+      "type": "fusion",
+      "state": "differs",
+      "label": "Gate granularity: vector vs scalar",
+      "cite": "paper: Eq.6 W_g in R^(dxd) + Eq.7\nelementwise product, txt:271-292 --\nbut Appx txt:1344-1347 already\ndescribes scalar-gate behavior\ncode: gate_proj=nn.Linear(dim,1),\ntransmem.py:213; gate_granularity\nhard-locked \"token_scalar\", :111-114\n(param count differs by ~d x, D1)"
+    },
+    {
+      "id": "d_bn",
+      "stage": "B6",
+      "row": 2,
+      "type": "sched",
+      "state": "differs",
+      "label": "Memory-slot count B: 5 (paper) vs 4 (code)",
+      "cite": "paper: \"optimal value being only 5\",\ntxt:248-250; Appendix retains B=4\nas the ablation default, txt:1397, 1406\ncode: n_mem=4 everywhere,\nlayered.py:119; all 14 configs=4;\nconfigs_nmem/ covers {4,8,...,384},\nno n=5 (D2)"
+    },
+    {
+      "id": "d_slot",
+      "stage": "B6",
+      "row": 3,
+      "type": "sched",
+      "state": "differs",
+      "label": "Segment-end position formula",
+      "cite": "paper: H_M=[h_n,...,h_L], last slot\nis literally h_L, txt:246-248, 322-325\ncode: default hm_mode=\"floor\",\nidx=(i+1)*seg-1, seg=len_cl//N --\nmisses h_L by up to N-1 tokens;\n\"frac\" (paper-matching formula) only\nforced on the overflow path (D3)"
+    },
+    {
+      "id": "d_inject",
+      "stage": "B6",
+      "row": 4,
+      "type": "fusion",
+      "state": "differs",
+      "label": "Correction start position: off by one",
+      "cite": "paper: Eq.7 t>=L+1, txt:290-293\ncode: injects from len_cq-1 (the\nlast prompt token), layered.py:512;\ntraining qpos=arange(len_cq-1,...),\n:627 (D4)"
+    },
+    {
+      "id": "d_overflow",
+      "stage": "B6",
+      "row": 5,
+      "type": "sched",
+      "state": "degraded",
+      "label": "Chunk-wise overflow: method vs opt-in flag",
+      "cite": "paper: presented as part of the\nmethod, txt:328-345\ncode: entirely caller-driven,\n--retain_overflow_hm default False,\neval_memory_agent_bench.py:1214,\nrequires --mode=paired, :1264-1265;\neval_locomo.py never passes\noverflow_memory -> LoCoMo never\ntriggers chunk-wise (D6)"
+    }
+  ],
+  "edges": []
+}

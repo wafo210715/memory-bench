@@ -1,0 +1,794 @@
+{
+  "system": "mandol",
+  "view": "code",
+  "title": "Mandol — code view",
+  "subtitle": "What AgentCombo/Mandol (upstream) and the memory-bench mandol arm actually execute — P3 (tri-tower) full state is the main path; P1/P2's single dense-only path is drawn separately at B2. Lane = canonical stage; empty lanes mean the stage does not exist here.",
+  "source": "repo AgentCombo/Mandol @ 6d7af4f + memory-bench @ 947c136 servers/mandol/{server.py,towers/*.py}   ·   verified against servers/mandol/verification.md (104 assertions: 80 ✓ / 5 ✗ / 16 ◐ / 3 ?, §2/§4/§5)",
+  "footer": "memory-bench · methodology flow · code view · every citation re-opened and confirmed during verification",
+  "legend_notes": [
+    "P1/P2 vs P3 are two different retrieval code paths, not two configurations of one path: P1/P2 (TRITOWER_ON=0) is a single space-filtered dense kNN that hard-cuts to 419 uid (conv-26), never including L1/L2 — not a ranking failure, a structural exclusion. P3 (TRITOWER_ON=1) is the full three-tower pipeline drawn below it.",
+    "The three towers (hierarchical/episodic/kg) never fuse: each runs its own internal RRF + cross-encoder rerank, but after concatenation to 75 candidates there is no cross-tower rerank or weighting. Upstream has one (a unified reranker over all 75 + a tower_separate prefilter to ~35); the adapter skips both.",
+    "Fusion:Cascade's stage3 λ=0.6 is a code default, not a paper value — the paper's Eq.(3) never gives λ a number. Stage2's arbitration score also carries a live 720h exponential time decay in every P3 query, and the cap it should respect (1500/1800/2000 tokens per script) is never wired in — it falls back to a class default of 4096 (measured: 98.0% of queries exceed 1500).",
+    "KG relations are extracted (5,208 across 10 conversations) but zero land as graph edges — a four-layer bug chain (candidate list omits entity_id, two key-name mismatches on load) confirmed against the archived run markers (kg.edges=0 for conv-41…50)."
+  ],
+  "nodes": [
+    {
+      "id": "sess",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:Session — messages arrive, one MemoryUnit built per turn",
+      "cite": "server.py:221-229 (verification row A1)",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "l0parse",
+      "stage": "A1",
+      "row": 1,
+      "type": "nlp",
+      "seq": 6,
+      "label": "IO:Turn — collect_l0_messages, secondary parse of already-stored units (regex speaker/date; <15 chars dropped)",
+      "cite": "hierarchical.py:71-103 (row A7, prim P-INTAKE “二次解析”)",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "l0rewrite",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "seq": 7,
+      "label": "LLM:Rewrite — L0 God Mode rewrite, one call per message, re-sends full session transcript, max_workers=8",
+      "cite": "hierarchical.py:106-147 (row A8)\nupstream step1_generate_l0_graph.py:601-608 (C1), max_tokens=250,\ntemp 0.1 upstream / 0 adapter",
+      "prim": "P-REWRITE"
+    },
+    {
+      "id": "l1extract",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "seq": 10,
+      "label": "LLM:Extract — L1 session summary → structured JSON (events/state_updates/dates/key_facts)",
+      "cite": "hierarchical.py:150-184 (row A9)",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "l2agg",
+      "stage": "A2",
+      "row": 2,
+      "type": "llm",
+      "seq": 11,
+      "label": "LLM:Summarize — L2 conv-level aggregation, ≤120k chars input, 1/conv",
+      "cite": "hierarchical.py:187-213 (row A10)",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "epfacts",
+      "stage": "A2",
+      "row": 3,
+      "type": "llm",
+      "seq": 13,
+      "label": "LLM:Extract — episodic facts, 1/session",
+      "cite": "episodic.py:33-73 (row A14)",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "kgent",
+      "stage": "A2",
+      "row": 4,
+      "type": "llm",
+      "seq": 16,
+      "label": "LLM:Extract — entities, 13-class schema, 1/session",
+      "cite": "kg.py:37-68 (row A17)",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "l1flat",
+      "stage": "A2",
+      "row": 6,
+      "type": "nlp",
+      "seq": 12,
+      "label": "NLP:Extract — flatten L1/L2 JSON → natural-language units (limit 1200/2000 chars) + derived_from edges (bundled in one function)",
+      "cite": "load.py:124-178 (row A13); measured mean 1,228 chars\nprim tags P-AGGREGATE+P-EMBED+P-LINK all in one call",
+      "prim": "P-NLPEXTRACT"
+    },
+    {
+      "id": "emotional_gap",
+      "stage": "A2",
+      "row": 5,
+      "type": "llm",
+      "seq": null,
+      "state": "paper_only",
+      "label": "LLM:Extract — emotional/preference-evolution chains",
+      "cite": "paper §3.1.2/§4 txt:285-288,755-758\ncode: hierarchical_prompts.py:35-38 locomo_types()=[STRUCTURED]\nexcludes EMOTIONAL; longmemeval_types() also excludes it (:40-43)\n— verification #89, diff A5",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "epdedup",
+      "stage": "A3",
+      "row": 0,
+      "type": "llm",
+      "seq": 14,
+      "label": "LLM:Dedup — MiniLM+DBSCAN(eps=0.25,min=2) cluster → merge (modes A/B/C), 1/cluster, ≥15 batched by 12",
+      "cite": "episodic.py:76-150 (row A15)",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "kgdedup",
+      "stage": "A3",
+      "row": 1,
+      "type": "llm",
+      "seq": 17,
+      "label": "LLM:Dedup — MiniLM + AgglomerativeClustering(threshold 0.85) → merge, 1/cluster",
+      "cite": "kg.py:114-157 (row A18)",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "embed",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "seq": 2,
+      "label": "NLP:Embed — embedding-3, 2048-dim, cloud (per turn)",
+      "cite": "server.py:187-193,230-234 (row A2)",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "splade_enc",
+      "stage": "A4",
+      "row": 1,
+      "type": "alg",
+      "seq": 3,
+      "label": "Retrieval:SPLADE — sparse encode (write time), default on",
+      "cite": "server.py:111,233 (row A3)\nfailure only logs a warning, semantic_map.py:1625-1691",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "idx_incr",
+      "stage": "A4",
+      "row": 2,
+      "type": "alg",
+      "seq": 4,
+      "label": "Retrieval:BM25 + Retrieval:SPLADE — merged: incremental inverted-index update (single call)",
+      "cite": "semantic_map.py:1217-1246 (row A4)\n_apply_index_update_mode default \"incremental\"",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "l0reembed",
+      "stage": "A4",
+      "row": 3,
+      "type": "alg",
+      "seq": 8,
+      "label": "NLP:Embed — apply_l0_indexing, re-embed with rewritten text_content (overwrites original, original_text kept as second view)",
+      "cite": "load.py:34-69 (row A11)",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "templink",
+      "stage": "A4",
+      "row": 4,
+      "type": "nlp",
+      "seq": 9,
+      "label": "NLP:SchemaLink — temporal_next edges between adjacent messages",
+      "cite": "load.py:72-88 (row A12)",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "kgrel",
+      "stage": "A2",
+      "row": 7,
+      "type": "llm",
+      "seq": 18,
+      "label": "LLM:Extract — session + cross-session relations",
+      "cite": "kg.py:160-226 (row A19)",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "kgedge",
+      "stage": "A4",
+      "row": 6,
+      "type": "nlp",
+      "seq": 19,
+      "state": "differs",
+      "label": "NLP:SchemaLink — relations → graph edges",
+      "cite": "load_kg, load.py:202-235 (row A20)\ncandidate list omits entity_id (kg.py:90-111)\nkey mismatch on load (load.py:223-234)\n→ 0 edges land for conv-41…50 (marker kg.edges=0)",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "eploadedge",
+      "stage": "A4",
+      "row": 7,
+      "type": "nlp",
+      "seq": 15,
+      "state": "differs",
+      "label": "NLP:SchemaLink — episodic facts → independent graph {conv}__episodic; source_unit_uids stored as metadata only",
+      "cite": "load.py:181-199 (row A16)\ncross-graph add_relationship silently returns False\n(semantic_graph.py:644-649) → 0 traceback edges (diff B5)",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "persist",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 5,
+      "label": "Store:Graph — save_graph, per-conv graphs (base + __episodic + __kg = 30 graphs / 10 conv)",
+      "cite": "server.py:206-210,369; orchestrator.py:94-95 (rows A6, A21)",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "duckdb_gap",
+      "stage": "A5",
+      "row": 1,
+      "type": "store",
+      "seq": null,
+      "state": "paper_only",
+      "label": "Store:DuckDB — paper-claimed persistence backend",
+      "cite": "paper §3.2/§4 txt:220,437-439,797-801\ncode: zero duckdb references repo-wide;\nactual backend rocksdict (pyproject.toml:53,\nrocksdb_payload_store.py) — diff A1",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "q",
+      "stage": "B1",
+      "row": 0,
+      "type": "io",
+      "seq": 20,
+      "label": "IO:Query",
+      "cite": "server.py:250 retrieve()",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "qemb",
+      "stage": "B1",
+      "row": 1,
+      "type": "alg",
+      "seq": 21,
+      "label": "NLP:Embed — query",
+      "cite": "retrieve.py (implicit query encode)",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "scopefilter",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 22,
+      "state": "differs",
+      "label": "Retrieval:SymFilter — scope=conv space filter, ms_names=[conv_id] — hard-excludes L1/L2 (they never join conv space)",
+      "cite": "server.py:281 (row A23); semantic_map.py:2186-2192,2539-2557\nconv-26 space = 419 uid, all L0, child_space_names=[]\n(verification #15, #51)",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "densep12",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "seq": 23,
+      "state": "differs",
+      "label": "Retrieval:Emb — dense kNN over the space-filtered candidate set (419 L0 only, conv-26); 100% of P2 evidence is L0",
+      "cite": "server.py:281 (row A23)\nP2 evidence.jsonl: 30,000/30,000 = L0 (verification #14)",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "h_bm25",
+      "stage": "B2",
+      "row": 2,
+      "type": "alg",
+      "seq": 24,
+      "label": "Retrieval:BM25 — hierarchical tower, per layer (L0/L1/L2 spaces)",
+      "cite": "hierarchical_retriever.py:107-111,163 (rows A26/C19)",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "h_cos",
+      "stage": "B2",
+      "row": 3,
+      "type": "alg",
+      "seq": 24,
+      "label": "Retrieval:Emb — hierarchical tower, per layer",
+      "cite": "hierarchical_retriever.py:163",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "h_splade",
+      "stage": "B2",
+      "row": 4,
+      "type": "alg",
+      "seq": 24,
+      "label": "Retrieval:SPLADE — hierarchical tower, per layer",
+      "cite": "hierarchical_retriever.py:163",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "e_bm25",
+      "stage": "B2",
+      "row": 5,
+      "type": "alg",
+      "seq": 24,
+      "label": "Retrieval:BM25 — episodic tower",
+      "cite": "retrieve.py:119-126,277 (row A27)",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "e_cos",
+      "stage": "B2",
+      "row": 6,
+      "type": "alg",
+      "seq": 24,
+      "label": "Retrieval:Emb — episodic tower",
+      "cite": "retrieve.py:119-126,277",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "e_splade",
+      "stage": "B2",
+      "row": 7,
+      "type": "alg",
+      "seq": 24,
+      "label": "Retrieval:SPLADE — episodic tower",
+      "cite": "retrieve.py:119-126,277",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "k_bm25",
+      "stage": "B2",
+      "row": 8,
+      "type": "alg",
+      "seq": 24,
+      "label": "Retrieval:BM25 — kg tower (entity semantic space)",
+      "cite": "retrieve.py:278 (row A28)",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "k_cos",
+      "stage": "B2",
+      "row": 9,
+      "type": "alg",
+      "seq": 24,
+      "label": "Retrieval:Emb — kg tower",
+      "cite": "retrieve.py:278",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "k_splade",
+      "stage": "B2",
+      "row": 10,
+      "type": "alg",
+      "seq": 24,
+      "label": "Retrieval:SPLADE — kg tower",
+      "cite": "retrieve.py:278",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "kgtraverse",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": null,
+      "state": "degraded",
+      "label": "Retrieval:Graph — entity_relation traversal (dead on the benchmarked route: topk_graph=0, use_entity_relation=False)",
+      "cite": "upstream locomo_tower_router.py:66-74; locomo_triple.py:3359 (row C21)\nkg tower has zero edges to walk anyway (kg.edges=0, see A4)",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "h_rrf",
+      "stage": "B4",
+      "row": 0,
+      "type": "fusion",
+      "seq": 25,
+      "label": "Fusion:RRF — hierarchical tower, per-layer bm25+cos+splade fusion",
+      "cite": "hierarchical_retriever.py:74 fusion_method=\"rrf\" (row A26/C19)",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "h_rerank",
+      "stage": "B4",
+      "row": 1,
+      "type": "fusion",
+      "seq": 26,
+      "label": "Fusion:CrossEncoder — hierarchical tower, per-layer BAAI/bge rerank",
+      "cite": "hierarchical_retriever.py:145 rerank_method=\"baai\"",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "h_layerfuse",
+      "stage": "B4",
+      "row": 2,
+      "type": "fusion",
+      "seq": 27,
+      "label": "Fusion:Add — combine L0/L1/L2 layer results → top-15",
+      "cite": "hierarchical_retriever.py:163-184 _fuse_layer_results\nmeasured tower_hits.hierarchical = 15, always",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "e_rrf",
+      "stage": "B4",
+      "row": 3,
+      "type": "fusion",
+      "seq": 25,
+      "label": "Fusion:RRF — episodic tower",
+      "cite": "retrieve.py:119-126,277 smart_search bm25+cosine+splade→rrf",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "e_rerank",
+      "stage": "B4",
+      "row": 4,
+      "type": "fusion",
+      "seq": 26,
+      "label": "Fusion:CrossEncoder — episodic tower rerank → top-30",
+      "cite": "retrieve.py:119-126,277\nmeasured tower_hits.episodic = 30, always",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "k_rrf",
+      "stage": "B4",
+      "row": 5,
+      "type": "fusion",
+      "seq": 25,
+      "label": "Fusion:RRF — kg tower",
+      "cite": "retrieve.py:278 (row A28)",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "k_rerank",
+      "stage": "B4",
+      "row": 6,
+      "type": "fusion",
+      "seq": 26,
+      "label": "Fusion:CrossEncoder — kg tower rerank → top-30",
+      "cite": "retrieve.py:278\nentity semantic score only, no edges (kg.edges=0)",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "concat",
+      "stage": "B4",
+      "row": 7,
+      "type": "fusion",
+      "seq": 28,
+      "state": "differs",
+      "label": "Fusion:Union — concatenate 3 towers, 15+30+30=75; no cross-tower rerank or weighting",
+      "cite": "towers/retrieve.py:282-289 (row A29); measured cascade.stage1_in = 75, always\nupstream: unified cross-encoder over all 75 + tower_separate\nprefilter to ~35 (rows C23-C24, locomo_triple_router_quantification.py:690,698-710)\n— NOT reproduced in the adapter",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "castmeta",
+      "stage": "B5",
+      "row": 0,
+      "type": "nlp",
+      "seq": 29,
+      "state": "degraded",
+      "label": "Fusion:Quota — EnhancedCandidateChunk assembly: entity_ids (KG name / episodic entities / L0 speaker) + source_chunk_ids or [chunk_id] fallback; timestamp→epoch",
+      "cite": "retrieve.py:160-260 (row A30)\nCASCADE_IDS_ON default OFF (on for scripts/run_mandol_full.sh)",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "cascade1",
+      "stage": "B5",
+      "row": 1,
+      "type": "fusion",
+      "seq": 30,
+      "label": "Fusion:Cascade — stage1 MAD hard filter, mad=3.0; measured 97.3% pass-through (near no-op)",
+      "cite": "cascade_pruner.py:406-460 (row A31)\nscript passes mad_multiplier=3.0, matching upstream default,\nnot the paper's stated κ=2.5 (diff A7)",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "cascade2",
+      "stage": "B5",
+      "row": 2,
+      "type": "fusion",
+      "seq": 31,
+      "state": "differs",
+      "label": "Fusion:Cascade — stage2 cross-tower conflict arbitration, score=0.5·CE+0.3·tower_trust+0.2·exp(−Δh/720h); requires CASCADE_IDS_ON",
+      "cite": "cascade_pruner.py:616-650 (row A32)\ntemporal_decay_hours=720 default, unmodified by the adapter\n— contradicts ARCHITECTURE.md's \"query-time: no decay\" claim for P3 (verification #85)",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "cascade3",
+      "stage": "B5",
+      "row": 3,
+      "type": "fusion",
+      "seq": 32,
+      "state": "differs",
+      "label": "Fusion:Cascade — stage3 MMR pack, λ=0.6 (code default, NOT the paper's Eq.1 value); token cap falls back to class default 4096; + final dedupe-by-uid cut to top-20",
+      "cite": "cascade_pruner.py:191,1133 λ default 0.6 (row A33); towers/retrieve.py:18\ncorrectly attributes λ default to code — ARCHITECTURE.md mis-transcribed\nit as \"paper Eq.(1)\" (verification #75)\ntoken cap: retrieve.py:297-302 never passes max_tokens;\nscript passes 1500/1800/2000; measured median 2,682, 98.0% > 1500\nfinal cut: retrieve.py:317-326 (row A34)",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "envelope",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 33,
+      "label": "IO:Context — envelope render, raw_format=mandol_unit (P1/P2) / mandol_tritower (P3); text ≤600 chars",
+      "cite": "server.py:294-302 (row A24, mandol_unit — ARCHITECTURE.md wrote\n\"mandol_dense\", 0/60,000 confirmed, verification #53)\nserver.py:274 (row A35, mandol_tritower)",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "ans",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 34,
+      "label": "LLM:Answer — harness backbone, outside the mandol boundary; no gold-category injection here",
+      "cite": "bench/runner.py:270-305\ncontrast upstream: locomo_triple_router.py:2147-2149 injects gold\ncategory into the answering prompt — the adapter does not",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "sess",
+      "to": "embed"
+    },
+    {
+      "from": "sess",
+      "to": "splade_enc"
+    },
+    {
+      "from": "sess",
+      "to": "idx_incr"
+    },
+    {
+      "from": "splade_enc",
+      "to": "idx_incr"
+    },
+    {
+      "from": "sess",
+      "to": "emotional_gap",
+      "state": "paper_only"
+    },
+    {
+      "from": "embed",
+      "to": "persist"
+    },
+    {
+      "from": "idx_incr",
+      "to": "persist"
+    },
+    {
+      "from": "persist",
+      "to": "duckdb_gap",
+      "state": "paper_only"
+    },
+    {
+      "from": "persist",
+      "to": "l0parse"
+    },
+    {
+      "from": "l0parse",
+      "to": "l0rewrite"
+    },
+    {
+      "from": "l0rewrite",
+      "to": "l0reembed"
+    },
+    {
+      "from": "l0reembed",
+      "to": "templink"
+    },
+    {
+      "from": "l0rewrite",
+      "to": "l1extract"
+    },
+    {
+      "from": "l1extract",
+      "to": "l2agg"
+    },
+    {
+      "from": "l1extract",
+      "to": "l1flat"
+    },
+    {
+      "from": "l2agg",
+      "to": "l1flat"
+    },
+    {
+      "from": "templink",
+      "to": "l1flat"
+    },
+    {
+      "from": "l1flat",
+      "to": "persist"
+    },
+    {
+      "from": "persist",
+      "to": "epfacts"
+    },
+    {
+      "from": "epfacts",
+      "to": "epdedup"
+    },
+    {
+      "from": "epdedup",
+      "to": "eploadedge"
+    },
+    {
+      "from": "eploadedge",
+      "to": "persist"
+    },
+    {
+      "from": "persist",
+      "to": "kgent"
+    },
+    {
+      "from": "kgent",
+      "to": "kgdedup"
+    },
+    {
+      "from": "kgdedup",
+      "to": "kgrel"
+    },
+    {
+      "from": "kgrel",
+      "to": "kgedge"
+    },
+    {
+      "from": "kgedge",
+      "to": "persist"
+    },
+    {
+      "from": "q",
+      "to": "qemb"
+    },
+    {
+      "from": "qemb",
+      "to": "scopefilter"
+    },
+    {
+      "from": "persist",
+      "to": "scopefilter"
+    },
+    {
+      "from": "scopefilter",
+      "to": "densep12"
+    },
+    {
+      "from": "densep12",
+      "to": "envelope"
+    },
+    {
+      "from": "qemb",
+      "to": "h_bm25"
+    },
+    {
+      "from": "qemb",
+      "to": "h_cos"
+    },
+    {
+      "from": "qemb",
+      "to": "h_splade"
+    },
+    {
+      "from": "qemb",
+      "to": "e_bm25"
+    },
+    {
+      "from": "qemb",
+      "to": "e_cos"
+    },
+    {
+      "from": "qemb",
+      "to": "e_splade"
+    },
+    {
+      "from": "qemb",
+      "to": "k_bm25"
+    },
+    {
+      "from": "qemb",
+      "to": "k_cos"
+    },
+    {
+      "from": "qemb",
+      "to": "k_splade"
+    },
+    {
+      "from": "persist",
+      "to": "h_bm25",
+      "label": "hierarchical graph"
+    },
+    {
+      "from": "persist",
+      "to": "e_bm25",
+      "label": "episodic graph"
+    },
+    {
+      "from": "persist",
+      "to": "k_bm25",
+      "label": "kg graph"
+    },
+    {
+      "from": "h_bm25",
+      "to": "h_rrf"
+    },
+    {
+      "from": "h_cos",
+      "to": "h_rrf"
+    },
+    {
+      "from": "h_splade",
+      "to": "h_rrf"
+    },
+    {
+      "from": "h_rrf",
+      "to": "h_rerank"
+    },
+    {
+      "from": "h_rerank",
+      "to": "h_layerfuse"
+    },
+    {
+      "from": "h_layerfuse",
+      "to": "concat"
+    },
+    {
+      "from": "e_bm25",
+      "to": "e_rrf"
+    },
+    {
+      "from": "e_cos",
+      "to": "e_rrf"
+    },
+    {
+      "from": "e_splade",
+      "to": "e_rrf"
+    },
+    {
+      "from": "e_rrf",
+      "to": "e_rerank"
+    },
+    {
+      "from": "e_rerank",
+      "to": "concat"
+    },
+    {
+      "from": "k_bm25",
+      "to": "k_rrf"
+    },
+    {
+      "from": "k_cos",
+      "to": "k_rrf"
+    },
+    {
+      "from": "k_splade",
+      "to": "k_rrf"
+    },
+    {
+      "from": "k_rrf",
+      "to": "k_rerank"
+    },
+    {
+      "from": "k_rerank",
+      "to": "concat"
+    },
+    {
+      "from": "kgtraverse",
+      "to": "concat",
+      "state": "degraded",
+      "label": "dead: topk_graph=0"
+    },
+    {
+      "from": "concat",
+      "to": "castmeta"
+    },
+    {
+      "from": "castmeta",
+      "to": "cascade1"
+    },
+    {
+      "from": "cascade1",
+      "to": "cascade2"
+    },
+    {
+      "from": "cascade2",
+      "to": "cascade3"
+    },
+    {
+      "from": "cascade3",
+      "to": "envelope"
+    },
+    {
+      "from": "envelope",
+      "to": "ans"
+    }
+  ]
+}

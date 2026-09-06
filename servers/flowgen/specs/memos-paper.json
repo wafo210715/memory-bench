@@ -1,0 +1,412 @@
+{
+  "system": "memos",
+  "view": "paper",
+  "title": "MemOS — paper view",
+  "subtitle": "The mechanism as Li et al. describe it. The A/B split below is an alignment device only — Figure 8 draws write and retrieve as one closed loop within a single turn. Empty/degraded lanes mean the paper leaves that step optional or undefined.",
+  "source": "Li et al. 2025, MemOS (arXiv:2507.03724v4)   ·   every anchor re-located in the paper text during verification (40 paper-side assertions, 31 ✓ / 9 ◐ / 0 ✗)",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "Write and retrieve are not sequential here: W1 and R1 are the SAME MemReader call, packaging one MemoryCall that feeds both extraction and retrieval intent — the A/B split is drawn only for cross-system alignment (call / call_query share seq 2).",
+    "A6 INTERNALIZE (Convert:Plaintext→Activation / →Parametric) is P-TRANSMUTE, the primitive minted for this system's headline claim — and every trigger condition (when, how much, at what cost) is left unstated by the paper, hence degraded styling through A4/A6/B3/B6.",
+    "B5 SELECT fires before the B4 rerank score exists: MemoryPathResolver's scope/order planning (route_select) precedes the 4-metric scoring (rerank) in the paper's own sequence — the opposite of the usual score-then-select order.",
+    "B8 LOOP is empty on purpose: no multi-hop, iterative retrieval, or agent tool loop is described anywhere in the text."
+  ],
+  "nodes": [
+    {
+      "id": "turn",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:Session — user turn / prompt input",
+      "cite": "§5.2 txt:1199-1201 (per-turn trigger)\nFigure 8 txt:1227",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "call",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "seq": 2,
+      "label": "LLM:Rewrite — MemReader packages prompt → MemoryCall (scope/type/window)",
+      "cite": "W1 §5.2 txt:1212\n§5.3.1 txt:1344-1345 (rewriting/coreference/\nslot filling; LLM use unstated)",
+      "prim": "P-REWRITE"
+    },
+    {
+      "id": "extract",
+      "stage": "A2",
+      "row": 2,
+      "type": "llm",
+      "seq": 3,
+      "label": "LLM:Extract — Semantic Parse → new memory content",
+      "cite": "W2 Figure 8 txt:1239-1243\n\"Semantic Parse: The user has a dog.\"",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "cube",
+      "stage": "A2",
+      "row": 3,
+      "type": "io",
+      "seq": 4,
+      "label": "IO:MemCube — payload + descriptive/governance/usage metadata",
+      "cite": "W3 §4.2 txt:889-902",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "layer",
+      "stage": "A2",
+      "row": 5,
+      "type": "nlp",
+      "seq": 7,
+      "state": "degraded",
+      "label": "NLP:Cluster — private/shared/global memory layering",
+      "cite": "W6 §4.1 txt:789-792\ntrigger unstated",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "usage",
+      "stage": "A2",
+      "row": 9,
+      "type": "nlp",
+      "seq": 18,
+      "label": "NLP:UsageUpdate — access pattern (frequency/recency) update",
+      "cite": "R8 §4.2 txt:1011-1014\n→ caching priority",
+      "prim": "P-META"
+    },
+    {
+      "id": "dedup_conflict",
+      "stage": "A3",
+      "row": 4,
+      "type": "nlp",
+      "seq": 6,
+      "state": "degraded",
+      "label": "NLP:TextDedup — dedup + conflict detection + version chain",
+      "cite": "W5 §4.1 txt:792-793, §4.2 txt:1029-1031\ntrigger AND mechanism unstated by paper",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "lifecycle",
+      "stage": "A3",
+      "row": 6,
+      "type": "sched",
+      "seq": 8,
+      "label": "Sched:Lifecycle — Generated→Activated→Merged→Archived(→Expired/Frozen)",
+      "cite": "W7 §5.2 txt:1308-1312\n§5.4.3 txt:1465-1479, 1481-1484\nthresholds not quantified (P35); paper self-\ncontradicts on state count (P36)",
+      "prim": "P-REVISE"
+    },
+    {
+      "id": "fingerprint",
+      "stage": "A4",
+      "row": 3,
+      "type": "alg",
+      "seq": 5,
+      "state": "degraded",
+      "label": "NLP:Embed — Contextual fingerprint — lightweight semantic signature",
+      "cite": "W4 §4.2 txt:1028-1029\n\"lightweight semantic signature\"; dense vector\nnot confirmed",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "graphlink",
+      "stage": "A4",
+      "row": 5,
+      "type": "nlp",
+      "seq": 7,
+      "state": "degraded",
+      "label": "NLP:SchemaLink — task–concept–fact hierarchical graph edges",
+      "cite": "W6 §5.4.1 txt:1404-1407\ntrigger unstated",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "persist",
+      "stage": "A5",
+      "row": 6,
+      "type": "store",
+      "seq": 9,
+      "label": "Store:Hierarchy — MemVault namespaces + ACL/TTL/audit (MemGovernance)",
+      "cite": "W8 §5.2 txt:1315-1322\n§5.5.1-2 via MemoryAdapter",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "transmute_act",
+      "stage": "A6",
+      "row": 7,
+      "type": "learn",
+      "seq": 10,
+      "state": "degraded",
+      "label": "Convert:Plaintext→Activation — KV cache / steering vectors",
+      "cite": "W9 §4.2 txt:1016-1024\n§5.4.2 txt:1447-1453\ntrigger thresholds not given",
+      "prim": "P-TRANSMUTE"
+    },
+    {
+      "id": "transmute_param",
+      "stage": "A6",
+      "row": 8,
+      "type": "learn",
+      "seq": 10,
+      "state": "degraded",
+      "label": "Convert:Plaintext→Parametric — LoRA/adapter distillation",
+      "cite": "W9 same span as above — Parameter direction\nneeds distillation (~P-TRAIN), process unstated",
+      "prim": "P-TRANSMUTE"
+    },
+    {
+      "id": "call_query",
+      "stage": "B1",
+      "row": 0,
+      "type": "llm",
+      "seq": 2,
+      "label": "LLM:Query — MemReader parses query intent (same call as W1)",
+      "cite": "R1 — identical MemReader call to W1\n§5.2 txt:1212, §5.3.1 txt:1344-1345",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "recall_sym",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 11,
+      "label": "Retrieval:SymFilter — task-specific index (tags/anchors/keywords)",
+      "cite": "R2/R3 §5.2 txt:1214-1217\n§5.4.1 txt:1408-1413 tags/time/boolean/ACL",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "recall_dense",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "seq": 11,
+      "label": "Retrieval:Emb — dense anchor/keyword vector match",
+      "cite": "R2 §5.2 txt:1214-1217",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "recall_graph",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": 11,
+      "state": "degraded",
+      "label": "Retrieval:Graph — memory-graph traversal (temporal chain/entity/dependency)",
+      "cite": "R2 §5.2 txt:1214-1217\ncondition/depth unstated",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "fuse",
+      "stage": "B4",
+      "row": 0,
+      "type": "fusion",
+      "seq": 12,
+      "label": "Fusion:Union — symbolic filter + semantic ranking, composed query",
+      "cite": "R3 §5.4.1 txt:1408-1413\n\"tag filters combined with semantic ranking\"",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "rerank",
+      "stage": "B4",
+      "row": 1,
+      "type": "alg",
+      "seq": 14,
+      "label": "Retrieval:Rerank — 4-metric scoring (similarity/frequency/decay/priority)",
+      "cite": "R5 §5.2 txt:1300-1305\n§5.4.2 txt:1433-1445",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "route_select",
+      "stage": "B5",
+      "row": 0,
+      "type": "sched",
+      "seq": 13,
+      "label": "Sched:PathResolver — MemoryPathResolver: what/where/what-order to query",
+      "cite": "R4 §5.4.1 txt:1418-1424\ntopic–concept–fact three-layer task pattern",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "select_sched",
+      "stage": "B5",
+      "row": 1,
+      "type": "sched",
+      "seq": 15,
+      "label": "Sched:MemScheduler — selects injection strategy per memory unit",
+      "cite": "R5 §5.2 txt:1300-1305\n§5.4.2 txt:1433-1445 (same step as rerank)",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "deliver_text",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 16,
+      "label": "IO:Context — plaintext blocks pasted into prompt",
+      "cite": "R6 §5.4.2 txt:1436-1441\nPlaintext channel",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "deliver_kv",
+      "stage": "B6",
+      "row": 1,
+      "type": "store",
+      "seq": 16,
+      "state": "degraded",
+      "label": "IO:Activation — Activation memory delivered via KV-cache injection",
+      "cite": "R6 §5.4.2 txt:1436-1441\nActivation channel",
+      "prim": "P-KVWINDOW"
+    },
+    {
+      "id": "answer",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 17,
+      "label": "LLM:Answer — backbone, drawn INSIDE the system boundary",
+      "cite": "R7 Figure 8 txt:1256-1257, 1275\nTable 2 / Figure 7 draw LLM Core inside MemOS\n(P29) — opposite of memory-bench's convention",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "turn",
+      "to": "call"
+    },
+    {
+      "from": "turn",
+      "to": "call_query"
+    },
+    {
+      "from": "call",
+      "to": "extract"
+    },
+    {
+      "from": "extract",
+      "to": "cube"
+    },
+    {
+      "from": "cube",
+      "to": "fingerprint",
+      "state": "degraded"
+    },
+    {
+      "from": "fingerprint",
+      "to": "dedup_conflict",
+      "state": "degraded"
+    },
+    {
+      "from": "persist",
+      "to": "dedup_conflict",
+      "state": "degraded",
+      "label": "prior committed memories"
+    },
+    {
+      "from": "dedup_conflict",
+      "to": "layer",
+      "state": "degraded"
+    },
+    {
+      "from": "layer",
+      "to": "graphlink",
+      "state": "degraded"
+    },
+    {
+      "from": "graphlink",
+      "to": "lifecycle"
+    },
+    {
+      "from": "lifecycle",
+      "to": "persist"
+    },
+    {
+      "from": "persist",
+      "to": "transmute_act",
+      "state": "degraded"
+    },
+    {
+      "from": "persist",
+      "to": "transmute_param",
+      "state": "degraded"
+    },
+    {
+      "from": "call_query",
+      "to": "recall_sym"
+    },
+    {
+      "from": "call_query",
+      "to": "recall_dense"
+    },
+    {
+      "from": "call_query",
+      "to": "recall_graph",
+      "state": "degraded"
+    },
+    {
+      "from": "persist",
+      "to": "recall_sym",
+      "label": "index"
+    },
+    {
+      "from": "persist",
+      "to": "recall_dense",
+      "label": "index"
+    },
+    {
+      "from": "graphlink",
+      "to": "recall_graph",
+      "state": "degraded",
+      "label": "graph"
+    },
+    {
+      "from": "recall_sym",
+      "to": "fuse"
+    },
+    {
+      "from": "recall_dense",
+      "to": "fuse"
+    },
+    {
+      "from": "recall_graph",
+      "to": "fuse",
+      "state": "degraded"
+    },
+    {
+      "from": "fuse",
+      "to": "route_select"
+    },
+    {
+      "from": "route_select",
+      "to": "rerank"
+    },
+    {
+      "from": "rerank",
+      "to": "select_sched"
+    },
+    {
+      "from": "select_sched",
+      "to": "deliver_text"
+    },
+    {
+      "from": "select_sched",
+      "to": "deliver_kv",
+      "state": "degraded"
+    },
+    {
+      "from": "transmute_act",
+      "to": "deliver_kv",
+      "state": "degraded"
+    },
+    {
+      "from": "transmute_param",
+      "to": "answer",
+      "state": "degraded"
+    },
+    {
+      "from": "deliver_text",
+      "to": "answer"
+    },
+    {
+      "from": "deliver_kv",
+      "to": "answer",
+      "state": "degraded"
+    },
+    {
+      "from": "answer",
+      "to": "usage"
+    }
+  ]
+}

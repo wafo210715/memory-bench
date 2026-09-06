@@ -1,0 +1,143 @@
+{
+  "system": "atommem",
+  "view": "diff",
+  "title": "AtomMem — where the paper and the code part ways",
+  "subtitle": "Only the divergent steps are drawn. Each node states both sides; the lane says which stage of the pipeline the divergence sits in.",
+  "source": "paper arXiv:2606.19847  ×  repo AtomMem @ 776f880   ·   servers/atommem/verification.md §5, 16 divergences found, 14 drawn here",
+  "footer": "memory-bench · methodology flow · paper ↔ code divergence",
+  "legend_notes": [
+    "Headline: AtomMem's namesake contribution — the Fact Executor — is the model that never runs in this repo's benchmarked LoCoMo pipeline. No weights, no training code; facts are read pre-extracted from disk (D1).",
+    "Second-biggest gap: event_contexts is computed at query time and then explicitly discarded before the final prompt is built, despite two prompt figures and the running text naming it as an input (D5).",
+    "A3 ADMIT is where the paper's single joint LLM call (residual + conflict) splits into three independent code paths: threshold dedup, LLM conflict-with-hard-overwrite, and an unrelated second retrieval for event attribution (D2, D3).",
+    "Not drawn: D12 (no CLI switch for the paper's ablation variants) and D14 (README env-var typo, ATOMMEM_FACT_EXECUTOR_* vs the code's ATOMMEM_FACT_EXTRACTOR_*) — both are real findings in verification.md §5 but neither is a pipeline step that fits a stage lane."
+  ],
+  "nodes": [
+    {
+      "id": "d1",
+      "stage": "A6",
+      "row": 0,
+      "type": "learn",
+      "state": "paper_only",
+      "label": "Fact Executor SFT pipeline (P-TRAIN + P-EXTRACT)",
+      "cite": "paper: Eq.1, §4.1 LoRA SFT Qwen3-14B\ncode: 0 weight files; no torch/transformers/peft;\nevaluate_locomo.py:744 reads pre-extracted JSON"
+    },
+    {
+      "id": "d4",
+      "stage": "A2",
+      "row": 0,
+      "type": "sched",
+      "state": "differs",
+      "label": "Profile batch trigger: session-end vs pending-count threshold",
+      "cite": "paper: \"At the end of a dialogue session\"\n(txt:354-360)\ncode: pending≥10 across sessions (profile_manager.py:41)\n+ one force-flush after all sessions (:362)"
+    },
+    {
+      "id": "d10",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "state": "differs",
+      "label": "\"Long-term trait\" flag: set during extraction vs during metadata parse",
+      "cite": "paper: set \"during atomic fact extraction\"\n(txt:357-359)\ncode: set by extract_fact_metadata\n(preextracted_pipeline.py:123) — extraction never runs"
+    },
+    {
+      "id": "d13",
+      "stage": "A2",
+      "row": 2,
+      "type": "llm",
+      "state": "differs",
+      "label": "Fact Executor's 5 extraction rules: unevenly implemented across two unused paths",
+      "cite": "paper: Figure A.1, 5 rules incl. 3rd-person rewrite\n+ image-as-primary-source (txt:1189-1207)\ncode: demo path matches (run_demo_server.py:131-146);\nbatch script drops rewrite+image rules (:166-180)"
+    },
+    {
+      "id": "d2",
+      "stage": "A3",
+      "row": 0,
+      "type": "llm",
+      "state": "differs",
+      "label": "Fact Verification: joint residual+conflict vs split threshold+overwrite",
+      "cite": "paper: 1 LLM call → (c'_new, U),\nonly on conflict (txt:264-274)\ncode: cosine>0.95 no-LLM IGNORE + LLM binary\nconflict → hard 4-field overwrite, no residual kept"
+    },
+    {
+      "id": "d3",
+      "stage": "A3",
+      "row": 1,
+      "type": "alg",
+      "state": "differs",
+      "label": "Event candidate generation: reuse Cret vs independent retrieval",
+      "cite": "paper: Algorithm 1 lines 5-11,\n\"for all F in Cret\" (txt:1290-1301)\ncode: _retrieve_top_similar_facts reruns top-10 search,\nown α/β weights (config.py:62-64 vs 79-80)"
+    },
+    {
+      "id": "d7",
+      "stage": "A3",
+      "row": 2,
+      "type": "nlp",
+      "state": "differs",
+      "label": "Symbolic filter's temporal component is a no-op (write side)",
+      "cite": "paper: \"participants and temporal contexts\"\n(txt:233-235)\ncode: fact_storage.py:189-195 is a bare `pass`\n— only people gates the filter"
+    },
+    {
+      "id": "d11",
+      "stage": "A3",
+      "row": 3,
+      "type": "nlp",
+      "state": "code_only",
+      "label": "Construction-side thresholds: absent in paper, hardcoded in code",
+      "cite": "paper: Table 5 covers retrieval-side only\n(txt:1625-1729), no construction thresholds\ncode: DUPLICATE_THRESHOLD=0.95, conflict sim>0.6\n& top-5, PROFILE_BATCH_TRIGGER=10, MIN_LLM_SCORE=0.55"
+    },
+    {
+      "id": "d15",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "state": "differs",
+      "label": "ks split: one shared parameter vs three independent configs",
+      "cite": "paper: ks=10, main/compensation seed each\nks/2=5 (txt:1537-1538, §A.6.1)\ncode: MAIN_RECALL_TOP_K=5 + COMPENSATION_FACT_TOP_K=5\n+ GRAPH_MAX_SEED_FACTS=10 (config.py:73,75,102)"
+    },
+    {
+      "id": "d8",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "state": "code_only",
+      "label": "People-gates on keyword/turn graph edges",
+      "cite": "paper: Eq.3 (keyword edge), Eq.5 (turn edge)\nhave no person term\ncode: _passes_person_gate (multichannel_graph.py:567-572),\n_turn_soft_person_gate (:558-565)"
+    },
+    {
+      "id": "d9",
+      "stage": "B3",
+      "row": 1,
+      "type": "alg",
+      "state": "differs",
+      "label": "Per-channel neighbor caps vs one unified cap",
+      "cite": "paper: Table 5 \"Maximum Neighbors\nper Fact = 30\" (txt:1684,1690)\ncode: event channel capped at 10, turn channel\nat 6 (config.py:96,100), overriding 30"
+    },
+    {
+      "id": "d16",
+      "stage": "B3",
+      "row": 2,
+      "type": "alg",
+      "state": "differs",
+      "label": "PPR dangling-node mass redistribution coefficient",
+      "cite": "paper: \"redistributed according to the restart\ndistribution p\" (txt:1441-1444), no coefficient given\ncode: sink_mass scaled by (1-η) before reflow\n(multichannel_graph.py:476-480)"
+    },
+    {
+      "id": "d5",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "state": "paper_only",
+      "label": "event_contexts reaches the final prompt",
+      "cite": "paper: Figure 8/9 Input item 4 (txt:1739/1762),\n\"enriched by event-level context\" (txt:436)\ncode: computed (run_atommem_pipeline.py:399)\nthen discarded (query_response.py:195,198,234)"
+    },
+    {
+      "id": "d6",
+      "stage": "B6",
+      "row": 1,
+      "type": "io",
+      "state": "code_only",
+      "label": "Per-category answer prompt (cat2 temporal template)",
+      "cite": "paper: Figure 8 covers single-hop/multi-hop/temporal\nin ONE prompt (txt:1753-1754)\ncode: _load_category_prompt splits cat2 into its own\n25-line template with rules absent from the paper"
+    }
+  ],
+  "edges": []
+}

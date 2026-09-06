@@ -1,0 +1,297 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1980" height="1639" viewBox="0 0 1980 1639" font-family="Inter, -apple-system, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Noto Sans SC&quot;, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="24" y="30" font-size="19" font-weight="700" fill="#111827">AtomMem — where the paper and the code part ways</text>
+<text x="24" y="50" font-size="11.5" fill="#4b5563">Only the divergent steps are drawn. Each node states both sides; the lane says which stage of the pipeline the divergence sits in.</text>
+<text x="24" y="66" font-size="9.5" fill="#9ca3af" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper arXiv:2606.19847  ×  repo AtomMem @ 776f880   ·   servers/atommem/verification.md §5, 16 divergences found, 14 drawn here</text>
+<rect x="14" y="100" width="1276" height="856.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="93" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">A · MEMORY FORMATION  (query-independent)</text>
+<rect x="18" y="104" width="196" height="844.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="116.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A1 INTAKE</text>
+<text x="116.0" y="541.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="230" y="104" width="196" height="844.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="328.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A2 DISTILL</text>
+<rect x="442" y="104" width="196" height="844.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="540.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A3 ADMIT</text>
+<rect x="654" y="104" width="196" height="844.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="752.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A4 INDEX</text>
+<text x="752.0" y="541.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="866" y="104" width="196" height="844.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="964.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A5 COMMIT</text>
+<text x="964.0" y="541.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="1078" y="104" width="196" height="844.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1176.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A6 INTERNALIZE</text>
+<rect x="14" y="1014.0" width="1700" height="595.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="1007.0" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">B · MEMORY MOBILIZATION  (query-conditioned)</text>
+<rect x="18" y="1018.0" width="196" height="583.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="116.0" y="1035.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B1 CUE</text>
+<text x="116.0" y="1324.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="230" y="1018.0" width="196" height="583.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="328.0" y="1035.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B2 RECALL</text>
+<rect x="442" y="1018.0" width="196" height="583.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="540.0" y="1035.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B3 EXPAND</text>
+<rect x="654" y="1018.0" width="196" height="583.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="752.0" y="1035.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B4 APPRAISE</text>
+<text x="752.0" y="1324.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="866" y="1018.0" width="196" height="583.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="964.0" y="1035.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B5 SELECT</text>
+<text x="964.0" y="1324.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="1078" y="1018.0" width="196" height="583.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1176.0" y="1035.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B6 DELIVER</text>
+<rect x="1290" y="1018.0" width="196" height="583.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="1388.0" y="1035.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B7 GENERATE</text>
+<text x="1388.0" y="1324.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="1502" y="1018.0" width="196" height="583.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="1600.0" y="1035.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B8 LOOP</text>
+<text x="1600.0" y="1324.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="1096.0" y="134.0" width="172" height="143" rx="7" fill="#f5d0fe" stroke="#dc2626" stroke-width="2.2" stroke-dasharray="6 4"/>
+<text x="1182.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Fact Executor SFT</text>
+<text x="1182.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">pipeline (P-TRAIN +</text>
+<text x="1182.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">P-EXTRACT)</text>
+<text x="1107.0" y="202.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: Eq.1, §4.1 LoRA SFT</text>
+<text x="1107.0" y="214.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Qwen3-14B</text>
+<text x="1107.0" y="226.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: 0 weight files; no</text>
+<text x="1107.0" y="238.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">torch/transformers/peft;</text>
+<text x="1107.0" y="250.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">evaluate_locomo.py:744 reads</text>
+<text x="1107.0" y="262.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">pre-extracted JSON</text>
+<circle cx="1257.0" cy="145.0" r="8" fill="#dc2626"/>
+<text x="1257.0" y="148.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">P</text>
+<rect x="248.0" y="134.0" width="172" height="167" rx="7" fill="#fef3c7" stroke="#b45309" stroke-width="2.2"/>
+<text x="334.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Profile batch trigger:</text>
+<text x="334.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">session-end vs</text>
+<text x="334.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">pending-count threshold</text>
+<text x="259.0" y="202.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: &quot;At the end of a</text>
+<text x="259.0" y="214.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">dialogue session&quot;</text>
+<text x="259.0" y="226.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:354-360)</text>
+<text x="259.0" y="238.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: pending≥10 across</text>
+<text x="259.0" y="250.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">sessions</text>
+<text x="259.0" y="262.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(profile_manager.py:41)</text>
+<text x="259.0" y="274.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">+ one force-flush after all</text>
+<text x="259.0" y="286.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">sessions (:362)</text>
+<circle cx="409.0" cy="145.0" r="8" fill="#b45309"/>
+<text x="409.0" y="148.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="248.0" y="326.0" width="172" height="170" rx="7" fill="#dbeafe" stroke="#b45309" stroke-width="2.2"/>
+<text x="334.0" y="348.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">&quot;Long-term trait&quot; flag:</text>
+<text x="334.0" y="363.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">set during extraction</text>
+<text x="334.0" y="378.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">vs during metadata</text>
+<text x="334.0" y="393.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">parse</text>
+<text x="259.0" y="409.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: set &quot;during atomic fact</text>
+<text x="259.0" y="421.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">extraction&quot;</text>
+<text x="259.0" y="433.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:357-359)</text>
+<text x="259.0" y="445.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: set by</text>
+<text x="259.0" y="457.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">extract_fact_metadata</text>
+<text x="259.0" y="469.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(preextracted_pipeline.py:123)</text>
+<text x="259.0" y="481.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">— extraction never runs</text>
+<circle cx="409.0" cy="337.0" r="8" fill="#b45309"/>
+<text x="409.0" y="340.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="248.0" y="530.0" width="172" height="182" rx="7" fill="#dbeafe" stroke="#b45309" stroke-width="2.2"/>
+<text x="334.0" y="552.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Fact Executor's 5</text>
+<text x="334.0" y="567.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">extraction rules:</text>
+<text x="334.0" y="582.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">unevenly implemented</text>
+<text x="334.0" y="597.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">across two unused paths</text>
+<text x="259.0" y="613.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: Figure A.1, 5 rules</text>
+<text x="259.0" y="625.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">incl. 3rd-person rewrite</text>
+<text x="259.0" y="637.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">+ image-as-primary-source</text>
+<text x="259.0" y="649.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:1189-1207)</text>
+<text x="259.0" y="661.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: demo path matches</text>
+<text x="259.0" y="673.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(run_demo_server.py:131-146);</text>
+<text x="259.0" y="685.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">batch script drops</text>
+<text x="259.0" y="697.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">rewrite+image rules (:166-180)</text>
+<circle cx="409.0" cy="541.0" r="8" fill="#b45309"/>
+<text x="409.0" y="544.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="460.0" y="134.0" width="172" height="170" rx="7" fill="#dbeafe" stroke="#b45309" stroke-width="2.2"/>
+<text x="546.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Fact Verification:</text>
+<text x="546.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">joint residual+conflict</text>
+<text x="546.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">vs split</text>
+<text x="546.0" y="201.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">threshold+overwrite</text>
+<text x="471.0" y="217.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: 1 LLM call → (c'_new,</text>
+<text x="471.0" y="229.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">U),</text>
+<text x="471.0" y="241.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">only on conflict (txt:264-274)</text>
+<text x="471.0" y="253.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: cosine&gt;0.95 no-LLM</text>
+<text x="471.0" y="265.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">IGNORE + LLM binary</text>
+<text x="471.0" y="277.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">conflict → hard 4-field</text>
+<text x="471.0" y="289.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">overwrite, no residual kept</text>
+<circle cx="621.0" cy="145.0" r="8" fill="#b45309"/>
+<text x="621.0" y="148.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="460.0" y="326.0" width="172" height="182" rx="7" fill="#ffedd5" stroke="#b45309" stroke-width="2.2"/>
+<text x="546.0" y="348.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Event candidate</text>
+<text x="546.0" y="363.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">generation: reuse Cret</text>
+<text x="546.0" y="378.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">vs independent</text>
+<text x="546.0" y="393.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">retrieval</text>
+<text x="471.0" y="409.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: Algorithm 1 lines 5-11,</text>
+<text x="471.0" y="421.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&quot;for all F in Cret&quot;</text>
+<text x="471.0" y="433.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:1290-1301)</text>
+<text x="471.0" y="445.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code:</text>
+<text x="471.0" y="457.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">_retrieve_top_similar_facts</text>
+<text x="471.0" y="469.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">reruns top-10 search,</text>
+<text x="471.0" y="481.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">own α/β weights</text>
+<text x="471.0" y="493.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(config.py:62-64 vs 79-80)</text>
+<circle cx="621.0" cy="337.0" r="8" fill="#b45309"/>
+<text x="621.0" y="340.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="460.0" y="530.0" width="172" height="143" rx="7" fill="#ecfccb" stroke="#b45309" stroke-width="2.2"/>
+<text x="546.0" y="552.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Symbolic filter's</text>
+<text x="546.0" y="567.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">temporal component is a</text>
+<text x="546.0" y="582.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">no-op (write side)</text>
+<text x="471.0" y="598.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: &quot;participants and</text>
+<text x="471.0" y="610.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">temporal contexts&quot;</text>
+<text x="471.0" y="622.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:233-235)</text>
+<text x="471.0" y="634.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: fact_storage.py:189-195</text>
+<text x="471.0" y="646.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">is a bare `pass`</text>
+<text x="471.0" y="658.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">— only people gates the filter</text>
+<circle cx="621.0" cy="541.0" r="8" fill="#b45309"/>
+<text x="621.0" y="544.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="460.0" y="734.0" width="172" height="206" rx="7" fill="#ecfccb" stroke="#0f766e" stroke-width="2.2"/>
+<text x="546.0" y="756.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Construction-side</text>
+<text x="546.0" y="771.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">thresholds: absent in</text>
+<text x="546.0" y="786.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">paper, hardcoded in</text>
+<text x="546.0" y="801.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">code</text>
+<text x="471.0" y="817.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: Table 5 covers</text>
+<text x="471.0" y="829.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">retrieval-side only</text>
+<text x="471.0" y="841.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:1625-1729), no</text>
+<text x="471.0" y="853.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">construction thresholds</text>
+<text x="471.0" y="865.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code:</text>
+<text x="471.0" y="877.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">DUPLICATE_THRESHOLD=0.95,</text>
+<text x="471.0" y="889.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">conflict sim&gt;0.6</text>
+<text x="471.0" y="901.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&amp; top-5,</text>
+<text x="471.0" y="913.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">PROFILE_BATCH_TRIGGER=10,</text>
+<text x="471.0" y="925.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">MIN_LLM_SCORE=0.55</text>
+<circle cx="621.0" cy="745.0" r="8" fill="#0f766e"/>
+<text x="621.0" y="748.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">C</text>
+<rect x="248.0" y="1048.0" width="172" height="155" rx="7" fill="#ffedd5" stroke="#b45309" stroke-width="2.2"/>
+<text x="334.0" y="1070.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">ks split: one shared</text>
+<text x="334.0" y="1085.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">parameter vs three</text>
+<text x="334.0" y="1100.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">independent configs</text>
+<text x="259.0" y="1116.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: ks=10,</text>
+<text x="259.0" y="1128.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">main/compensation seed each</text>
+<text x="259.0" y="1140.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ks/2=5 (txt:1537-1538, §A.6.1)</text>
+<text x="259.0" y="1152.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: MAIN_RECALL_TOP_K=5 +</text>
+<text x="259.0" y="1164.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">COMPENSATION_FACT_TOP_K=5</text>
+<text x="259.0" y="1176.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">+ GRAPH_MAX_SEED_FACTS=10</text>
+<text x="259.0" y="1188.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(config.py:73,75,102)</text>
+<circle cx="409.0" cy="1059.0" r="8" fill="#b45309"/>
+<text x="409.0" y="1062.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="460.0" y="1048.0" width="172" height="167" rx="7" fill="#ffedd5" stroke="#0f766e" stroke-width="2.2"/>
+<text x="546.0" y="1070.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">People-gates on</text>
+<text x="546.0" y="1085.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">keyword/turn graph</text>
+<text x="546.0" y="1100.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">edges</text>
+<text x="471.0" y="1116.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: Eq.3 (keyword edge),</text>
+<text x="471.0" y="1128.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Eq.5 (turn edge)</text>
+<text x="471.0" y="1140.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">have no person term</text>
+<text x="471.0" y="1152.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: _passes_person_gate</text>
+<text x="471.0" y="1164.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(multichannel_graph.py:567-572</text>
+<text x="471.0" y="1176.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">),</text>
+<text x="471.0" y="1188.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">_turn_soft_person_gate</text>
+<text x="471.0" y="1200.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(:558-565)</text>
+<circle cx="621.0" cy="1059.0" r="8" fill="#0f766e"/>
+<text x="621.0" y="1062.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">C</text>
+<rect x="460.0" y="1237.0" width="172" height="140" rx="7" fill="#ffedd5" stroke="#b45309" stroke-width="2.2"/>
+<text x="546.0" y="1259.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Per-channel neighbor</text>
+<text x="546.0" y="1274.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">caps vs one unified cap</text>
+<text x="471.0" y="1290.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: Table 5 &quot;Maximum</text>
+<text x="471.0" y="1302.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Neighbors</text>
+<text x="471.0" y="1314.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">per Fact = 30&quot; (txt:1684,1690)</text>
+<text x="471.0" y="1326.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: event channel capped at</text>
+<text x="471.0" y="1338.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">10, turn channel</text>
+<text x="471.0" y="1350.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">at 6 (config.py:96,100),</text>
+<text x="471.0" y="1362.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">overriding 30</text>
+<circle cx="621.0" cy="1248.0" r="8" fill="#b45309"/>
+<text x="621.0" y="1251.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="460.0" y="1414.0" width="172" height="179" rx="7" fill="#ffedd5" stroke="#b45309" stroke-width="2.2"/>
+<text x="546.0" y="1436.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">PPR dangling-node mass</text>
+<text x="546.0" y="1451.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">redistribution</text>
+<text x="546.0" y="1466.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">coefficient</text>
+<text x="471.0" y="1482.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: &quot;redistributed</text>
+<text x="471.0" y="1494.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">according to the restart</text>
+<text x="471.0" y="1506.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">distribution p&quot;</text>
+<text x="471.0" y="1518.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:1441-1444), no</text>
+<text x="471.0" y="1530.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">coefficient given</text>
+<text x="471.0" y="1542.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: sink_mass scaled by</text>
+<text x="471.0" y="1554.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(1-η) before reflow</text>
+<text x="471.0" y="1566.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(multichannel_graph.py:476-480</text>
+<text x="471.0" y="1578.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">)</text>
+<circle cx="621.0" cy="1425.0" r="8" fill="#b45309"/>
+<text x="621.0" y="1428.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<rect x="1096.0" y="1048.0" width="172" height="164" rx="82.0" fill="#f3e8ff" stroke="#dc2626" stroke-width="2.2" stroke-dasharray="6 4"/>
+<text x="1182.0" y="1070.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">event_contexts reaches</text>
+<text x="1182.0" y="1085.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">the final prompt</text>
+<text x="1107.0" y="1101.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: Figure 8/9 Input item 4</text>
+<text x="1107.0" y="1113.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(txt:1739/1762),</text>
+<text x="1107.0" y="1125.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&quot;enriched by event-level</text>
+<text x="1107.0" y="1137.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">context&quot; (txt:436)</text>
+<text x="1107.0" y="1149.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: computed</text>
+<text x="1107.0" y="1161.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(run_atommem_pipeline.py:399)</text>
+<text x="1107.0" y="1173.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">then discarded</text>
+<text x="1107.0" y="1185.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(query_response.py:195,198,234</text>
+<text x="1107.0" y="1197.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">)</text>
+<circle cx="1257.0" cy="1059.0" r="8" fill="#dc2626"/>
+<text x="1257.0" y="1062.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">P</text>
+<rect x="1096.0" y="1237.0" width="172" height="155" rx="77.5" fill="#f3e8ff" stroke="#0f766e" stroke-width="2.2"/>
+<text x="1182.0" y="1259.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Per-category answer</text>
+<text x="1182.0" y="1274.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">prompt (cat2 temporal</text>
+<text x="1182.0" y="1289.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">template)</text>
+<text x="1107.0" y="1305.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">paper: Figure 8 covers</text>
+<text x="1107.0" y="1317.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">single-hop/multi-hop/temporal</text>
+<text x="1107.0" y="1329.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">in ONE prompt (txt:1753-1754)</text>
+<text x="1107.0" y="1341.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">code: _load_category_prompt</text>
+<text x="1107.0" y="1353.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">splits cat2 into its own</text>
+<text x="1107.0" y="1365.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">25-line template with rules</text>
+<text x="1107.0" y="1377.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">absent from the paper</text>
+<circle cx="1257.0" cy="1248.0" r="8" fill="#0f766e"/>
+<text x="1257.0" y="1251.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">C</text>
+<rect x="1726" y="100" width="208" height="1493.0" rx="9" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="1740" y="122" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NODE TYPE</text>
+<rect x="1740" y="130" width="16" height="11" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<text x="1763" y="138" font-size="10" fill="#4b5563">LLM call</text>
+<rect x="1740" y="147" width="16" height="11" rx="3" fill="#ffedd5" stroke="#ea580c" stroke-width="1.4"/>
+<text x="1763" y="155" font-size="10" fill="#4b5563">Retrieval / ranking</text>
+<rect x="1740" y="164" width="16" height="11" rx="3" fill="#ecfccb" stroke="#4d7c0f" stroke-width="1.4"/>
+<text x="1763" y="172" font-size="10" fill="#4b5563">Deterministic NLP</text>
+<rect x="1740" y="181" width="16" height="11" rx="3" fill="#fef3c7" stroke="#b45309" stroke-width="1.4"/>
+<text x="1763" y="189" font-size="10" fill="#4b5563">Scheduling</text>
+<rect x="1740" y="198" width="16" height="11" rx="3" fill="#f5d0fe" stroke="#a21caf" stroke-width="1.4"/>
+<text x="1763" y="206" font-size="10" fill="#4b5563">Learned parameters</text>
+<rect x="1740" y="215" width="16" height="11" rx="3" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.4"/>
+<text x="1763" y="223" font-size="10" fill="#4b5563">Input / output</text>
+<text x="1740" y="250" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">PAPER vs CODE</text>
+<rect x="1740" y="257" width="18" height="13" rx="3" fill="#ffffff" stroke="#dc2626" stroke-width="2" stroke-dasharray="6 4"/>
+<circle cx="1766" cy="263" r="6.5" fill="#dc2626"/>
+<text x="1766" y="266.6" font-size="8.5" font-weight="700" text-anchor="middle" fill="#ffffff">P</text>
+<text x="1779" y="266" font-size="9.5" fill="#4b5563">Paper only — not in code</text>
+<rect x="1740" y="277" width="18" height="13" rx="3" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+<circle cx="1766" cy="283" r="6.5" fill="#0f766e"/>
+<text x="1766" y="286.6" font-size="8.5" font-weight="700" text-anchor="middle" fill="#ffffff">C</text>
+<text x="1779" y="286" font-size="9.5" fill="#4b5563">Code only — not in paper</text>
+<rect x="1740" y="297" width="18" height="13" rx="3" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
+<circle cx="1766" cy="303" r="6.5" fill="#b45309"/>
+<text x="1766" y="306.6" font-size="8.5" font-weight="700" text-anchor="middle" fill="#ffffff">!</text>
+<text x="1779" y="306" font-size="9.5" fill="#4b5563">Both, but behave</text>
+<text x="1779" y="317" font-size="9.5" fill="#4b5563">differently</text>
+<text x="1740" y="345" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NOTES</text>
+<text x="1740" y="360" font-size="9.5" fill="#4b5563">• Headline: AtomMem's namesake</text>
+<text x="1740" y="371.5" font-size="9.5" fill="#4b5563">contribution — the Fact Executor — is</text>
+<text x="1740" y="383.0" font-size="9.5" fill="#4b5563">the model that never runs in this</text>
+<text x="1740" y="394.5" font-size="9.5" fill="#4b5563">repo's benchmarked LoCoMo pipeline. No</text>
+<text x="1740" y="406.0" font-size="9.5" fill="#4b5563">weights, no training code; facts are</text>
+<text x="1740" y="417.5" font-size="9.5" fill="#4b5563">read pre-extracted from disk (D1).</text>
+<text x="1740" y="434.0" font-size="9.5" fill="#4b5563">• Second-biggest gap: event_contexts</text>
+<text x="1740" y="445.5" font-size="9.5" fill="#4b5563">is computed at query time and then</text>
+<text x="1740" y="457.0" font-size="9.5" fill="#4b5563">explicitly discarded before the final</text>
+<text x="1740" y="468.5" font-size="9.5" fill="#4b5563">prompt is built, despite two prompt</text>
+<text x="1740" y="480.0" font-size="9.5" fill="#4b5563">figures and the running text naming it</text>
+<text x="1740" y="491.5" font-size="9.5" fill="#4b5563">as an input (D5).</text>
+<text x="1740" y="508.0" font-size="9.5" fill="#4b5563">• A3 ADMIT is where the paper's single</text>
+<text x="1740" y="519.5" font-size="9.5" fill="#4b5563">joint LLM call (residual + conflict)</text>
+<text x="1740" y="531.0" font-size="9.5" fill="#4b5563">splits into three independent code</text>
+<text x="1740" y="542.5" font-size="9.5" fill="#4b5563">paths: threshold dedup, LLM</text>
+<text x="1740" y="554.0" font-size="9.5" fill="#4b5563">conflict-with-hard-overwrite, and an</text>
+<text x="1740" y="565.5" font-size="9.5" fill="#4b5563">unrelated second retrieval for event</text>
+<text x="1740" y="577.0" font-size="9.5" fill="#4b5563">attribution (D2, D3).</text>
+<text x="1740" y="593.5" font-size="9.5" fill="#4b5563">• Not drawn: D12 (no CLI switch for</text>
+<text x="1740" y="605.0" font-size="9.5" fill="#4b5563">the paper's ablation variants) and D14</text>
+<text x="1740" y="616.5" font-size="9.5" fill="#4b5563">(README env-var typo,</text>
+<text x="1740" y="628.0" font-size="9.5" fill="#4b5563">ATOMMEM_FACT_EXECUTOR_* vs the code's</text>
+<text x="1740" y="639.5" font-size="9.5" fill="#4b5563">ATOMMEM_FACT_EXTRACTOR_*) — both are</text>
+<text x="1740" y="651.0" font-size="9.5" fill="#4b5563">real findings in verification.md §5</text>
+<text x="1740" y="662.5" font-size="9.5" fill="#4b5563">but neither is a pipeline step that</text>
+<text x="1740" y="674.0" font-size="9.5" fill="#4b5563">fits a stage lane.</text>
+<text x="24" y="1623.0" font-size="9" fill="#9ca3af">memory-bench · methodology flow · paper ↔ code divergence</text>
+</svg>

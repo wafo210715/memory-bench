@@ -1,0 +1,258 @@
+{
+  "system": "letta",
+  "view": "paper",
+  "title": "Letta / MemGPT — paper view",
+  "subtitle": "The mechanism as Packer et al. describe it. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes mean the paper defines no such step.",
+  "source": "Packer et al. 2023/2024, MemGPT (arXiv:2310.08560v2, 13pp)  ·  txt: = pdftotext -layout (1000 lines); libtxt: = local library copy (1473 lines, no -layout) — two incompatible line-number systems, see servers/letta/verification.md header  ·  verified against servers/letta/verification.md (56 paper-side assertions, 48 ✓ / 2 ✗ / 6 ◐)",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "B3 EXPAND / B4 APPRAISE / B5 SELECT are all empty: recall_storage.search() and archival_storage.search() are undocumented black boxes — no algorithm, no reranking, no top-k rule, no expansion is ever given (P30).",
+    "B8 LOOP is filled while B5 SELECT is empty — MemGPT sits at the 'multi-pass' extreme of the retrieval architecture split (SKELETON §4④): zero combinatorial selection, but an unbounded heartbeat chain with no documented step cap or safety valve (P48, full-text grep = 0 hits).",
+    "A4 INDEX's only exercised instance is the offline Wikipedia precompute (W0) run before the experiments start — the LLM-triggered archival_storage.insert() described in §2.2 is never walked by any reported experiment (P22, P45)."
+  ],
+  "nodes": [
+    {
+      "id": "ev",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 3,
+      "label": "IO:Event — user / system / interaction / scheduled",
+      "cite": "§2.4 event types\ntxt:309-320  (W1)",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "warn",
+      "stage": "A3",
+      "row": 0,
+      "type": "sched",
+      "seq": 4,
+      "label": "Sched:QueueManager — memory pressure warning (e.g. 70%)",
+      "cite": "§2.2/§3.1  txt:224-240\n\"e.g.\", not a hardcoded value  (W5)",
+      "prim": "P-EVICT"
+    },
+    {
+      "id": "selfedit",
+      "stage": "A3",
+      "row": 1,
+      "type": "llm",
+      "seq": 5,
+      "label": "LLM:SelfEdit — append/replace working context (merged)",
+      "cite": "Fig.1 txt:74-147 / libtxt:182-190\nFig.4 txt:267-301 / libtxt:415\nmerged extract+conflict, one call  (W6, P8/P10/P11)",
+      "prim": "P-REVISE"
+    },
+    {
+      "id": "flush",
+      "stage": "A3",
+      "row": 2,
+      "type": "sched",
+      "seq": 6,
+      "label": "Sched:QueueManager — queue flush (e.g. 100% → evict e.g. 50%)",
+      "cite": "§3.5  txt:242-248\nboth values are \"e.g.\"  (W8)",
+      "prim": "P-EVICT"
+    },
+    {
+      "id": "summ",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "seq": 7,
+      "label": "LLM:Summarize — recursive summary (rolling)",
+      "cite": "§2.2  txt:242-248\n\"generates a new recursive summary using\nthe existing recursive summary and evicted messages\"\nnot stated whether this is an independent LLM call (P18)  (W9)",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "wikiemb",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "seq": 1,
+      "label": "NLP:Embed — precompute corpus embeddings (offline)",
+      "cite": "§3.2.1  txt:465-490\n\"We precompute embeddings and load them\ninto the database\"  (W0)",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "arcinsert",
+      "stage": "A4",
+      "row": 1,
+      "type": "alg",
+      "seq": null,
+      "state": "degraded",
+      "label": "NLP:Embed — ~archival insert (concept only)",
+      "cite": "§2.2  txt:238-241\nno experiment ever exercises this path:\nlibtxt archival_storage.* has only .search (P22)\n\"archival_storage.insert\" is not a real fn name (P45)  (W7)",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "wikistore",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 2,
+      "label": "Store:Vector — pgvector + HNSW, cosine",
+      "cite": "§3.2.1  txt:465-490  (W0)",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "recalldb",
+      "stage": "A5",
+      "row": 1,
+      "type": "store",
+      "seq": null,
+      "label": "Store:Database — recall storage (dual write)",
+      "cite": "§2.2  txt:186-190\n\"writes both the incoming message and the\ngenerated LLM output to recall storage\"  (W3)",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "selfquery",
+      "stage": "B1",
+      "row": 0,
+      "type": "llm",
+      "seq": 8,
+      "label": "LLM:SelfEdit — self-directed query formulation",
+      "cite": "§2.3  txt:255-261\n\"Memory edits and retrieval are entirely\nself-directed\"  (R2)",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "recallsearch",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 9,
+      "label": "Retrieval:Unspecified — recall_storage.search(query)",
+      "cite": "§3.2  txt:181-190  algorithm never given (P30)\nFig.2 txt:101-130,146-148 / libtxt:134,136,409\n\"six flags\" example  (R3)",
+      "prim": "P-DENSE|P-SPARSE",
+      "prim_note": "论文只写 recall_storage.search()，未说明检索机制"
+    },
+    {
+      "id": "archsearch",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "seq": 10,
+      "label": "Retrieval:Emb — archival_storage.search (paginated)",
+      "cite": "§3.2  txt:465-490  cosine similarity\nFig.6/8 txt:421-450,570-575 / libtxt:722,873-889\npage=2, nested-KV multi-step demo  (R4, P29/P34/P36)",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "fnresult",
+      "stage": "B6",
+      "row": 0,
+      "type": "store",
+      "seq": 11,
+      "label": "IO:Context — function result → main context",
+      "cite": "§2.3/§2.4  txt:243-259,329-335\nfunction output + runtime errors both feed back;\npagination guards against overflow  (R5)",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "heartbeat",
+      "stage": "B8",
+      "row": 0,
+      "type": "sched",
+      "seq": 12,
+      "label": "Sched:Heartbeat — chain or yield",
+      "cite": "§2.4/§3.3  txt:212-217,323-337\nrequest_heartbeat=true chains; no flag = yield\nno documented step cap or safety valve\n(libtxt full-text grep, 0 hits, P48)  (R6)",
+      "prim": "P-TOOLLOOP"
+    },
+    {
+      "id": "ans",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 13,
+      "label": "LLM:Answer",
+      "cite": "outside the boundary — the LLM Processor\nonly \"ingests prompt tokens, emits completion\ntokens\" (§3.3)  (R7)",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "wikiemb",
+      "to": "wikistore"
+    },
+    {
+      "from": "ev",
+      "to": "recalldb"
+    },
+    {
+      "from": "ev",
+      "to": "warn"
+    },
+    {
+      "from": "warn",
+      "to": "selfedit"
+    },
+    {
+      "from": "warn",
+      "to": "arcinsert",
+      "state": "degraded",
+      "label": "alternative destination, never exercised"
+    },
+    {
+      "from": "warn",
+      "to": "flush",
+      "label": "pressure keeps rising"
+    },
+    {
+      "from": "flush",
+      "to": "summ"
+    },
+    {
+      "from": "summ",
+      "to": "recalldb",
+      "label": "also written to recall DB"
+    },
+    {
+      "from": "ev",
+      "to": "selfquery"
+    },
+    {
+      "from": "selfquery",
+      "to": "recallsearch"
+    },
+    {
+      "from": "selfquery",
+      "to": "archsearch"
+    },
+    {
+      "from": "recalldb",
+      "to": "recallsearch",
+      "label": "search target"
+    },
+    {
+      "from": "wikistore",
+      "to": "archsearch",
+      "label": "search target"
+    },
+    {
+      "from": "recallsearch",
+      "to": "fnresult"
+    },
+    {
+      "from": "archsearch",
+      "to": "fnresult"
+    },
+    {
+      "from": "selfedit",
+      "to": "fnresult"
+    },
+    {
+      "from": "arcinsert",
+      "to": "fnresult",
+      "state": "degraded"
+    },
+    {
+      "from": "fnresult",
+      "to": "heartbeat"
+    },
+    {
+      "from": "heartbeat",
+      "to": "ev",
+      "label": "request_heartbeat=true: chain"
+    },
+    {
+      "from": "heartbeat",
+      "to": "ans",
+      "label": "no flag: yield"
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "system": "plugmem",
+  "view": "diff",
+  "title": "PlugMem — where the paper and the code part ways",
+  "subtitle": "Only the 14 divergences confirmed in verification.md §5. Each node states both sides; edges are omitted — this graph is a checklist, not a pipeline.",
+  "source": "paper arXiv:2603.03296v1  ×  repo PlugMem @ 3b2ce75   ·   servers/plugmem/verification.md §5, 15 divergences found; D15 (a documentation-dating error about the plugmem/ package's git history, not a flow divergence) excluded here",
+  "footer": "memory-bench · methodology flow · paper ↔ code divergence",
+  "legend_notes": [
+    "D1 is the structural headline: the paper's default multi-hop loop (B8) has no system-side counterpart at all — the nearest code analog is an external, opt-in, semantic-only eval script (HotpotQA only, off by default).",
+    "Three of the fourteen divergences share one shape — a real signal is computed and then thrown away: return score (D2, forced to 0.0), importance (D4, forced to 0), and the 'only one memory type' router (D11, contradicts the paper's own Table 14).",
+    "D7's promotion pathway (credibility/confidence/coding-assistant memory promotion) is the single biggest code-only addition — a whole fourth write channel with no paper counterpart, entered via a separate API and bypassing every other node in this diagram."
+  ],
+  "nodes": [
+    {
+      "id": "d1",
+      "stage": "B8",
+      "row": 0,
+      "type": "sched",
+      "state": "paper_only",
+      "label": "Multi-hop retrieval controller (default design)",
+      "cite": "paper: main text txt:755-757 +\nC.3 txt:2520-2542, Table 14\ncode: plugmem/ grep multi_hop|Tmax|\nmax_hop|enough = 0 hits. Only\nsrc/eval/hotpotqa/eval_qa_all.py:122-221\nexists — external eval script,\nsemantic-only, opt-in (default off)"
+    },
+    {
+      "id": "d2",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "state": "paper_only",
+      "label": "Return score ρ ∈ [1,10], independent evaluator",
+      "cite": "paper: txt:728-730, 2426-2427,\nListing 3 @2236/2238\ncode: structuring.py:124 _return=0.0\nhardcoded; get_return() zero call\nsites; src/.../structuring_inference.py:138\ncall commented out"
+    },
+    {
+      "id": "d10",
+      "stage": "A2",
+      "row": 1,
+      "type": "alg",
+      "state": "differs",
+      "label": "Segmentation threshold",
+      "cite": "paper: \"a predefined threshold\",\ntxt:640, 2420-2422\ncode: hardcoded 0.75,\nmemory.py:81 / src/.../memory.py:48"
+    },
+    {
+      "id": "d12",
+      "stage": "A2",
+      "row": 2,
+      "type": "io",
+      "state": "code_only",
+      "label": "Task-adapted variant (LongMemEval)",
+      "cite": "paper: Appendix F says only \"swap\nextraction prompt + reflexion update\",\ntxt:3736-3746\ncode: Memory_LongMemEval skips\nsubgoal/reward/state entirely, produces\nno procedural memory at all,\nmemory.py:100-148"
+    },
+    {
+      "id": "d3",
+      "stage": "A3",
+      "row": 0,
+      "type": "nlp",
+      "state": "differs",
+      "label": "Intent deduplication",
+      "cite": "paper: cosine > θ_equal,\ntxt:2428-2431\ncode: exact string match,\nmemory_graph.py:515\nsubgoal2node.get()"
+    },
+    {
+      "id": "d7",
+      "stage": "A3",
+      "row": 1,
+      "type": "nlp",
+      "state": "code_only",
+      "label": "credibility / confidence / promotion",
+      "cite": "paper: grep credib 0 hits,\npromot 0 hits\ncode: graph_node.py:70 credibility=10,\n:72 confidence=0.5;\ninference/promotion.py /extract API\nbypasses c-W1–c-W7 entirely"
+    },
+    {
+      "id": "d13",
+      "stage": "A3",
+      "row": 2,
+      "type": "sched",
+      "state": "paper_only",
+      "label": "Delete / decay",
+      "cite": "paper: \"decay low-utility nodes +\ncompress old episodic\", Table 13\ntxt:2140-2143\ncode: only credibility_decay\n(default 0, no-op) + whole-graph\ndelete (routes/graphs.py:53); zero\nepisodic compression anywhere"
+    },
+    {
+      "id": "d14",
+      "stage": "A4",
+      "row": 0,
+      "type": "store",
+      "state": "code_only",
+      "label": "Storage vs. ANN retrieval",
+      "cite": "paper: does not address storage impl.\ncode: ChromaDB persists but 4\nquery_* ANN methods\n(chroma.py:411/521/623/750) are\nzero-callsite dead code; retrieval is\na brute-force Python cosine loop,\nmemory_graph.py:688-696"
+    },
+    {
+      "id": "d11",
+      "stage": "B1",
+      "row": 0,
+      "type": "llm",
+      "state": "differs",
+      "label": "Memory-type selection: one vs many",
+      "cite": "paper self-contradicts: Table 14\nF⊆{E,S,P} txt:2683 vs Listing 8\n\"only one\" txt:2560\ncode: strict 3-way exclusive,\nmemory_graph.py:56-70 _normalize_mode"
+    },
+    {
+      "id": "d5",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "state": "differs",
+      "label": "Semantic init-candidate k",
+      "cite": "paper: scores ALL low-level nodes,\nno number given, txt:735-739\ncode: hardcoded top-5,\nmemory_graph.py:686 sem_node_topk=5"
+    },
+    {
+      "id": "d6",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "state": "differs",
+      "label": "Episodic mapping (ToEpisodic)",
+      "cite": "paper: one-line provenance map,\ntxt:2696+2702, 732-734\ncode: session-id vote ≥ 3 →\nfull session; < 3 → semantic\nproposition text, no provenance,\nmemory_graph.py:871, 876-877"
+    },
+    {
+      "id": "d4",
+      "stage": "B4",
+      "row": 0,
+      "type": "alg",
+      "state": "differs",
+      "label": "Rerank signal: importance",
+      "cite": "paper: relevance + importance/recency,\ntxt:754-755, 2531\ncode: compute_importance() → 0,\nvalue_functions.py:75-76; credibility\nalso missing, value_base.py:30"
+    },
+    {
+      "id": "d8",
+      "stage": "B6",
+      "row": 0,
+      "type": "llm",
+      "state": "differs",
+      "label": "Reasoning Module boundary",
+      "cite": "paper: 3rd core component, txt:444-451,\n761-775, C.4 txt:2660-2766\ncode: retrieve_memory returns messages\nonly, memory_graph.py:1091-1092,1108;\nretrieve_and_reason():1274 zero call sites"
+    },
+    {
+      "id": "d9",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "state": "differs",
+      "label": "LongMemEval model config",
+      "cite": "paper: reasoning=base agent=Qwen2.5-72B,\nTable 3 txt:1057-1058, E.1 txt:3310-3313\ncode: gpt-4o hardcoded,\neval_longmemeval_all.py:102,116;\nutils.py:142 explicit arg beats env var.\nWebArena unaffected (Q32+4o both sides)"
+    }
+  ],
+  "edges": []
+}

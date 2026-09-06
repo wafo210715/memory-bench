@@ -1,0 +1,319 @@
+{
+  "system": "mragent",
+  "view": "paper",
+  "title": "MRAgent — paper view",
+  "subtitle": "The mechanism as Ji et al. describe it (Algorithm 1 + Appendix B.1). Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes mean the paper defines no such step.",
+  "source": "Ji et al. 2026, MRAgent (arXiv:2606.06036v1, ICML 2026 / PMLR 306)   ·   verified against servers/mragent/verification.md §3 (60 paper-side assertions: 47 ✓ / 1 ✗ / 11 ◐ / 1 ?)",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "A3 ADMIT and B5 SELECT are both empty: the paper never describes a write-time dedup/admission step, and retrieval settles for whatever f_route keeps — no combinatorial selection or quota.",
+    "B8 LOOP is one of only 4/14 systems that fill this lane. f_select and STOP/C_LLM are Algorithm 1's real loop; it cycles within B3 (traversal) -> B4 (f_route) -> B8 (stop check) and back to B8 (f_select), not all the way back to B1/B2.",
+    "The A5 Store:Graph node is an interpretive call, not a literal quote: §7 explicitly disclaims that construction 'does not update or consolidate memory over time', but the graph M is still the addressable object queried at retrieval time — see summary for the alternative reading."
+  ],
+  "nodes": [
+    {
+      "id": "input",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:Corpus — input stream T",
+      "cite": "§3.3  txt:309-310\n\"populated through an automated\ndistillation pipeline applied to T\"",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "rewrite",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "seq": 2,
+      "label": "LLM:Rewrite — R_LLM: pronoun resolution + temporal norm + episodic segmentation",
+      "cite": "Appx B.1  Eq.18  txt:1281-1285\nR_LLM(T) → {e_i}",
+      "prim": "P-REWRITE"
+    },
+    {
+      "id": "semext",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "seq": 2,
+      "label": "LLM:Extract — S_LLM: semantic unit extraction, parallel to R_LLM",
+      "cite": "Appx B.1  Eq.20  txt:1300-1302\nS_LLM(T) → {(c^s,g^s,s)}",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "tag",
+      "stage": "A2",
+      "row": 2,
+      "type": "llm",
+      "seq": 3,
+      "label": "LLM:Tag — T_LLM: associative tag per episode",
+      "cite": "Appx B.1  Eq.19  txt:1289\nT_LLM(x_i) → g_i",
+      "prim": "P-META"
+    },
+    {
+      "id": "cue",
+      "stage": "A2",
+      "row": 3,
+      "type": "llm",
+      "seq": 3,
+      "label": "LLM:Extract — K_LLM: cue extraction per episode",
+      "cite": "Appx B.1  Eq.19  txt:1291\nK_LLM(x_i) → C_i",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "topic",
+      "stage": "A2",
+      "row": 4,
+      "type": "llm",
+      "seq": 6,
+      "label": "LLM:Summarize — A_LLM: topic abstraction over the full episode set",
+      "cite": "Appx B.1  Eq.21  txt:1311-1313\nA_LLM({e_i}) → {τ_j}",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "linkep",
+      "stage": "A4",
+      "row": 0,
+      "type": "nlp",
+      "seq": 4,
+      "label": "NLP:SchemaLink — Cue-Tag-Episode relations",
+      "cite": "§3.1  R ⊆ C×G×V  txt:244-246\nAppx B.1  txt:1294-1295",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "linksem",
+      "stage": "A4",
+      "row": 1,
+      "type": "nlp",
+      "seq": 4,
+      "label": "NLP:SchemaLink — Cue-Tag-Semantic associations",
+      "cite": "§3.2  txt:303-307\nAppx B.1  txt:1304-1307",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "timeline",
+      "stage": "A4",
+      "row": 2,
+      "type": "nlp",
+      "seq": 5,
+      "label": "NLP:SchemaLink — unified timeline ordering of episodes",
+      "cite": "§3.2  txt:296-299\n\"organized along a unified timeline\"",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "linktopic",
+      "stage": "A4",
+      "row": 3,
+      "type": "nlp",
+      "seq": 7,
+      "label": "NLP:SchemaLink — topic-episode links",
+      "cite": "Appx B.1  txt:1311-1315",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "graphstore",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 8,
+      "label": "Store:Graph — heterogeneous graph M = (C, V, R)",
+      "cite": "§3.1  txt:226-228, 244-246\n§7 txt:948-953 \"static\nconstruction does not update or\nconsolidate memory over time\"",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "query",
+      "stage": "B1",
+      "row": 0,
+      "type": "io",
+      "seq": 9,
+      "label": "IO:Query x",
+      "cite": "§4.1  txt:404-405",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "extractcues",
+      "stage": "B1",
+      "row": 1,
+      "type": "llm",
+      "seq": 10,
+      "label": "LLM:Query — ExtractCues(x)  (Alg.1 line 1)",
+      "cite": "Appx B.2  Alg.1 line1  txt:1329-1330\npaper does not state whether this\nis an LLM call or a symbolic step\n— modeled as LLM, see summary",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "activesetinit",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 11,
+      "label": "Retrieval:CueMatch — ActiveSetInit(C,G) → Z^(0)",
+      "cite": "Alg.1 line2  txt:1331\n§4.2 \"matches them against the\nstored cue set\" txt:408-409\nmatching mechanism undescribed",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "fselect",
+      "stage": "B8",
+      "row": 0,
+      "type": "llm",
+      "seq": 12,
+      "label": "LLM:Select — f_select: pick action set A^(t) ⊆ A (tools)",
+      "cite": "Eq.10  txt:444-455\n§4.1  txt:426-427",
+      "prim": "P-TOOLLOOP"
+    },
+    {
+      "id": "traverse",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": 13,
+      "label": "Retrieval:Graph — Controlled Traversal Π_a: Forward Cue→Tag/(Cue,Tag)→Content + Reverse Content→(Cue,Tag)",
+      "cite": "Eq.8-9,11  txt:355-395, 461-466\n\"the memory system executes the\ncorresponding traversal operator\"\ntxt:461-462, no LLM",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "froute",
+      "stage": "B4",
+      "row": 0,
+      "type": "llm",
+      "seq": 14,
+      "label": "LLM:Rerank — f_route: select relevant, update/prune trajectory",
+      "cite": "Eq.12  txt:496-498\n\"not surface matching or\npredefined traversal\" txt:508-510",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "stopcheck",
+      "stage": "B8",
+      "row": 1,
+      "type": "sched",
+      "seq": 15,
+      "label": "Sched:ToolLoop — STOP(x,H^(t+1)) / C_LLM judges sufficiency, ≤ T steps",
+      "cite": "Alg.1 line16-18  txt:1344-1348\n§4.2 C_LLM  txt:510-513",
+      "prim": "P-TOOLLOOP"
+    },
+    {
+      "id": "context",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 16,
+      "label": "IO:Context — assembled evidence history H^(T)",
+      "cite": "Alg.1 line20 input H  txt:1349",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "answer",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 17,
+      "label": "LLM:Answer — AnswerLLM(x, H^(T))",
+      "cite": "Alg.1 line20  txt:1349\nAppx E QA prompt  txt:1898-1917",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "input",
+      "to": "rewrite"
+    },
+    {
+      "from": "input",
+      "to": "semext"
+    },
+    {
+      "from": "rewrite",
+      "to": "tag"
+    },
+    {
+      "from": "rewrite",
+      "to": "cue"
+    },
+    {
+      "from": "tag",
+      "to": "linkep"
+    },
+    {
+      "from": "cue",
+      "to": "linkep"
+    },
+    {
+      "from": "semext",
+      "to": "linksem"
+    },
+    {
+      "from": "rewrite",
+      "to": "timeline"
+    },
+    {
+      "from": "rewrite",
+      "to": "topic"
+    },
+    {
+      "from": "topic",
+      "to": "linktopic"
+    },
+    {
+      "from": "linkep",
+      "to": "graphstore"
+    },
+    {
+      "from": "linksem",
+      "to": "graphstore"
+    },
+    {
+      "from": "timeline",
+      "to": "graphstore"
+    },
+    {
+      "from": "linktopic",
+      "to": "graphstore"
+    },
+    {
+      "from": "query",
+      "to": "extractcues"
+    },
+    {
+      "from": "extractcues",
+      "to": "activesetinit"
+    },
+    {
+      "from": "graphstore",
+      "to": "activesetinit"
+    },
+    {
+      "from": "activesetinit",
+      "to": "fselect"
+    },
+    {
+      "from": "fselect",
+      "to": "traverse"
+    },
+    {
+      "from": "graphstore",
+      "to": "traverse"
+    },
+    {
+      "from": "traverse",
+      "to": "froute"
+    },
+    {
+      "from": "froute",
+      "to": "stopcheck"
+    },
+    {
+      "from": "stopcheck",
+      "to": "fselect",
+      "label": "continue (t+1)"
+    },
+    {
+      "from": "stopcheck",
+      "to": "context",
+      "label": "stop, exit loop"
+    },
+    {
+      "from": "context",
+      "to": "answer"
+    }
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "system": "transmem",
+  "view": "paper",
+  "title": "TransMem — paper view",
+  "subtitle": "In-forward-pass hidden-state injection with an offline self-distillation training regime (ECSD). Lane = canonical stage; only A1 (boundary), A5, A6, B6, B7 carry content — the other nine lanes are empty because this mechanism has no discrete write step and no discrete retrieve step.",
+  "source": "Lei et al. 2026, TransMem (arXiv:2607.29032v1)   ·   every anchor re-located in the paper txt during verification (servers/transmem/verification.md, 50 paper-side assertions: 41 correct / 1 wrong / 8 partial)",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "Only 4 of 14 lanes have real content, plus a boundary A1 node. B1-B5 and A2-A4 are empty because there is no discrete write step and no discrete retrieve step: the entire recall+shift+gate+inject chain (Eq.4-7) runs inside one frozen forward pass and all of it lands on B6 DELIVER.",
+    "B6 delivers via P-INJECT — a gated residual on hidden states (h_hat = h + g*Delta h), one of only three delivery mechanisms across all 14 systems in this study (the others being P-ASSEMBLE and P-INTERP).",
+    "New primitive P-ACTSELECT (drawn as Sched:MemSelect): pick B segment-end positions from already-computed hidden states H_C. No encoding forward, no (key,value) structure, nothing persisted — this is the system's entire 'write' step.",
+    "tau (gate temperature, Eq.6) is used but never given a numeric value anywhere in the paper (txt:275, 277, 1059) — left as a bare symbol here since verification could not resolve it either."
+  ],
+  "nodes": [
+    {
+      "id": "ctx",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "state": "degraded",
+      "label": "IO:Prompt — caller assembles x_1:L=[C;A_<=t] (outside boundary)",
+      "cite": "txt:159-163 defines x_1:L=[C;A_<=t]\nnot described how caller builds it —\nverification §3 row B0 marks this\n\"outside boundary, undescribed\"",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "ecsd",
+      "stage": "A6",
+      "row": 0,
+      "type": "learn",
+      "seq": 2,
+      "label": "Learn:ECSD — frozen backbone as both teacher (E,Q) and student (full C + TransMem)",
+      "cite": "Eq.3 forward KL, txt:192-218\n\"no separate teacher model is\nintroduced\", txt:207-208\ntrained only on HotpotQA, generalizes\nto LoCoMo/MAB, txt:399-404\nbackbone receives zero gradient\nupdates, txt:222-226",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "ckpt",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 3,
+      "label": "Store:Parametric — trained TransMem module, fixed at deployment",
+      "cite": "Fig.2(a) inference vs 2(b) training,\ntxt:280-287\nno checkpoint format or file layout\ndiscussed in the paper",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "chunk",
+      "stage": "B6",
+      "row": 0,
+      "type": "sched",
+      "seq": null,
+      "state": "degraded",
+      "label": "Sched:Chunk — split C into S segments when C exceeds the context window",
+      "cite": "chunk-wise extraction, txt:328-341\n\"aggregating\" H_M^i, txt:338-339\ntriggered only when C overflows;\nwhether LoCoMo/HotpotQA ever\ntrigger it is left open (P50) —\nsee diff view D6 for the code answer",
+      "prim": "P-ORCHESTRATE"
+    },
+    {
+      "id": "actselect",
+      "stage": "B6",
+      "row": 1,
+      "type": "sched",
+      "seq": 5,
+      "label": "Sched:MemSelect — pick B segment-end positions from H_C -> H_M",
+      "cite": "H_M=[h_n^K,...,h_L^K], txt:243-248\nn=L/B, txt:322-325\n\"optimal value being only 5\",\ntxt:248-250\nnew primitive P-ACTSELECT, see\nverification §6",
+      "prim": "P-ACTSELECT"
+    },
+    {
+      "id": "sidepath",
+      "stage": "B6",
+      "row": 2,
+      "type": "learn",
+      "seq": 6,
+      "label": "Learn:TransMem — side-path attention (Eq.4) + memory shift (Eq.5)",
+      "cite": "standard autoregressive attention\n-> h_m, txt:257-259\nW_Delta in R^(dxd), txt:254-256,\n277-279\nEq.4 txt:260, Eq.5 txt:265",
+      "prim": "P-INJECT"
+    },
+    {
+      "id": "gate",
+      "stage": "B6",
+      "row": 3,
+      "type": "fusion",
+      "seq": 7,
+      "label": "Fusion:Gate — g_m = 2*sigmoid(W_g h_m / tau), Eq.6",
+      "cite": "Eq.6, txt:271-278\nW_g in R^(dxd), vector gate\n(see diff D1 for code's scalar gate)\ntau never given a numeric value,\ntxt:275, 277, 1059",
+      "prim": "P-INJECT"
+    },
+    {
+      "id": "add",
+      "stage": "B6",
+      "row": 4,
+      "type": "fusion",
+      "seq": 8,
+      "label": "Fusion:Inject — h_hat = h + g (x) Delta h, t>=L+1, Eq.7",
+      "cite": "Eq.7, txt:290-293\n\"not every memory shift is useful\",\ntxt:269-271",
+      "prim": "P-INJECT"
+    },
+    {
+      "id": "backbone",
+      "stage": "B7",
+      "row": 0,
+      "type": "learn",
+      "seq": 4,
+      "label": "Learn:Backbone — 36-layer frozen decoder: prefill H_C, cascade thru injected layers, decode + generate",
+      "cite": "prefill H_C, Eq.1, txt:169-177\nflow to next layer, Eq.8, txt:296-298\nsequential over last 4 layers,\ntxt:315-316\ngenerate answer token — outside\nthe memory-system boundary",
+      "prim": "P-FROZENFWD"
+    }
+  ],
+  "edges": [
+    {
+      "from": "ctx",
+      "to": "backbone",
+      "label": "prefill"
+    },
+    {
+      "from": "ctx",
+      "to": "chunk",
+      "state": "degraded",
+      "label": "if C > window"
+    },
+    {
+      "from": "backbone",
+      "to": "actselect",
+      "label": "H_C (Eq.1)"
+    },
+    {
+      "from": "chunk",
+      "to": "actselect",
+      "state": "degraded",
+      "label": "H_M^i per chunk"
+    },
+    {
+      "from": "actselect",
+      "to": "sidepath",
+      "label": "H_M"
+    },
+    {
+      "from": "sidepath",
+      "to": "gate",
+      "label": "h_m"
+    },
+    {
+      "from": "sidepath",
+      "to": "add",
+      "label": "Delta h"
+    },
+    {
+      "from": "gate",
+      "to": "add",
+      "label": "g_m"
+    },
+    {
+      "from": "add",
+      "to": "backbone",
+      "label": "h_hat -> next layer (x4, layers 32-35)"
+    },
+    {
+      "from": "backbone",
+      "to": "ecsd",
+      "label": "teacher & student logits (Eq.3)"
+    },
+    {
+      "from": "ecsd",
+      "to": "ckpt",
+      "label": "trained TransMem params"
+    },
+    {
+      "from": "ckpt",
+      "to": "sidepath",
+      "label": "trained weights (Fig.2a)"
+    }
+  ]
+}

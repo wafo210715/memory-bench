@@ -1,0 +1,182 @@
+{
+  "system": "livemem",
+  "view": "paper",
+  "title": "LiveMem — paper view",
+  "subtitle": "The mechanism as Liu et al. describe it: an in-forward-pass recurrent side branch, no external store, no retrieval step. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes are stages the paper's own mechanism does not have.",
+  "source": "Liu et al. 2026, LiveMem (arXiv:2608.02515v2)   ·   every anchor re-located in the paper txt during verification",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "Only 5 of 14 stages have content. LiveMem folds the entire query-conditioned side (B1-B5, B8) and the write-time distill/admit/index side (A2-A4) into one per-token, per-layer forward-pass computation — there is no discrete write step or retrieve step to draw.",
+    "The often-repeated claim that the readout carries \"no gating\" is wrong: Appx C.1 (txt:1622-1623) states the readout passes through a gated RMS normalization before the output projection — drawn here as its own Fusion:Gate node, not folded silently into the add.",
+    "B6 DELIVER is where the whole story lives: Learn:Recurrent computes the state read, Fusion:Gate filters it, Fusion:Add merges it with the frozen backbone's output — three distinct primitives, not \"just adds a vector.\""
+  ],
+  "nodes": [
+    {
+      "id": "ctx",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "state": "degraded",
+      "label": "IO:Prompt — eval-protocol input format (paper appendix)",
+      "cite": "Appx D.2, txt:1777-1791\nAppx D.3, txt:1795-1797 — eval-harness\nconvention, not a core mechanism step",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "sideinit",
+      "stage": "A6",
+      "row": 1,
+      "type": "learn",
+      "seq": 2,
+      "label": "Learn:SideInit — attach GDN2 branch + copy/zero init",
+      "cite": "§3.1 end, txt:244-247\nAppx C.1, txt:1630-1632",
+      "prim": "P-SIDEINIT"
+    },
+    {
+      "id": "sft",
+      "stage": "A6",
+      "row": 2,
+      "type": "learn",
+      "seq": 3,
+      "label": "Learn:LiveMemSFT — Answer-based SFT, stage1+stage2",
+      "cite": "§3.3 Eq.11\nAppx C.4",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "grpo",
+      "stage": "A6",
+      "row": 3,
+      "type": "learn",
+      "seq": 4,
+      "label": "Learn:GRPO — exploration with memory (RL)",
+      "cite": "§3.3 Eq.12-14\nAppx C.4, D.1 (judge fallback)",
+      "prim": "P-TRAIN"
+    },
+    {
+      "id": "ckpt",
+      "stage": "A5",
+      "row": 4,
+      "type": "store",
+      "seq": 5,
+      "label": "Store:Parametric — LiveMem-SFT / LiveMem-RL weights",
+      "cite": "§3.3 outputs;\nFig.3 names both checkpoints, txt:897-899",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "chunk",
+      "stage": "B6",
+      "row": 0,
+      "type": "sched",
+      "seq": 6,
+      "label": "Sched:Chunk — chunk boundaries + system-prompt sink",
+      "cite": "§3.2, Eq.10, txt:261\nsink + FIFO, txt:252-256",
+      "prim": "P-ORCHESTRATE"
+    },
+    {
+      "id": "backbone",
+      "stage": "B7",
+      "row": 1,
+      "type": "learn",
+      "seq": 7,
+      "label": "Learn:Backbone — frozen attention main path + decode",
+      "cite": "§2.2 Eq.3\n§3.1 Eq.4, Eq.10 visibility",
+      "prim": "P-FROZENFWD"
+    },
+    {
+      "id": "recur",
+      "stage": "B6",
+      "row": 2,
+      "type": "learn",
+      "seq": 7,
+      "label": "Learn:Recurrent — GDN2 delta-rule state update + read",
+      "cite": "§3.1 Eq.7-9\nAppx C.1 Eq.15, txt:1620",
+      "prim": "P-INJECT"
+    },
+    {
+      "id": "gate",
+      "stage": "B6",
+      "row": 3,
+      "type": "fusion",
+      "seq": 8,
+      "label": "Fusion:Gate — gated RMS normalization on readout",
+      "cite": "Appx C.1, txt:1622-1623\n\"gated RMS normalization ... before\nit is added to the softmax-attention\noutput\"",
+      "prim": "P-INJECT"
+    },
+    {
+      "id": "add",
+      "stage": "B6",
+      "row": 4,
+      "type": "fusion",
+      "seq": 9,
+      "label": "Fusion:Inject — o_total = o_main + o_side",
+      "cite": "§3.1 Eq.6\nFig.2 caption, txt:166",
+      "prim": "P-INJECT"
+    },
+    {
+      "id": "evict",
+      "stage": "B6",
+      "row": 5,
+      "type": "sched",
+      "seq": 10,
+      "label": "Sched:KVWindow — release evicted KV pages",
+      "cite": "§3.2; Appx C.3, txt:1704-1706\n\"memory slot is unaffected\"",
+      "prim": "P-KVWINDOW"
+    }
+  ],
+  "edges": [
+    {
+      "from": "ctx",
+      "to": "chunk"
+    },
+    {
+      "from": "sideinit",
+      "to": "sft"
+    },
+    {
+      "from": "sft",
+      "to": "grpo"
+    },
+    {
+      "from": "grpo",
+      "to": "ckpt"
+    },
+    {
+      "from": "ckpt",
+      "to": "recur",
+      "label": "trained weights"
+    },
+    {
+      "from": "chunk",
+      "to": "backbone",
+      "label": "visible window"
+    },
+    {
+      "from": "chunk",
+      "to": "evict",
+      "label": "chunk boundary"
+    },
+    {
+      "from": "backbone",
+      "to": "add",
+      "label": "a_t"
+    },
+    {
+      "from": "recur",
+      "to": "gate"
+    },
+    {
+      "from": "gate",
+      "to": "add"
+    },
+    {
+      "from": "add",
+      "to": "backbone",
+      "label": "o_t -> next-layer h"
+    },
+    {
+      "from": "evict",
+      "to": "chunk",
+      "label": "next chunk"
+    }
+  ]
+}

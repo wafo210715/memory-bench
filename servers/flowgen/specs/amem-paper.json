@@ -1,0 +1,181 @@
+{
+  "system": "amem",
+  "view": "paper",
+  "title": "A-MEM — paper view",
+  "subtitle": "The mechanism as Xu et al. describe it. Lane = canonical stage (METHODOLOGY-SKELETON §2.2); empty lanes mean the paper defines no such step.",
+  "source": "Xu et al. 2025, A-MEM (arXiv:2502.12110v11)   ·   every anchor re-located during verification (servers/amem/verification.md §2/§3, 56 ARCHITECTURE.md assertions: 40 ✓ / 1 ✗ / 13 ◐ / 2 ?)",
+  "footer": "memory-bench · methodology flow · paper view",
+  "legend_notes": [
+    "B1 CUE is empty: Eq.8-10 fold query encoding into one cosine top-k step — the paper never treats query embedding as its own stage.",
+    "Linked-memory auto-access (Fig.2 caption, txt:296-297) sits outside the formal Eq.8-10 treatment — drawn with seq: null because the equations never mention it.",
+    "The write path is almost entirely LLM-driven: three separate prompted roles (Ps1 construct, Ps2 link, Ps3 evolve) touch every new note; only the embedding step (Eq.3) is not an LLM call.",
+    "A6 / B4 / B5 / B8 are empty by design — A-MEM defines no training, no reranking or fusion, no combinatorial selection, and no retrieval loop."
+  ],
+  "nodes": [
+    {
+      "id": "turn",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "label": "IO:TurnPair — interaction content c_i, timestamp t_i",
+      "cite": "§3.1  txt:334-336",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "ext",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "seq": 2,
+      "label": "LLM:Extract — note construction: keywords K_i + tags G_i + one-sentence context X_i, one call",
+      "cite": "§3.1 Eq.1-2  txt:351-353\nPs1  txt:3137-3154",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "emb",
+      "stage": "A4",
+      "row": 0,
+      "type": "alg",
+      "seq": 3,
+      "label": "NLP:Embed — rich text e_i = f_enc[concat(c_i,K_i,G_i,X_i)]",
+      "cite": "§3.1 Eq.3  txt:358-360",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "probe",
+      "stage": "A3",
+      "row": 0,
+      "type": "alg",
+      "seq": 4,
+      "label": "Retrieval:Emb — top-k similar existing notes M_near, using e_i",
+      "cite": "§3.2 Eq.4-5  txt:372-379",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "link",
+      "stage": "A4",
+      "row": 1,
+      "type": "llm",
+      "seq": 5,
+      "label": "LLM:Link — link generation L_i from M_near (Ps2)",
+      "cite": "§3.2 Eq.6  txt:388-392\nPs2  txt:3159-3170",
+      "prim": "P-LINK"
+    },
+    {
+      "id": "evolve",
+      "stage": "A3",
+      "row": 1,
+      "type": "llm",
+      "seq": 6,
+      "label": "LLM:Evolve — per-neighbor revise: m_j* replaces m_j for each m_j in M_near (Ps3)",
+      "cite": "§3.3 Eq.7  txt:407-423\nPs3  txt:3177-3208",
+      "prim": "P-REVISE"
+    },
+    {
+      "id": "commit",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "seq": 7,
+      "label": "Store:Vector — memory set M (new note + updated m_j*)",
+      "cite": "Eq.1 defines M; Eq.7 \"m_j* replaces m_j in M\"\ntxt:342-343, 422-423",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "retrieve",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 8,
+      "label": "Retrieval:Emb — query encoding + cosine top-k, k=10",
+      "cite": "§3.4 Eq.8-10  txt:907 (k=10)\nquery encoding folded in — no separate CUE stage",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "linkauto",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": null,
+      "label": "Retrieval:Graph — linked memories auto-accessed alongside hits",
+      "cite": "Fig.2 caption only, txt:296-297\nabsent from the Eq.8-10 formal treatment",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "assemble",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 9,
+      "label": "IO:Structured — M_retrieved passed into the agent prompt",
+      "cite": "§3.4  txt:449-450",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "answer",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 10,
+      "label": "LLM:Answer — outside the memory-system boundary",
+      "cite": "§4 backbone agent\nverification.md §3 boundary note",
+      "prim": "P-GENERATE"
+    }
+  ],
+  "edges": [
+    {
+      "from": "turn",
+      "to": "ext"
+    },
+    {
+      "from": "ext",
+      "to": "emb"
+    },
+    {
+      "from": "emb",
+      "to": "probe"
+    },
+    {
+      "from": "probe",
+      "to": "link"
+    },
+    {
+      "from": "probe",
+      "to": "evolve"
+    },
+    {
+      "from": "link",
+      "to": "commit"
+    },
+    {
+      "from": "evolve",
+      "to": "commit"
+    },
+    {
+      "from": "commit",
+      "to": "probe",
+      "label": "search existing M"
+    },
+    {
+      "from": "commit",
+      "to": "retrieve"
+    },
+    {
+      "from": "retrieve",
+      "to": "linkauto"
+    },
+    {
+      "from": "retrieve",
+      "to": "assemble"
+    },
+    {
+      "from": "linkauto",
+      "to": "assemble"
+    },
+    {
+      "from": "assemble",
+      "to": "answer"
+    }
+  ]
+}

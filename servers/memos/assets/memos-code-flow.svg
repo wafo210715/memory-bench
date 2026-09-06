@@ -1,0 +1,515 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1980" height="1865" viewBox="0 0 1980 1865" font-family="Inter, -apple-system, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Noto Sans SC&quot;, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="24" y="30" font-size="19" font-weight="700" fill="#111827">MemOS — code view</text>
+<text x="24" y="50" font-size="11.5" fill="#4b5563">What the upstream MemOS REST service actually executes under the memory-bench deployment config (MemOS/.env). Lane = canonical stage; empty lanes mean the stage does not exist here.</text>
+<text x="24" y="66" font-size="9.5" fill="#9ca3af" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">MemOS @ 8553242 (2026-08-18) + servers/memos/server.py   ·   verified against servers/memos/verification.md (108 code-side assertions: 73 ✓ / 10 ✗ / 25 ◐ / 0 ?)</text>
+<circle cx="1411" cy="44" r="8" fill="#111827"/>
+<text x="1411" y="47.3" font-size="9" font-weight="700" text-anchor="middle" fill="#ffffff">n</text>
+<text x="1426" y="47.5" font-size="10" fill="#6b7280">true execution order — lanes are canonical stages, not sequence</text>
+<rect x="14" y="100" width="1276" height="751.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="93" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">A · MEMORY FORMATION  (query-independent)</text>
+<rect x="18" y="104" width="196" height="739.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="116.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A1 INTAKE</text>
+<rect x="230" y="104" width="196" height="739.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="328.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A2 DISTILL</text>
+<rect x="442" y="104" width="196" height="739.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="540.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A3 ADMIT</text>
+<rect x="654" y="104" width="196" height="739.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="752.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A4 INDEX</text>
+<rect x="866" y="104" width="196" height="739.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="964.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">A5 COMMIT</text>
+<rect x="1078" y="104" width="196" height="739.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="1176.0" y="121" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">A6 INTERNALIZE</text>
+<text x="1176.0" y="488.5" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<rect x="14" y="961.0" width="1700" height="874.0" rx="10" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="24" y="954.0" font-size="10.5" font-weight="700" letter-spacing="0.9" fill="#6b7280">B · MEMORY MOBILIZATION  (query-conditioned)</text>
+<rect x="18" y="965.0" width="196" height="862.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="116.0" y="982.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B1 CUE</text>
+<rect x="230" y="965.0" width="196" height="862.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="328.0" y="982.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B2 RECALL</text>
+<rect x="442" y="965.0" width="196" height="862.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="540.0" y="982.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B3 EXPAND</text>
+<rect x="654" y="965.0" width="196" height="862.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="752.0" y="982.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B4 APPRAISE</text>
+<rect x="866" y="965.0" width="196" height="862.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="964.0" y="982.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B5 SELECT</text>
+<rect x="1078" y="965.0" width="196" height="862.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1176.0" y="982.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B6 DELIVER</text>
+<rect x="1290" y="965.0" width="196" height="862.0" rx="7" fill="#ffffff" stroke="#eef0f3"/>
+<text x="1388.0" y="982.0" font-size="10" font-weight="700" text-anchor="middle" fill="#374151" letter-spacing="0.6">B7 GENERATE</text>
+<rect x="1502" y="965.0" width="196" height="862.0" rx="7" fill="#f4f4f6" stroke="#e5e7eb"/>
+<text x="1600.0" y="982.0" font-size="10" font-weight="700" text-anchor="middle" fill="#c7cad1" letter-spacing="0.6">B8 LOOP</text>
+<text x="1600.0" y="1411.0" font-size="10.5" text-anchor="middle" fill="#c7cad1">—</text>
+<path d="M 122.0 268.0 L 122.0 292.5 L 122.0 292.5 L 122.0 317.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(122.0,317.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 122.0 466.0 L 122.0 484.5 L 122.0 484.5 L 122.0 503.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(122.0,503.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 208.0 582.0 L 234.0 582.0 Q 242.0 582.0 242.0 574.0 L 242.0 216.5 Q 242.0 208.5 250.0 208.5 L 248.0 208.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(248.0,208.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 334.0 283.0 L 334.0 300.0 L 334.0 300.0 L 334.0 317.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(334.0,317.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 420.0 390.0 L 546.0 390.0 Q 554.0 390.0 554.0 398.0 L 554.0 548.5 Q 554.0 556.5 562.0 556.5 L 672.0 556.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(672.0,556.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 758.0 610.0 L 758.0 655.5 L 758.0 655.5 L 758.0 701.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(758.0,701.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 844.0 733.5 L 858.0 733.5 Q 866.0 733.5 866.0 725.5 L 866.0 215.0 Q 866.0 207.0 874.0 207.0 L 884.0 207.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(884.0,207.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 970.0 280.0 L 970.0 490.5 L 970.0 490.5 L 970.0 701.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(970.0,701.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 970.0 835.0 L 970.0 576.0 L 970.0 576.0 L 970.0 317.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(970.0,317.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 420.0 390.0 L 434.0 390.0 Q 442.0 390.0 442.0 382.0 L 442.0 222.5 Q 442.0 214.5 450.0 214.5 L 460.0 214.5" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(460.0,214.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<rect x="410.0" y="292.75" width="64.0" height="13" rx="3" fill="#ffffff" stroke="#78716c" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="442.0" y="302.25" font-size="8.5" text-anchor="middle" fill="#78716c">if enabled</text>
+<path d="M 758.0 503.0 L 758.0 496.0 L 546.0 496.0 L 546.0 481.0" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(546.0,481.0) rotate(270)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<rect x="620.0" y="481.5" width="64.0" height="13" rx="3" fill="#ffffff" stroke="#78716c" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="652.0" y="491.0" font-size="8.5" text-anchor="middle" fill="#78716c">if enabled</text>
+<path d="M 970.0 701.0 L 970.0 681.0 L 546.0 681.0 L 546.0 661.0" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(546.0,661.0) rotate(270)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<path d="M 122.0 1078.0 L 122.0 1144.5 L 122.0 1144.5 L 122.0 1211.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(122.0,1211.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 208.0 1237.5 L 228.0 1237.5 Q 236.0 1237.5 236.0 1229.5 L 236.0 1064.0 Q 236.0 1056.0 244.0 1056.0 L 248.0 1056.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(248.0,1056.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 208.0 1237.5 L 234.0 1237.5 Q 242.0 1237.5 242.0 1245.5 L 242.0 1276.0 Q 242.0 1284.0 250.0 1284.0 L 248.0 1284.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(248.0,1284.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 208.0 1237.5 L 222.0 1237.5 Q 230.0 1237.5 230.0 1245.5 L 230.0 1444.0 Q 230.0 1452.0 238.0 1452.0 L 248.0 1452.0" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(248.0,1452.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<path d="M 208.0 1237.5 L 228.0 1237.5 Q 236.0 1237.5 236.0 1245.5 L 236.0 1595.5 Q 236.0 1603.5 244.0 1603.5 L 248.0 1603.5" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(248.0,1603.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<path d="M 970.0 280.0 L 970.0 857.0 L 321.0 857.0 L 321.0 995.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(321.0,995.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="624.3" y="841.5" width="42.400000000000006" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="645.5" y="851.0" font-size="8.5" text-anchor="middle" fill="#4b5563">Qdrant</text>
+<path d="M 970.0 835.0 L 970.0 880.0 L 347.0 880.0 L 347.0 995.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(347.0,995.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="621.1" y="864.5" width="74.80000000000001" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="658.5" y="874.0" font-size="8.5" text-anchor="middle" fill="#4b5563">Neo4j fields</text>
+<path d="M 970.0 835.0 L 970.0 903.0 L 546.0 903.0 L 546.0 995.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(546.0,995.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 420.0 1056.0 L 446.0 1056.0 Q 454.0 1056.0 454.0 1064.0 L 454.0 1054.0 Q 454.0 1062.0 462.0 1062.0 L 460.0 1062.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(460.0,1062.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="435.5" y="1049.5" width="37.0" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="454.0" y="1059.0" font-size="8.5" text-anchor="middle" fill="#4b5563">merge</text>
+<path d="M 420.0 1056.0 L 540.0 1056.0 Q 548.0 1056.0 548.0 1064.0 L 548.0 1084.0 Q 548.0 1092.0 556.0 1092.0 L 672.0 1092.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(672.0,1092.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 420.0 1284.0 L 546.0 1284.0 Q 554.0 1284.0 554.0 1276.0 L 554.0 1100.0 Q 554.0 1092.0 562.0 1092.0 L 672.0 1092.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(672.0,1092.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 632.0 1062.0 L 658.0 1062.0 Q 666.0 1062.0 666.0 1070.0 L 666.0 1084.0 Q 666.0 1092.0 674.0 1092.0 L 672.0 1092.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(672.0,1092.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 420.0 1452.0 L 540.0 1452.0 Q 548.0 1452.0 548.0 1444.0 L 548.0 1100.0 Q 548.0 1092.0 556.0 1092.0 L 672.0 1092.0" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(672.0,1092.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<path d="M 420.0 1603.5 L 546.0 1603.5 Q 554.0 1603.5 554.0 1595.5 L 554.0 1100.0 Q 554.0 1092.0 562.0 1092.0 L 672.0 1092.0" fill="none" stroke="#78716c" stroke-width="1.5" stroke-dasharray="3 3"/>
+<g transform="translate(672.0,1092.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#78716c"/></g>
+<path d="M 758.0 1189.0 L 758.0 1200.0 L 758.0 1200.0 L 758.0 1211.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(758.0,1211.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 844.0 1252.5 L 858.0 1252.5 Q 866.0 1252.5 866.0 1244.5 L 866.0 1058.0 Q 866.0 1050.0 874.0 1050.0 L 884.0 1050.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(884.0,1050.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 970.0 1105.0 L 970.0 1158.0 L 970.0 1158.0 L 970.0 1211.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(970.0,1211.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 970.0 1321.0 L 970.0 1363.5 L 970.0 1363.5 L 970.0 1406.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(970.0,1406.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 970.0 1522.0 L 970.0 1533.0 L 970.0 1533.0 L 970.0 1544.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(970.0,1544.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 970.0 1651.0 L 970.0 1672.0 L 758.0 1672.0 L 758.0 1685.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(758.0,1685.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 844.0 1752.0 L 976.0 1752.0 Q 984.0 1752.0 984.0 1744.0 L 984.0 1077.5 Q 984.0 1069.5 992.0 1069.5 L 1096.0 1069.5" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1096.0,1069.5) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 1182.0 1144.0 L 1182.0 1177.5 L 1182.0 1177.5 L 1182.0 1211.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1182.0,1211.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 1268.0 1297.5 L 1288.0 1297.5 Q 1296.0 1297.5 1296.0 1289.5 L 1296.0 1082.0 Q 1296.0 1074.0 1304.0 1074.0 L 1308.0 1074.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(1308.0,1074.0) rotate(0)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<path d="M 970.0 1321.0 L 970.0 926.0 L 970.0 926.0 L 970.0 503.0" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+<g transform="translate(970.0,503.0) rotate(90)"><path d="M 0 0 L -8 -3.6 L -8 3.6 Z" fill="#4b5563"/></g>
+<rect x="938.0" y="910.5" width="64.0" height="13" rx="3" fill="#ffffff" stroke="#4b5563" stroke-width="0.7" fill-opacity="0.96"/>
+<text x="970.0" y="920.0" font-size="8.5" text-anchor="middle" fill="#4b5563">post-query</text>
+<rect x="36.0" y="134.0" width="172" height="134" rx="67.0" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.6"/>
+<text x="122.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Session — server.py</text>
+<text x="122.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">forces async_mode=sync,</text>
+<text x="122.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">whole session posted</text>
+<text x="122.0" y="201.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">once</text>
+<text x="47.0" y="217.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">server.py:69-79</text>
+<text x="47.0" y="229.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">APIADDRequest.async_mode</text>
+<text x="47.0" y="241.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">default &quot;async&quot;</text>
+<text x="47.0" y="253.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(product_models.py:642-643)</text>
+<circle cx="37.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="37.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">1</text>
+<rect x="36.0" y="317.0" width="172" height="149" rx="74.5" fill="#f3e8ff" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="122.0" y="339.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Session — dispatch</text>
+<text x="122.0" y="354.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">to</text>
+<text x="122.0" y="369.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">MultiModalStructMemRead</text>
+<text x="122.0" y="384.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">er</text>
+<text x="122.0" y="399.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(doc said SimpleStruct)</text>
+<text x="47.0" y="415.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">server_router.py:128→134</text>
+<text x="47.0" y="427.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">single_cube.py:59→662→703-717</text>
+<text x="47.0" y="439.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">api/config.py:657,</text>
+<text x="47.0" y="451.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">mem_reader/factory.py:22 (C15)</text>
+<circle cx="197.0" cy="328.0" r="8" fill="#78716c"/>
+<text x="197.0" y="331.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<circle cx="37.0" cy="318.0" r="9.5" fill="#111827"/>
+<text x="37.0" y="321.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">2</text>
+<rect x="36.0" y="503.0" width="172" height="158" rx="79.0" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.6"/>
+<text x="122.0" y="525.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Stream —</text>
+<text x="122.0" y="540.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">get_scene_data_info:</text>
+<text x="122.0" y="555.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">multimodal reader does</text>
+<text x="122.0" y="570.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">NOT window-split</text>
+<text x="47.0" y="586.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">multi_modal_struct.py:1257-127</text>
+<text x="47.0" y="598.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">0</text>
+<text x="47.0" y="610.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&quot;TODO: split</text>
+<text x="47.0" y="622.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">messages&quot;</text>
+<text x="47.0" y="634.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">simple_struct.py:857-866 (dead</text>
+<text x="47.0" y="646.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">for this reader, C18)</text>
+<circle cx="37.0" cy="504.0" r="9.5" fill="#111827"/>
+<text x="37.0" y="507.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">3</text>
+<rect x="248.0" y="134.0" width="172" height="149" rx="7" fill="#fef3c7" stroke="#b45309" stroke-width="1.6"/>
+<text x="334.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Sched:Batch —</text>
+<text x="334.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">token-window</text>
+<text x="334.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">aggregation,</text>
+<text x="334.0" y="201.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">max_tokens=1024,</text>
+<text x="334.0" y="216.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">overlap=200</text>
+<text x="259.0" y="232.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">multi_modal_struct.py:194-196</text>
+<text x="259.0" y="244.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">simple_struct.py:207</text>
+<text x="259.0" y="256.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(constant)</text>
+<text x="259.0" y="268.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">_split_large_memory_item :115</text>
+<circle cx="249.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="249.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
+<rect x="248.0" y="317.0" width="172" height="146" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="334.0" y="339.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">LLM:Extract — 4</text>
+<text x="334.0" y="354.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">parallel channels: fact</text>
+<text x="334.0" y="369.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">/ tool-trajectory /</text>
+<text x="334.0" y="384.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">skill / preference</text>
+<text x="259.0" y="400.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">multi_modal_struct.py:1020-104</text>
+<text x="259.0" y="412.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">9</text>
+<text x="259.0" y="424.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">_process_string_fine:615</text>
+<text x="259.0" y="436.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">_process_tool_trajectory_fine:</text>
+<text x="259.0" y="448.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">900</text>
+<circle cx="249.0" cy="318.0" r="9.5" fill="#111827"/>
+<text x="249.0" y="321.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">5</text>
+<rect x="672.0" y="503.0" width="172" height="107" rx="7" fill="#ecfccb" stroke="#4d7c0f" stroke-width="1.6"/>
+<text x="758.0" y="525.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">NLP:SchemaLink — build</text>
+<text x="758.0" y="540.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">TextualMemoryItem; type</text>
+<text x="758.0" y="555.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">hardcoded &quot;fact&quot;</text>
+<text x="683.0" y="571.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">simple_struct.py:220-256</text>
+<text x="683.0" y="583.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">type_=&quot;fact&quot; :229 </text>
+<text x="683.0" y="595.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">background=summary :250,423</text>
+<circle cx="673.0" cy="504.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="507.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">6</text>
+<rect x="672.0" y="701.0" width="172" height="65" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="758.0" y="723.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">NLP:Embed — value</text>
+<text x="683.0" y="739.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">simple_struct.py:247</text>
+<text x="683.0" y="751.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">embedder.embed([value])[0]</text>
+<circle cx="673.0" cy="702.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="705.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">9</text>
+<rect x="460.0" y="134.0" width="172" height="161" rx="7" fill="#dbeafe" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="546.0" y="156.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">LLM:Dedup —</text>
+<text x="546.0" y="171.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">filter_hallucination_in</text>
+<text x="546.0" y="186.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">_memories,</text>
+<text x="546.0" y="201.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">listwise per group, OFF</text>
+<text x="546.0" y="216.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">by default</text>
+<text x="471.0" y="232.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">simple_struct.py:709-734</text>
+<text x="471.0" y="244.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">SIMPLE_STRUCT_ADD_FILTER</text>
+<text x="471.0" y="256.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">default &quot;false&quot; (:709)</text>
+<text x="471.0" y="268.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">one call per group, not per</text>
+<text x="471.0" y="280.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">item (C31)</text>
+<circle cx="621.0" cy="145.0" r="8" fill="#78716c"/>
+<text x="621.0" y="148.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<rect x="460.0" y="317.0" width="172" height="164" rx="7" fill="#fef3c7" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="546.0" y="339.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Sched:Lifecycle —</text>
+<text x="546.0" y="354.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">GraphStructureReorganiz</text>
+<text x="546.0" y="369.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">er</text>
+<text x="546.0" y="384.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(dedup/conflict/merge/l</text>
+<text x="546.0" y="399.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">ink),</text>
+<text x="546.0" y="414.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">OFF by default</text>
+<text x="471.0" y="430.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">component_init.py:223</text>
+<text x="471.0" y="442.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">api/config.py:1234</text>
+<text x="471.0" y="454.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">MOS_ENABLE_REORGANIZE</text>
+<text x="471.0" y="466.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">unset in .env → False</text>
+<circle cx="621.0" cy="328.0" r="8" fill="#78716c"/>
+<text x="621.0" y="331.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<rect x="460.0" y="503.0" width="172" height="158" rx="7" fill="#fef3c7" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="546.0" y="525.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Sched:Evict —</text>
+<text x="546.0" y="540.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">WorkingMemory quota</text>
+<text x="546.0" y="555.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">cleanup; set is never</text>
+<text x="546.0" y="570.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">populated</text>
+<text x="471.0" y="586.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">manager.py:115-116,250</text>
+<text x="471.0" y="598.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">_cleanup_working_memory</text>
+<text x="471.0" y="610.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">tree.py:83 quota=20</text>
+<text x="471.0" y="622.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">manager.py:239-241 TODO:</text>
+<text x="471.0" y="634.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">WorkingMemory computed</text>
+<text x="471.0" y="646.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">but never submitted (bug)</text>
+<circle cx="621.0" cy="514.0" r="8" fill="#78716c"/>
+<text x="621.0" y="517.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<path d="M 884.0 141.0 a 86.0 7 0 0 1 172 0 v 132 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.6"/>
+<path d="M 884.0 141.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#6b7280" stroke-width="1.2800000000000002"/>
+<text x="970.0" y="157.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Store:Vector — Qdrant;</text>
+<text x="970.0" y="172.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">embedding popped out of</text>
+<text x="970.0" y="187.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">node metadata before</text>
+<text x="970.0" y="202.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">the Neo4j write</text>
+<text x="895.0" y="218.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">neo4j_community.py:151-165,194</text>
+<text x="895.0" y="230.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">collection=&quot;neo4j_vec_db&quot;</text>
+<text x="895.0" y="242.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">cosine dim=2048</text>
+<text x="895.0" y="254.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(api/config.py:781-795)</text>
+<circle cx="885.0" cy="135.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="138.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">10</text>
+<path d="M 884.0 708.0 a 86.0 7 0 0 1 172 0 v 120 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.6"/>
+<path d="M 884.0 708.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#6b7280" stroke-width="1.2800000000000002"/>
+<text x="970.0" y="724.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Store:Graph — Neo4j</text>
+<text x="970.0" y="739.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">node write,</text>
+<text x="970.0" y="754.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">batch_size=5, ≤8</text>
+<text x="970.0" y="769.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">threads</text>
+<text x="895.0" y="785.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">single_cube.py:734→tree.py:114</text>
+<text x="895.0" y="797.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">manager.py:89,138</text>
+<text x="895.0" y="809.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">_add_memories_batch</text>
+<circle cx="885.0" cy="702.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="705.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">10</text>
+<rect x="884.0" y="317.0" width="172" height="134" rx="7" fill="#fef3c7" stroke="#b45309" stroke-width="1.6"/>
+<text x="970.0" y="339.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Sched:TaskQueue —</text>
+<text x="970.0" y="354.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">ADD_TASK_LABEL enqueued</text>
+<text x="970.0" y="369.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">(sync branch still</text>
+<text x="970.0" y="384.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">schedules)</text>
+<text x="895.0" y="400.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">single_cube.py:762→549-561</text>
+<text x="895.0" y="412.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">task_schemas.py:33</text>
+<text x="895.0" y="424.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ADD_TASK_LABEL</text>
+<text x="895.0" y="436.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">registry.py:52 → self.add</text>
+<circle cx="885.0" cy="318.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="321.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">11</text>
+<path d="M 884.0 510.0 a 86.0 7 0 0 1 172 0 v 162 a 86.0 7 0 0 1 -172 0 Z" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.6"/>
+<path d="M 884.0 510.0 a 86.0 7 0 0 0 172 0" fill="none" stroke="#6b7280" stroke-width="1.2800000000000002"/>
+<text x="970.0" y="526.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Store:Graph —</text>
+<text x="970.0" y="541.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">usage/access stats</text>
+<text x="970.0" y="556.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">written back, 4</text>
+<text x="970.0" y="571.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">background threads;</text>
+<text x="970.0" y="586.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">never read back into</text>
+<text x="970.0" y="601.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">scoring</text>
+<text x="895.0" y="617.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">searcher.py:187,1343</text>
+<text x="895.0" y="629.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">_update_usage_history</text>
+<text x="895.0" y="641.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">&quot;usage&quot; written, never read</text>
+<text x="895.0" y="653.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">back for scoring</text>
+<circle cx="885.0" cy="504.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="507.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">22</text>
+<rect x="36.0" y="995.0" width="172" height="83" rx="41.5" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.6"/>
+<text x="122.0" y="1017.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Query — explicit</text>
+<text x="122.0" y="1032.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">top_k + relativity=0.45</text>
+<text x="122.0" y="1047.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">passed down</text>
+<text x="122.0" y="1063.0" font-size="9" text-anchor="middle" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">server.py:101-119</text>
+<circle cx="37.0" cy="996.0" r="9.5" fill="#111827"/>
+<text x="37.0" y="999.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">12</text>
+<rect x="36.0" y="1211.0" width="172" height="53" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="122.0" y="1233.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">NLP:Embed — query</text>
+<text x="122.0" y="1249.0" font-size="9" text-anchor="middle" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">searcher.py:349-351</text>
+<circle cx="37.0" cy="1212.0" r="9.5" fill="#111827"/>
+<text x="37.0" y="1215.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">13</text>
+<rect x="248.0" y="995.0" width="172" height="122" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="334.0" y="1017.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Retrieval:Emb — dense</text>
+<text x="334.0" y="1032.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">vector search via</text>
+<text x="334.0" y="1047.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Qdrant (through</text>
+<text x="334.0" y="1062.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Neo4jCommunityGraphDB)</text>
+<text x="259.0" y="1078.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">recall.py:81-98 docstring</text>
+<text x="259.0" y="1090.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">neo4j_community.py:293→360 =</text>
+<text x="259.0" y="1102.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Qdrant search</text>
+<circle cx="249.0" cy="996.0" r="9.5" fill="#111827"/>
+<text x="249.0" y="999.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">14</text>
+<rect x="248.0" y="1211.0" width="172" height="146" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="334.0" y="1233.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Retrieval:SymFilter —</text>
+<text x="334.0" y="1248.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">user_name/status/sessio</text>
+<text x="334.0" y="1263.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">n_id/id_filter,</text>
+<text x="334.0" y="1278.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">per path</text>
+<text x="259.0" y="1294.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">searcher.py:355-501, 6 paths</text>
+<text x="259.0" y="1306.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">submitted here</text>
+<text x="259.0" y="1318.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(Working/LongTerm+User/Interne</text>
+<text x="259.0" y="1330.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">t(inert)/Tool/</text>
+<text x="259.0" y="1342.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Skill/Preference)</text>
+<circle cx="249.0" cy="1212.0" r="9.5" fill="#111827"/>
+<text x="249.0" y="1215.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">14</text>
+<rect x="248.0" y="1406.0" width="172" height="92" rx="7" fill="#ffedd5" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="334.0" y="1428.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Retrieval:FTS — keyword</text>
+<text x="334.0" y="1443.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">full-text path, OFF</text>
+<text x="259.0" y="1459.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">api/config.py:1245</text>
+<text x="259.0" y="1471.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">FULLTEXT_CALL default &quot;false&quot;</text>
+<text x="259.0" y="1483.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">searcher.py:429 use_fulltext</text>
+<circle cx="409.0" cy="1417.0" r="8" fill="#78716c"/>
+<text x="409.0" y="1420.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<rect x="248.0" y="1544.0" width="172" height="119" rx="7" fill="#ffedd5" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="334.0" y="1566.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Retrieval:BM25 —</text>
+<text x="334.0" y="1581.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">EnhancedBM25 injection,</text>
+<text x="334.0" y="1596.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">OFF</text>
+<text x="259.0" y="1612.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">api/config.py:1243 BM25_CALL</text>
+<text x="259.0" y="1624.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">default &quot;false&quot;</text>
+<text x="259.0" y="1636.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">tree.py:59-61 /</text>
+<text x="259.0" y="1648.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">simple_tree.py:52-56</text>
+<circle cx="409.0" cy="1555.0" r="8" fill="#78716c"/>
+<text x="409.0" y="1558.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<rect x="460.0" y="995.0" width="172" height="134" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="546.0" y="1017.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Retrieval:Graph — graph</text>
+<text x="546.0" y="1032.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">lookup + vector search</text>
+<text x="546.0" y="1047.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">merged; Path B opens 3</text>
+<text x="546.0" y="1062.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">more threads</text>
+<text x="471.0" y="1078.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">recall.py:81-98 &quot;graph-based</text>
+<text x="471.0" y="1090.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">lookup + vector</text>
+<text x="471.0" y="1102.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">similarity search + merge&quot;</text>
+<text x="471.0" y="1114.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">searcher.py Path B :817</text>
+<circle cx="461.0" cy="996.0" r="9.5" fill="#111827"/>
+<text x="461.0" y="999.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">15</text>
+<rect x="672.0" y="995.0" width="172" height="194" rx="7" fill="#ffedd5" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="758.0" y="1017.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Retrieval:Rerank —</text>
+<text x="758.0" y="1032.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">CosineLocalReranker,</text>
+<text x="758.0" y="1047.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">per path; level_weight</text>
+<text x="758.0" y="1062.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">always 1.0 (dead)</text>
+<text x="683.0" y="1078.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">cosine_local.py:63-100</text>
+<text x="683.0" y="1090.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">level_field=&quot;background&quot; (:56)</text>
+<text x="683.0" y="1102.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">→ weight always</text>
+<text x="683.0" y="1114.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">the same value (C85); backend</text>
+<text x="683.0" y="1126.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">= MOS_RERANKER_</text>
+<text x="683.0" y="1138.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">BACKEND=cosine_local</text>
+<text x="683.0" y="1150.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(.env:13), NOT tree.py:66</text>
+<text x="683.0" y="1162.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(that fallback is dead code,</text>
+<text x="683.0" y="1174.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">C68)</text>
+<circle cx="833.0" cy="1006.0" r="8" fill="#78716c"/>
+<text x="833.0" y="1009.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<rect x="672.0" y="1211.0" width="172" height="83" rx="7" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.6"/>
+<text x="758.0" y="1233.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Fusion:Union — 6 paths</text>
+<text x="758.0" y="1248.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">simple-concatenated, no</text>
+<text x="758.0" y="1263.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">RRF / no weighting</text>
+<text x="758.0" y="1279.0" font-size="9" text-anchor="middle" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">searcher.py:496-498</text>
+<circle cx="673.0" cy="1212.0" r="9.5" fill="#111827"/>
+<text x="673.0" y="1215.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">17</text>
+<rect x="884.0" y="995.0" width="172" height="110" rx="7" fill="#ecfccb" stroke="#4d7c0f" stroke-width="1.6"/>
+<text x="970.0" y="1017.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Fusion:Dedup — by</text>
+<text x="970.0" y="1032.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">item.memory text, keep</text>
+<text x="970.0" y="1047.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">higher score on</text>
+<text x="970.0" y="1062.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">collision</text>
+<text x="895.0" y="1078.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">searcher.py:1149-1155</text>
+<text x="895.0" y="1090.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">_deduplicate_results</text>
+<circle cx="885.0" cy="996.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="999.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">18</text>
+<rect x="884.0" y="1211.0" width="172" height="110" rx="7" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.6"/>
+<text x="970.0" y="1233.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Fusion:Quota — sort +</text>
+<text x="970.0" y="1248.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">per-type bucket top_k</text>
+<text x="970.0" y="1263.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">cut, write score to</text>
+<text x="970.0" y="1278.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">metadata.relativity</text>
+<text x="895.0" y="1294.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">searcher.py:1158-1185</text>
+<text x="895.0" y="1306.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">_sort_and_trim</text>
+<circle cx="885.0" cy="1212.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="1215.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">19</text>
+<rect x="884.0" y="1406.0" width="172" height="116" rx="7" fill="#ffedd5" stroke="#ea580c" stroke-width="1.6"/>
+<text x="970.0" y="1428.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Threshold gate — drop</text>
+<text x="970.0" y="1443.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">relativity &lt; 0.45</text>
+<text x="895.0" y="1459.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">search_handler.py:254-278,</text>
+<text x="895.0" y="1471.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">default 0.45</text>
+<text x="895.0" y="1483.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(product_models.py:406-407)</text>
+<text x="895.0" y="1495.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">78/1986 queries return 0</text>
+<text x="895.0" y="1507.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">results (C102)</text>
+<circle cx="885.0" cy="1407.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="1410.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">20</text>
+<rect x="884.0" y="1544.0" width="172" height="107" rx="7" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.6"/>
+<text x="970.0" y="1566.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Fusion:MMR —</text>
+<text x="970.0" y="1581.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">dedup=&quot;mmr&quot; default,</text>
+<text x="970.0" y="1596.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">over ×3 candidate pool</text>
+<text x="895.0" y="1612.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">search_handler.py:90-92</text>
+<text x="895.0" y="1624.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(comment says 5x, code ×3)</text>
+<text x="895.0" y="1636.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">:113-115,331 MMR select</text>
+<circle cx="885.0" cy="1545.0" r="9.5" fill="#111827"/>
+<text x="885.0" y="1548.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">21</text>
+<rect x="672.0" y="1685.0" width="172" height="134" rx="7" fill="#ffedd5" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="758.0" y="1707.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">Retrieval:Rerank —</text>
+<text x="758.0" y="1722.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">rerank_knowledge_mem,</text>
+<text x="758.0" y="1737.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">body says &quot;# rerank set</text>
+<text x="758.0" y="1752.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">unuse&quot;</text>
+<text x="683.0" y="1768.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">search_handler.py:119-125→form</text>
+<text x="683.0" y="1780.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">atters_handler.py</text>
+<text x="683.0" y="1792.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">:169-209  no RawFileMemory in</text>
+<text x="683.0" y="1804.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">this arm → near no-op</text>
+<circle cx="833.0" cy="1696.0" r="8" fill="#78716c"/>
+<text x="833.0" y="1699.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<rect x="1096.0" y="995.0" width="172" height="149" rx="74.5" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.6"/>
+<text x="1182.0" y="1017.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Structured —</text>
+<text x="1182.0" y="1032.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">envelope:</text>
+<text x="1182.0" y="1047.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">memory_id/text/score=re</text>
+<text x="1182.0" y="1062.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">lativity/timestamp/raw_</text>
+<text x="1182.0" y="1077.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">format</text>
+<text x="1107.0" y="1093.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">server.py:122-153</text>
+<text x="1107.0" y="1105.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">RETURNED /</text>
+<text x="1107.0" y="1117.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">TRUNCATED_BELOW_TOP_K</text>
+<text x="1107.0" y="1129.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(:147-153)</text>
+<circle cx="1097.0" cy="996.0" r="9.5" fill="#111827"/>
+<text x="1097.0" y="999.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">23</text>
+<rect x="1096.0" y="1211.0" width="172" height="173" rx="86.5" fill="#f3e8ff" stroke="#78716c" stroke-width="2.2" stroke-dasharray="3 3"/>
+<text x="1182.0" y="1233.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">IO:Structured — &quot;Prefer</text>
+<text x="1182.0" y="1248.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">chat_time&quot; fix — always</text>
+<text x="1182.0" y="1263.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">falls back to</text>
+<text x="1182.0" y="1278.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">created_at, field never</text>
+<text x="1182.0" y="1293.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">exists at top level</text>
+<text x="1107.0" y="1309.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">server.py:143</text>
+<text x="1107.0" y="1321.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">meta.get(&quot;chat_time&quot;)</text>
+<text x="1107.0" y="1333.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">item.py:40 chat_time only</text>
+<text x="1107.0" y="1345.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">inside metadata.</text>
+<text x="1107.0" y="1357.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">sources[], never promoted</text>
+<text x="1107.0" y="1369.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(C106)</text>
+<circle cx="1257.0" cy="1222.0" r="8" fill="#78716c"/>
+<text x="1257.0" y="1225.6" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<rect x="1308.0" y="995.0" width="172" height="158" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="1394.0" y="1017.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">LLM:Answer —</text>
+<text x="1394.0" y="1032.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">memory-bench backbone,</text>
+<text x="1394.0" y="1047.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">outside the MemOS</text>
+<text x="1394.0" y="1062.0" font-size="11.5" font-weight="600" text-anchor="middle" fill="#111827">process</text>
+<text x="1319.0" y="1078.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">R15 — outside the MemOS</text>
+<text x="1319.0" y="1090.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">boundary</text>
+<text x="1319.0" y="1102.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ENABLE_CHAT_API=false</text>
+<text x="1319.0" y="1114.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">(.env:21):</text>
+<text x="1319.0" y="1126.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">/product/chat/* unused this</text>
+<text x="1319.0" y="1138.0" font-size="9" text-anchor="start" fill="#6b7280" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">arm</text>
+<circle cx="1309.0" cy="996.0" r="9.5" fill="#111827"/>
+<text x="1309.0" y="999.5" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">24</text>
+<rect x="1726" y="100" width="208" height="1719.0" rx="9" fill="#fbfbfd" stroke="#e5e7eb"/>
+<text x="1740" y="122" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NODE TYPE</text>
+<rect x="1740" y="130" width="16" height="11" rx="3" fill="#dbeafe" stroke="#2563eb" stroke-width="1.4"/>
+<text x="1763" y="138" font-size="10" fill="#4b5563">LLM call</text>
+<rect x="1740" y="147" width="16" height="11" rx="3" fill="#ffedd5" stroke="#ea580c" stroke-width="1.4"/>
+<text x="1763" y="155" font-size="10" fill="#4b5563">Retrieval / ranking</text>
+<rect x="1740" y="164" width="16" height="11" rx="3" fill="#ecfccb" stroke="#4d7c0f" stroke-width="1.4"/>
+<text x="1763" y="172" font-size="10" fill="#4b5563">Deterministic NLP</text>
+<rect x="1740" y="181" width="16" height="11" rx="3" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.4"/>
+<text x="1763" y="189" font-size="10" fill="#4b5563">Fusion / gating</text>
+<rect x="1740" y="198" width="16" height="11" rx="3" fill="#fef3c7" stroke="#b45309" stroke-width="1.4"/>
+<text x="1763" y="206" font-size="10" fill="#4b5563">Scheduling</text>
+<rect x="1740" y="215" width="16" height="11" rx="3" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.4"/>
+<text x="1763" y="223" font-size="10" fill="#4b5563">Storage</text>
+<rect x="1740" y="232" width="16" height="11" rx="3" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.4"/>
+<text x="1763" y="240" font-size="10" fill="#4b5563">Input / output</text>
+<text x="1740" y="267" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">PAPER vs CODE</text>
+<rect x="1740" y="274" width="18" height="13" rx="3" fill="#ffffff" stroke="#78716c" stroke-width="2" stroke-dasharray="3 3"/>
+<circle cx="1766" cy="280" r="6.5" fill="#78716c"/>
+<text x="1766" y="283.6" font-size="8.5" font-weight="700" text-anchor="middle" fill="#ffffff">~</text>
+<text x="1779" y="283" font-size="9.5" fill="#4b5563">Present but degraded</text>
+<text x="1740" y="311" font-size="10.5" font-weight="700" letter-spacing="0.7" fill="#374151">NOTES</text>
+<text x="1740" y="326" font-size="9.5" fill="#4b5563">• A6 INTERNALIZE is empty:</text>
+<text x="1740" y="337.5" font-size="9.5" fill="#4b5563">component_init.py:245-249 hardcodes</text>
+<text x="1740" y="349.0" font-size="9.5" fill="#4b5563">act_mem=None, para_mem=None.</text>
+<text x="1740" y="360.5" font-size="9.5" fill="#4b5563">P-TRANSMUTE, the primitive this paper</text>
+<text x="1740" y="372.0" font-size="9.5" fill="#4b5563">exists to introduce, has zero code</text>
+<text x="1740" y="383.5" font-size="9.5" fill="#4b5563">path.</text>
+<text x="1740" y="400.0" font-size="9.5" fill="#4b5563">• The storage split runs backwards</text>
+<text x="1740" y="411.5" font-size="9.5" fill="#4b5563">from the docs: Neo4jCommunityGraphDB</text>
+<text x="1740" y="423.0" font-size="9.5" fill="#4b5563">pops `embedding` out of every node's</text>
+<text x="1740" y="434.5" font-size="9.5" fill="#4b5563">metadata and ships it straight to</text>
+<text x="1740" y="446.0" font-size="9.5" fill="#4b5563">Qdrant — vectors never touch Neo4j</text>
+<text x="1740" y="457.5" font-size="9.5" fill="#4b5563">(C47).</text>
+<text x="1740" y="474.0" font-size="9.5" fill="#4b5563">• The write-side reader is</text>
+<text x="1740" y="485.5" font-size="9.5" fill="#4b5563">MultiModalStructMemReader, not</text>
+<text x="1740" y="497.0" font-size="9.5" fill="#4b5563">SimpleStructMemReader as documented —</text>
+<text x="1740" y="508.5" font-size="9.5" fill="#4b5563">4 parallel LLM channels per scene</text>
+<text x="1740" y="520.0" font-size="9.5" fill="#4b5563">(fact/tool/skill/preference), not &quot;one</text>
+<text x="1740" y="531.5" font-size="9.5" fill="#4b5563">call per window&quot; (C15, C20).</text>
+<text x="1740" y="548.0" font-size="9.5" fill="#4b5563">• Three mechanisms that look</text>
+<text x="1740" y="559.5" font-size="9.5" fill="#4b5563">load-bearing are quietly dead: the</text>
+<text x="1740" y="571.0" font-size="9.5" fill="#4b5563">reranker's level_weight is inert</text>
+<text x="1740" y="582.5" font-size="9.5" fill="#4b5563">(level_field=&quot;background&quot; always the</text>
+<text x="1740" y="594.0" font-size="9.5" fill="#4b5563">same value, C85), BM25/fulltext both</text>
+<text x="1740" y="605.5" font-size="9.5" fill="#4b5563">default off, and the &quot;prefer</text>
+<text x="1740" y="617.0" font-size="9.5" fill="#4b5563">chat_time&quot; timestamp fix always falls</text>
+<text x="1740" y="628.5" font-size="9.5" fill="#4b5563">back to created_at because chat_time</text>
+<text x="1740" y="640.0" font-size="9.5" fill="#4b5563">never leaves metadata.sources[]</text>
+<text x="1740" y="651.5" font-size="9.5" fill="#4b5563">(C106).</text>
+<text x="24" y="1849.0" font-size="9" fill="#9ca3af">memory-bench · methodology flow · code view · every citation re-opened and confirmed during verification</text>
+</svg>

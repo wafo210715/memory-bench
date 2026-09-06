@@ -1,0 +1,97 @@
+{
+  "system": "letta",
+  "view": "diff",
+  "title": "Letta / MemGPT — where the paper and the code part ways",
+  "subtitle": "Only the divergent steps are drawn. Each node states both sides; the lane says which stage of the pipeline the divergence sits in.",
+  "source": "paper arXiv:2310.08560v2 (txt:/libtxt: two incompatible pdftotext extractions)  ×  repo letta @ origin/archive 56ba9c25   ·   servers/letta/verification.md, 162 assertions checked across 3 documents (128 ✓ / 6 ✗ / 28 ◐)",
+  "footer": "memory-bench · methodology flow · paper ↔ code divergence",
+  "legend_notes": [
+    "The single biggest correction (verification §7 priority #1): the architecture docs described the paper-faithful compaction path (Summarizer, 30% message-count evict) as the default. It is not — default letta_v1_agent → LettaAgentV3 uses compact_messages with a 100%/90%-of-context-window token threshold, and its summarizer model can be swapped for a cheaper one.",
+    "Structural mirror at B8: the paper's single explicit heartbeat flag becomes the code's implicit 'did you call a tool' rule — same node position, same job, opposite control signal, and neither side documents a step cap.",
+    "Two 'unreachable path' findings anchor d7: the docs' own citations (legacy sleeptime_multi_agent.py, legacy letta/agent.py:Agent) point at code with zero live callers — `git grep def load_agent` returns nothing, so the REST route that would construct the legacy agent is itself broken."
+  ],
+  "nodes": [
+    {
+      "id": "d2",
+      "stage": "A2",
+      "row": 0,
+      "type": "llm",
+      "state": "differs",
+      "label": "Context compaction: mechanism, threshold and default reachability",
+      "cite": "paper: §2.2 txt:224-248, token-based,\ne.g. 70% warn / 100% flush / 50% evict\ncode: default LettaAgentV3 → compact_messages,\nthresholds.py:27-41 = 100% window (90% GPT-5),\nmodel swappable (compact.py:42-131); non-default\nLettaAgentV2/legacy → Summarizer, message-count\n30% evict (settings.py:78,86)"
+    },
+    {
+      "id": "d3",
+      "stage": "A3",
+      "row": 0,
+      "type": "llm",
+      "state": "differs",
+      "label": "Core memory rewrite: uniqueness semantics",
+      "cite": "paper: Fig.4 txt:267-301 / libtxt:415, semantic\nreplace example only, no matching rule defined\ncode: core_memory_replace — no uniqueness check,\nfull str.replace (core_tool_executor.py:328-345,\ntop-priority bug in verification §1/§7); memory_replace —\nunique-checked successor (:346-401)"
+    },
+    {
+      "id": "d7",
+      "stage": "A3",
+      "row": 1,
+      "type": "llm",
+      "state": "code_only",
+      "label": "Self-maintenance: single agent vs background Sleeptime (docs cite dead code)",
+      "cite": "paper: §2 single LLM processor, no background\nagent concept\ncode: live path sleeptime_multi_agent_v4.py:132-280\n(default freq=5, server.py:784) revises shared Blocks;\ndocs point to legacy groups/sleeptime_multi_agent.py\n(helpers.py:15 load_multi_agent, 0 callers) and legacy\nletta/agent.py:Agent (chat_completions.py:51 →\n`git grep def load_agent` = 0 hits)"
+    },
+    {
+      "id": "d6",
+      "stage": "A5",
+      "row": 0,
+      "type": "store",
+      "state": "differs",
+      "label": "Message persistence: \"stored indefinitely\" vs three hard-delete paths",
+      "cite": "paper: §2.2/§6 txt:248-251, \"stored indefinitely\nin recall storage\", 0 hits for forget/delete\n(libtxt full-text grep, P47)\ncode: message_manager.py:822 (single), :1045-1067\ndelete(MessageModel) at :1060 (whole agent),\n:1094-1121 delete(...) at :1119 (batch by id)"
+    },
+    {
+      "id": "d4",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "state": "differs",
+      "label": "Archival memory: paper's core layer vs code's removed-by-default tool",
+      "cite": "paper: §2.2/§3.2.1 txt:207-217,465-490, archival\nis the documented long-term store; all reported\nexperiments depend on it\ncode: constants.py:115-116 DEPRECATED_LETTA_TOOLS\nremoves archival_memory_insert/search from BASE_TOOLS\nby default; exception: agent_manager.py:404-405\nenable_sleeptime branch keeps archival_memory_search\n(constants.py:133)"
+    },
+    {
+      "id": "d5",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "state": "differs",
+      "label": "Recall retrieval: undisclosed algorithm vs substring match + overclaim",
+      "cite": "paper: §3.2 txt:181-190, no algorithm ever given\nfor recall_storage.search; Fig.6 page=2 pagination\n(txt:421-450) for archival\ncode: message_manager.py:977-993 ILIKE/JSON LIKE\nsubstring, no ranking — docstring claims \"hybrid\nsearch (text + semantic similarity)\" (base.py:87);\narchival_memory_search has no page param at all\n(core_tool_executor.py:278-288)"
+    },
+    {
+      "id": "d9",
+      "stage": "B6",
+      "row": 0,
+      "type": "store",
+      "state": "differs",
+      "label": "Core memory residency: always-in-context vs git-mode partial exclusion",
+      "cite": "paper: §2.1 txt:165-170, working context is a\nfixed-size block ALWAYS present in main context\ncode: standard/line-numbered modes keep this true;\ngit mode breaks it — schemas/memory.py:122-130\n_get_renderable_blocks only renders system/* blocks\nwhen git_enabled; compile() itself is at :688,\nnot :143 as some docs claim"
+    },
+    {
+      "id": "d8",
+      "stage": "B7",
+      "row": 0,
+      "type": "io",
+      "state": "differs",
+      "label": "Who answers: send_message as a function vs default plain-text reply",
+      "cite": "paper: Fig.3/§2.4, send_message is a function on\nequal footing with memory functions\ncode: agent_manager.py:413 discard(\"send_message\")\nfor default letta_v1_agent, replaced by server.py:968\ntext_is_assistant_message; enable_sleeptime branch\n(agent_manager.py:404-405) does NOT discard it —\na live exception"
+    },
+    {
+      "id": "d1",
+      "stage": "B8",
+      "row": 0,
+      "type": "sched",
+      "state": "differs",
+      "label": "Multi-step control signal: explicit flag vs implicit tool-call rule",
+      "cite": "paper: §2.4/§3.3 txt:212-217,323-337, explicit\nrequest_heartbeat=true chains inference; no flag = yield\ncode: default letta_agent_v3.py:1967-2036\n_decide_continuation ignores the flag entirely — tool\ncalled → continue, no tool → stop (:2071\nrequest_heartbeat=False hardcoded); old flag-reading\nlogic still lives in legacy agent.py:563,834-842 and\nLettaAgentV2 (:1126,1241-1250); neither side documents\na step cap (paper: P48, 0 grep hits)"
+    }
+  ],
+  "edges": []
+}

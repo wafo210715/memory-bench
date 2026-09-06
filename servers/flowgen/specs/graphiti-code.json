@@ -12,92 +12,536 @@
     "Communities never form on the ingest path: update_communities defaults to False and build_communities() is a manual MCP tool. All 105 measured retrieves returned 0 communities."
   ],
   "nodes": [
-    {"id": "conv",     "stage": "A1", "row": 0,  "type": "io",    "seq": 1,  "state": "differs", "label": "IO:Session — the whole session joined into ONE episode", "cite": "server.py:414-417\npaper: episode = one message"},
-    {"id": "hist",     "stage": "A3", "row": 0,  "type": "alg",   "seq": 2,  "state": "differs", "label": "Recall last 10 episodes — i.e. last 10 sessions here", "cite": "graphiti.py:1087-1090\nsearch_utils.py:64  = 10"},
-
-    {"id": "ext",      "stage": "A2", "row": 1,  "type": "llm",   "seq": 3,  "label": "LLM:Extract — entities, exactly one call", "cite": "graphiti.py:1122\nnode_operations.py:250\n\"a single LLM call\""},
-    {"id": "reflect",  "stage": "A2", "row": 2,  "type": "llm",   "seq": null, "state": "paper_only", "label": "LLM:Reflect — reflexion self-check", "cite": "paper §2.2.1 txt:133-134\ngrep -i reflexion: 0 hits\nextraction returns immediately"},
-
-    {"id": "nemb",     "stage": "A4", "row": 3,  "type": "alg",   "seq": 4,  "label": "Embed entity name", "cite": "node_operations.py:637"},
-    {"id": "cand",     "stage": "A3", "row": 3,  "type": "alg",   "seq": 5,  "label": "Retrieval:Emb — resolution candidates", "cite": "_collect_candidate_nodes\nnode_operations.py:637\n:652 zero candidates → skip"},
-    {"id": "simres",   "stage": "A3", "row": 4,  "type": "nlp",   "seq": 6,  "state": "code_only", "label": "NLP:EmbDedup — deterministic resolve, zero LLM", "cite": "node_operations.py:659\n_resolve_with_similarity"},
-    {"id": "llmres",   "stage": "A3", "row": 5,  "type": "llm",   "seq": 7,  "state": "differs", "label": "LLM:Dedup — ONE batch call for all unresolved nodes", "cite": "node_operations.py:681 → :552\n0 or 1 call, not per entity\nreturns name only, no summary"},
-
-    {"id": "fext",     "stage": "A2", "row": 6,  "type": "llm",   "seq": 8,  "label": "LLM:Extract — fact edges", "cite": "edge_operations.py:656"},
-    {"id": "femb",     "stage": "A4", "row": 6,  "type": "alg",   "seq": 9,  "label": "Embed fact", "cite": ""},
-
-    {"id": "edup",     "stage": "A3", "row": 7,  "type": "llm",   "seq": 10, "state": "differs", "label": "LLM:Dedup — dedupe and contradiction in ONE merged call", "cite": "edge_operations.py:726-732\ndedupe_edges.py:27-29\n:653 zero candidates → 0 calls"},
-    {"id": "tex",      "stage": "A2", "row": 8,  "type": "llm",   "seq": 11, "label": "LLM:TimeExtract — new edges only", "cite": "edge_operations.py:680\n:812-813 duplicates skipped"},
-    {"id": "conflict", "stage": "A3", "row": 8,  "type": "nlp",   "seq": 12, "state": "code_only", "label": "Resolve contradictions — pure temporal compare, no LLM", "cite": "edge_operations.py:538\n:569-570 invalid_at / expired_at\n:826-839 new edge born invalid"},
-
-    {"id": "attrs",    "stage": "A2", "row": 9,  "type": "llm",   "seq": 13, "state": "degraded", "label": "LLM:Tag — entity attributes", "cite": "node_operations.py:790-794\n0 calls: no entity_types passed"},
-    {"id": "esum",     "stage": "A2", "row": 10, "type": "llm",   "seq": 14, "state": "differs", "label": "LLM:Summarize — batched, MAX_NODES = 30", "cite": "node_operations.py:836\n:879-882 short ones skip the LLM\nprompt = extract_summaries_batch"},
-    {"id": "deadp",    "stage": "A2", "row": 11, "type": "llm",   "seq": null, "state": "paper_only", "label": "extract_summary prompt — documented but dead", "cite": "prompts/extract_nodes.py:467\nzero call sites repo-wide"},
-
-    {"id": "graph",    "stage": "A5", "row": 10, "type": "store", "seq": 15, "label": "Store:Graph — Neo4j, predefined Cypher", "cite": "graphiti.py:1170\nMENTIONS / RELATES_TO\n5th timestamp reference_time\npersisted (edges.py:280,355)"},
-
-    {"id": "cdyn",     "stage": "A2", "row": 12, "type": "llm",   "seq": null, "state": "degraded", "label": "LLM:Summarize — community dynamic extension", "cite": "graphiti.py:989\nupdate_communities = False\nbranch never taken"},
-    {"id": "cbuild",   "stage": "A5", "row": 12, "type": "sched", "seq": null, "state": "code_only", "label": "Sched:Lifecycle — build_communities() exposed as a manual MCP tool", "cite": "server.py:539-549\ningest path never triggers it\nwhile True, no iteration cap"},
-
-    {"id": "q",        "stage": "B1", "row": 0,  "type": "io",    "seq": 16, "label": "IO:Query", "cite": "server.py:470  retrieve()"},
-    {"id": "qemb",     "stage": "B1", "row": 1,  "type": "alg",   "seq": 17, "label": "Embed query", "cite": "search.py:145-149\n:117 only checks for empty"},
-
-    {"id": "bm25",     "stage": "B2", "row": 0,  "type": "alg",   "seq": 18, "label": "Retrieval:BM25 — 2 × limit, Neo4j Lucene", "cite": "search.py:173 parallel\n:286/:297/:309  2 * limit"},
-    {"id": "cos",      "stage": "B2", "row": 1,  "type": "alg",   "seq": 19, "label": "Retrieval:Emb — sim_min_score 0.6", "cite": "search_utils.py:65"},
-    {"id": "epsearch", "stage": "B2", "row": 2,  "type": "alg",   "seq": null, "state": "degraded", "label": "Retrieval:BM25 over episodes — the engine's 4th channel", "cite": "search.py:664\nturned off here:\nserver.py:114 episode_config=None"},
-    {"id": "symf",     "stage": "B2", "row": 3,  "type": "alg",   "seq": null, "state": "degraded", "label": "Retrieval:SymFilter — expired_at / labels / types", "cite": "search_filters.py:65, :242-271\nimplemented but never passed\n→ stale facts still returned"},
-
-    {"id": "bfs",      "stage": "B3", "row": 0,  "type": "alg",   "seq": 20, "label": "Retrieval:Graph — BFS, depth 3, no seed passed", "cite": "search_utils.py:67  = 3\nserver.py:477 no seed\nfirst call: 0 hits"},
-    {"id": "bfs2",     "stage": "B3", "row": 1,  "type": "alg",   "seq": 21, "state": "code_only", "label": "Retrieval:Graph — auto-seeded second BFS", "cite": "search.py:332-353\nseeds = this round's hits\nmeasured hits_per_call [0, 40]"},
-
-    {"id": "rrf",      "stage": "B4", "row": 0,  "type": "fusion","seq": 22, "label": "Fusion:RRF", "cite": "server.py:65 default\n105 / 105 retrieves used it"},
-    {"id": "xenc",     "stage": "B4", "row": 1,  "type": "alg",   "seq": null, "state": "degraded", "label": "Fusion:CrossEncoder — upstream default", "cite": "search.py:395-411\nhere downgraded to\nTrue/False → 1.0 / 0.0\nserver.py:157-208"},
-    {"id": "mmr",      "stage": "B4", "row": 2,  "type": "fusion","seq": null, "state": "degraded", "label": "Fusion:MMR", "cite": "search.py:375-394  unused"},
-    {"id": "epment",   "stage": "B4", "row": 3,  "type": "alg",   "seq": null, "state": "degraded", "label": "Fusion:EpisodeMentions", "cite": "search.py:450-451  unused"},
-    {"id": "nodedist", "stage": "B4", "row": 4,  "type": "alg",   "seq": null, "state": "degraded", "label": "Fusion:NodeDistance", "cite": "search.py:412-446  unused"},
-
-    {"id": "alloc",    "stage": "B5", "row": 0,  "type": "fusion","seq": 23, "state": "code_only", "label": "Fusion:Quota — largest-remainder split 3:1:1, then backfill", "cite": "server.py:387-409  _allocate\npaper defines no selection rule"},
-
-    {"id": "env",      "stage": "B6", "row": 0,  "type": "io",    "seq": 24, "state": "differs", "label": "IO:Structured — envelopes built by the wrapper", "cite": "server.py:346/372/380\nvalid_at only, \"lo → hi\"\nmissing → VALID_AT_MISSING"},
-    {"id": "chi",      "stage": "B6", "row": 1,  "type": "io",    "seq": null, "state": "degraded", "label": "search_results_to_context_string — the engine's own χ", "cite": "search_helpers.py:28\nsearch_() never calls it\nonly caller: a test file"},
-
-    {"id": "ans",      "stage": "B7", "row": 0,  "type": "llm",   "seq": 25, "label": "LLM:Answer — harness, outside the boundary", "cite": "glm-5.3, anthropic protocol"}
+    {
+      "id": "conv",
+      "stage": "A1",
+      "row": 0,
+      "type": "io",
+      "seq": 1,
+      "state": "differs",
+      "label": "IO:Session — the whole session joined into ONE episode",
+      "cite": "server.py:414-417\npaper: episode = one message",
+      "prim": "P-INTAKE"
+    },
+    {
+      "id": "hist",
+      "stage": "A3",
+      "row": 0,
+      "type": "alg",
+      "seq": 2,
+      "state": "differs",
+      "label": "Retrieval:Recent — Recall last 10 episodes — i.e. last 10 sessions here",
+      "cite": "graphiti.py:1087-1090\nsearch_utils.py:64  = 10",
+      "prim": "P-DEDUP|P-ORCHESTRATE",
+      "prim_note": "读近期历史为抽取提供上下文：它确实查了库存（故在 A3），但服务的是 A2 抽取而非准入判定"
+    },
+    {
+      "id": "ext",
+      "stage": "A2",
+      "row": 1,
+      "type": "llm",
+      "seq": 3,
+      "label": "LLM:Extract — entities, exactly one call",
+      "cite": "graphiti.py:1122\nnode_operations.py:250\n\"a single LLM call\"",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "reflect",
+      "stage": "A2",
+      "row": 2,
+      "type": "llm",
+      "seq": null,
+      "state": "paper_only",
+      "label": "LLM:Reflect — reflexion self-check",
+      "cite": "paper §2.2.1 txt:133-134\ngrep -i reflexion: 0 hits\nextraction returns immediately",
+      "prim": "P-SELFCHECK"
+    },
+    {
+      "id": "nemb",
+      "stage": "A4",
+      "row": 3,
+      "type": "alg",
+      "seq": 4,
+      "label": "NLP:Embed — entity name",
+      "cite": "node_operations.py:637",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "cand",
+      "stage": "A3",
+      "row": 3,
+      "type": "alg",
+      "seq": 5,
+      "label": "Retrieval:Emb — resolution candidates",
+      "cite": "_collect_candidate_nodes\nnode_operations.py:637\n:652 zero candidates → skip",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "simres",
+      "stage": "A3",
+      "row": 4,
+      "type": "nlp",
+      "seq": 6,
+      "state": "code_only",
+      "label": "NLP:EmbDedup — deterministic resolve, zero LLM",
+      "cite": "node_operations.py:659\n_resolve_with_similarity",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "llmres",
+      "stage": "A3",
+      "row": 5,
+      "type": "llm",
+      "seq": 7,
+      "state": "differs",
+      "label": "LLM:Dedup — ONE batch call for all unresolved nodes",
+      "cite": "node_operations.py:681 → :552\n0 or 1 call, not per entity\nreturns name only, no summary",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "fext",
+      "stage": "A2",
+      "row": 6,
+      "type": "llm",
+      "seq": 8,
+      "label": "LLM:Extract — fact edges",
+      "cite": "edge_operations.py:656",
+      "prim": "P-EXTRACT"
+    },
+    {
+      "id": "femb",
+      "stage": "A4",
+      "row": 6,
+      "type": "alg",
+      "seq": 9,
+      "label": "NLP:Embed — fact",
+      "cite": "",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "edup",
+      "stage": "A3",
+      "row": 7,
+      "type": "llm",
+      "seq": 10,
+      "state": "differs",
+      "label": "LLM:Dedup — dedupe and contradiction in ONE merged call",
+      "cite": "edge_operations.py:726-732\ndedupe_edges.py:27-29\n:653 zero candidates → 0 calls",
+      "prim": "P-DEDUP"
+    },
+    {
+      "id": "tex",
+      "stage": "A2",
+      "row": 8,
+      "type": "llm",
+      "seq": 11,
+      "label": "LLM:TimeExtract — new edges only",
+      "cite": "edge_operations.py:680\n:812-813 duplicates skipped",
+      "prim": "P-META"
+    },
+    {
+      "id": "conflict",
+      "stage": "A3",
+      "row": 8,
+      "type": "nlp",
+      "seq": 12,
+      "state": "code_only",
+      "label": "NLP:Conflict — Resolve contradictions — pure temporal compare, no LLM",
+      "cite": "edge_operations.py:538\n:569-570 invalid_at / expired_at\n:826-839 new edge born invalid",
+      "prim": "P-CONFLICT"
+    },
+    {
+      "id": "attrs",
+      "stage": "A2",
+      "row": 9,
+      "type": "llm",
+      "seq": 13,
+      "state": "degraded",
+      "label": "LLM:Tag — entity attributes",
+      "cite": "node_operations.py:790-794\n0 calls: no entity_types passed",
+      "prim": "P-META"
+    },
+    {
+      "id": "esum",
+      "stage": "A2",
+      "row": 10,
+      "type": "llm",
+      "seq": 14,
+      "state": "differs",
+      "label": "LLM:Summarize — batched, MAX_NODES = 30",
+      "cite": "node_operations.py:836\n:879-882 short ones skip the LLM\nprompt = extract_summaries_batch",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "deadp",
+      "stage": "A2",
+      "row": 11,
+      "type": "llm",
+      "seq": null,
+      "state": "paper_only",
+      "label": "LLM:Summarize — extract_summary prompt — documented but dead",
+      "cite": "prompts/extract_nodes.py:467\nzero call sites repo-wide",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "graph",
+      "stage": "A5",
+      "row": 10,
+      "type": "store",
+      "seq": 15,
+      "label": "Store:Graph — Neo4j, predefined Cypher",
+      "cite": "graphiti.py:1170\nMENTIONS / RELATES_TO\n5th timestamp reference_time\npersisted (edges.py:280,355)",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "cdyn",
+      "stage": "A2",
+      "row": 12,
+      "type": "llm",
+      "seq": null,
+      "state": "degraded",
+      "label": "LLM:Summarize — community dynamic extension",
+      "cite": "graphiti.py:989\nupdate_communities = False\nbranch never taken",
+      "prim": "P-AGGREGATE"
+    },
+    {
+      "id": "cbuild",
+      "stage": "A5",
+      "row": 12,
+      "type": "sched",
+      "seq": null,
+      "state": "code_only",
+      "label": "Sched:Rebuild — build_communities() exposed as a manual MCP tool",
+      "cite": "server.py:539-549\ningest path never triggers it\nwhile True, no iteration cap",
+      "prim": "P-PERSIST"
+    },
+    {
+      "id": "q",
+      "stage": "B1",
+      "row": 0,
+      "type": "io",
+      "seq": 16,
+      "label": "IO:Query",
+      "cite": "server.py:470  retrieve()",
+      "prim": "P-QUERYPARSE"
+    },
+    {
+      "id": "qemb",
+      "stage": "B1",
+      "row": 1,
+      "type": "alg",
+      "seq": 17,
+      "label": "NLP:Embed — query",
+      "cite": "search.py:145-149\n:117 only checks for empty",
+      "prim": "P-EMBED"
+    },
+    {
+      "id": "bm25",
+      "stage": "B2",
+      "row": 0,
+      "type": "alg",
+      "seq": 18,
+      "label": "Retrieval:BM25 — 2 × limit, Neo4j Lucene",
+      "cite": "search.py:173 parallel\n:286/:297/:309  2 * limit",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "cos",
+      "stage": "B2",
+      "row": 1,
+      "type": "alg",
+      "seq": 19,
+      "label": "Retrieval:Emb — sim_min_score 0.6",
+      "cite": "search_utils.py:65",
+      "prim": "P-DENSE"
+    },
+    {
+      "id": "epsearch",
+      "stage": "B2",
+      "row": 2,
+      "type": "alg",
+      "seq": null,
+      "state": "degraded",
+      "label": "Retrieval:BM25 over episodes — the engine's 4th channel",
+      "cite": "search.py:664\nturned off here:\nserver.py:114 episode_config=None",
+      "prim": "P-SPARSE"
+    },
+    {
+      "id": "symf",
+      "stage": "B2",
+      "row": 3,
+      "type": "alg",
+      "seq": null,
+      "state": "degraded",
+      "label": "Retrieval:SymFilter — expired_at / labels / types",
+      "cite": "search_filters.py:65, :242-271\nimplemented but never passed\n→ stale facts still returned",
+      "prim": "P-SYMFILTER"
+    },
+    {
+      "id": "bfs",
+      "stage": "B3",
+      "row": 0,
+      "type": "alg",
+      "seq": 20,
+      "label": "Retrieval:Graph — BFS, depth 3, no seed passed",
+      "cite": "search_utils.py:67  = 3\nserver.py:477 no seed\nfirst call: 0 hits",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "bfs2",
+      "stage": "B3",
+      "row": 1,
+      "type": "alg",
+      "seq": 21,
+      "state": "code_only",
+      "label": "Retrieval:Graph — auto-seeded second BFS",
+      "cite": "search.py:332-353\nseeds = this round's hits\nmeasured hits_per_call [0, 40]",
+      "prim": "P-GRAPHEXPAND"
+    },
+    {
+      "id": "rrf",
+      "stage": "B4",
+      "row": 0,
+      "type": "fusion",
+      "seq": 22,
+      "label": "Fusion:RRF",
+      "cite": "server.py:65 default\n105 / 105 retrieves used it",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "xenc",
+      "stage": "B4",
+      "row": 1,
+      "type": "alg",
+      "seq": null,
+      "state": "degraded",
+      "label": "Fusion:CrossEncoder — upstream default",
+      "cite": "search.py:395-411\nhere downgraded to\nTrue/False → 1.0 / 0.0\nserver.py:157-208",
+      "prim": "P-RERANK"
+    },
+    {
+      "id": "mmr",
+      "stage": "B4",
+      "row": 2,
+      "type": "fusion",
+      "seq": null,
+      "state": "degraded",
+      "label": "Fusion:MMR",
+      "cite": "search.py:375-394  unused",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "epment",
+      "stage": "B4",
+      "row": 3,
+      "type": "alg",
+      "seq": null,
+      "state": "degraded",
+      "label": "Fusion:EpisodeMentions",
+      "cite": "search.py:450-451  unused",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "nodedist",
+      "stage": "B4",
+      "row": 4,
+      "type": "alg",
+      "seq": null,
+      "state": "degraded",
+      "label": "Fusion:NodeDistance",
+      "cite": "search.py:412-446  unused",
+      "prim": "P-FUSE"
+    },
+    {
+      "id": "alloc",
+      "stage": "B5",
+      "row": 0,
+      "type": "fusion",
+      "seq": 23,
+      "state": "code_only",
+      "label": "Fusion:Quota — largest-remainder split 3:1:1, then backfill",
+      "cite": "server.py:387-409  _allocate\npaper defines no selection rule",
+      "prim": "P-SELECT"
+    },
+    {
+      "id": "env",
+      "stage": "B6",
+      "row": 0,
+      "type": "io",
+      "seq": 24,
+      "state": "differs",
+      "label": "IO:Structured — envelopes built by the wrapper",
+      "cite": "server.py:346/372/380\nvalid_at only, \"lo → hi\"\nmissing → VALID_AT_MISSING",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "chi",
+      "stage": "B6",
+      "row": 1,
+      "type": "io",
+      "seq": null,
+      "state": "degraded",
+      "label": "IO:Context — search_results_to_context_string — the engine's own χ",
+      "cite": "search_helpers.py:28\nsearch_() never calls it\nonly caller: a test file",
+      "prim": "P-ASSEMBLE"
+    },
+    {
+      "id": "ans",
+      "stage": "B7",
+      "row": 0,
+      "type": "llm",
+      "seq": 25,
+      "label": "LLM:Answer — harness, outside the boundary",
+      "cite": "glm-5.3, anthropic protocol",
+      "prim": "P-GENERATE"
+    }
   ],
   "edges": [
-    {"from": "conv",     "to": "hist"},
-    {"from": "hist",     "to": "ext"},
-    {"from": "ext",      "to": "reflect", "state": "paper_only", "label": "never runs"},
-    {"from": "ext",      "to": "nemb"},
-    {"from": "nemb",     "to": "cand"},
-    {"from": "cand",     "to": "simres"},
-    {"from": "simres",   "to": "llmres", "label": "leftovers only"},
-    {"from": "llmres",   "to": "fext"},
-    {"from": "fext",     "to": "femb"},
-    {"from": "femb",     "to": "edup"},
-    {"from": "edup",     "to": "tex"},
-    {"from": "tex",      "to": "conflict"},
-    {"from": "conflict", "to": "attrs"},
-    {"from": "attrs",    "to": "esum"},
-    {"from": "esum",     "to": "graph"},
-    {"from": "esum",     "to": "deadp", "state": "paper_only"},
-    {"from": "graph",    "to": "cdyn", "state": "degraded", "label": "default off"},
-    {"from": "cdyn",     "to": "cbuild", "state": "degraded"},
-
-    {"from": "q",        "to": "qemb"},
-    {"from": "qemb",     "to": "bm25"},
-    {"from": "qemb",     "to": "cos"},
-    {"from": "qemb",     "to": "bfs"},
-    {"from": "qemb",     "to": "epsearch", "state": "degraded"},
-    {"from": "graph",    "to": "bm25"},
-    {"from": "graph",    "to": "cos"},
-    {"from": "graph",    "to": "bfs"},
-    {"from": "graph",    "to": "epsearch", "state": "degraded"},
-    {"from": "bfs",      "to": "bfs2", "label": "auto-seed"},
-    {"from": "cos",      "to": "rrf"},
-    {"from": "bm25",     "to": "rrf"},
-    {"from": "bfs2",     "to": "rrf"},
-    {"from": "rrf",      "to": "alloc"},
-    {"from": "alloc",    "to": "env"},
-    {"from": "env",      "to": "ans"}
+    {
+      "from": "conv",
+      "to": "hist"
+    },
+    {
+      "from": "hist",
+      "to": "ext"
+    },
+    {
+      "from": "ext",
+      "to": "reflect",
+      "state": "paper_only",
+      "label": "never runs"
+    },
+    {
+      "from": "ext",
+      "to": "nemb"
+    },
+    {
+      "from": "nemb",
+      "to": "cand"
+    },
+    {
+      "from": "cand",
+      "to": "simres"
+    },
+    {
+      "from": "simres",
+      "to": "llmres",
+      "label": "leftovers only"
+    },
+    {
+      "from": "llmres",
+      "to": "fext"
+    },
+    {
+      "from": "fext",
+      "to": "femb"
+    },
+    {
+      "from": "femb",
+      "to": "edup"
+    },
+    {
+      "from": "edup",
+      "to": "tex"
+    },
+    {
+      "from": "tex",
+      "to": "conflict"
+    },
+    {
+      "from": "conflict",
+      "to": "attrs"
+    },
+    {
+      "from": "attrs",
+      "to": "esum"
+    },
+    {
+      "from": "esum",
+      "to": "graph"
+    },
+    {
+      "from": "esum",
+      "to": "deadp",
+      "state": "paper_only"
+    },
+    {
+      "from": "graph",
+      "to": "cdyn",
+      "state": "degraded",
+      "label": "default off"
+    },
+    {
+      "from": "cdyn",
+      "to": "cbuild",
+      "state": "degraded"
+    },
+    {
+      "from": "q",
+      "to": "qemb"
+    },
+    {
+      "from": "qemb",
+      "to": "bm25"
+    },
+    {
+      "from": "qemb",
+      "to": "cos"
+    },
+    {
+      "from": "qemb",
+      "to": "bfs"
+    },
+    {
+      "from": "qemb",
+      "to": "epsearch",
+      "state": "degraded"
+    },
+    {
+      "from": "graph",
+      "to": "bm25"
+    },
+    {
+      "from": "graph",
+      "to": "cos"
+    },
+    {
+      "from": "graph",
+      "to": "bfs"
+    },
+    {
+      "from": "graph",
+      "to": "epsearch",
+      "state": "degraded"
+    },
+    {
+      "from": "bfs",
+      "to": "bfs2",
+      "label": "auto-seed"
+    },
+    {
+      "from": "cos",
+      "to": "rrf"
+    },
+    {
+      "from": "bm25",
+      "to": "rrf"
+    },
+    {
+      "from": "bfs2",
+      "to": "rrf"
+    },
+    {
+      "from": "rrf",
+      "to": "alloc"
+    },
+    {
+      "from": "alloc",
+      "to": "env"
+    },
+    {
+      "from": "env",
+      "to": "ans"
+    }
   ]
 }

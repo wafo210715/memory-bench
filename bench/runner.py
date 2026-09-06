@@ -177,10 +177,19 @@ async def ingest_system(client: Client, system: str, convs: list[dict], run: Run
             if session["session_id"] in done_sessions:
                 continue
             payload = session_to_add_conversation(session, cid)
-            r = await acall(client, "add_conversation", payload, timeout=600)
+            r = await acall(client, "add_conversation", payload,
+                            timeout=int(os.environ.get("MEMBENCH_INGEST_TIMEOUT", "1800")))
             n_turns += r.get("accepted_turns", 0)
             sys_progress.setdefault(cid, []).append(session["session_id"])
             run.save_progress(progress)
+            # 逐 session 快照（2026-09-05 下午改）：逐 conv 版仍留缺口——conv 灌到一半被杀时，
+            # 快照里没有这个 conv，而 progress 记着部分 session，resume 只补后半 → 记忆残缺
+            # （conv-47 的 170/689 就是这么来的）。逐 session 后暴露窗口 ≈ 一个 session（~5min）。
+            # 代价：每次快照全量序列化 notes（≤几秒），272 个 session 共计 ~10-15 分钟，可接受。
+            r = await acall(client, "snapshot", {"tag": SNAP_TAG}, timeout=1800)
+            if not r.get("ok") and r.get("error") != "SNAPSHOT_UNSUPPORTED":
+                print(f"  ⚠️ [{system}] {cid}/{session['session_id']} 快照失败: "
+                      f"{r.get('error')}（继续，中断则丢本 session）")
         print(f"  [{system}] {cid} 灌完（{len(conv['sessions'])} sessions）")
 
     r = await acall(client, "snapshot", {"tag": SNAP_TAG}, timeout=600)

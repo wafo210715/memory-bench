@@ -2,7 +2,16 @@
   "run_id": "amem-ab-3conv",
   "benchmark": "locomo10",
   "convs": [
-    "conv-26"
+    "conv-26",
+    "conv-30",
+    "conv-41",
+    "conv-42",
+    "conv-43",
+    "conv-44",
+    "conv-47",
+    "conv-48",
+    "conv-49",
+    "conv-50"
   ],
   "arms": [
     "amem_fixed"
@@ -24,9 +33,11 @@
   "started_at": "2026-08-30T12:30:16+00:00",
   "status": "DONE",
   "phase_b": {
-    "completed": 594,
-    "wall_s": 858.8,
-    "ts": "2026-08-31T13:41:33+00:00"
+    "completed": 3818,
+    "wall_s": 3503.7,
+    "ts": "2026-09-06T03:45:52+00:00"
   },
-  "finished_at": "2026-08-31T13:41:33+00:00"
+  "finished_at": "2026-09-06T03:45:53+00:00",
+  "suspended_reason": "重试耗尽（4 次）: ConnectError: All connection attempts failed",
+  "suspended_at": "2026-09-06T02:16:10+00:00"
 }

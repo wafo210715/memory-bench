@@ -1,0 +1,1 @@
+{"arm": "intent_full", "stats": {"n_memories": 1297, "n_sessions": 63, "mode": "full", "ablate": [], "tokens_used": {"ingest": null, "retrieve": 0, "internal_llm": 194419, "embed": 44349}, "llm_calls": 126, "embed_calls": 1563, "last_reset_at": null, "snapshots": ["locomo_full", "smoke"]}, "ts": "2026-09-06T19:03:32+00:00"}

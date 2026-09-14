@@ -7,9 +7,10 @@
 对照锚点：`rag_baseline`（裸向量检索，无 LLM）与 `full_context`（整段历史塞进上下文）。
 没有这两个，"记忆系统是不是只是向量检索"这个质疑就没有落点。
 
-**当前状态**：Phase 1（8 臂封装 + 契约门禁）完成；Phase 2 第一轮跑分完成
-（locomo-r2-n3，2026-08-30：mem0 / graphiti / rag_baseline × 10 conv × n=3，top_k=20；
-intent 因有效性威胁退出该轮，evidence 已保留）。路线与阶段划分见 [PLAN.md](PLAN.md)。
+**当前状态**：Phase 1（8 臂封装 + 契约门禁）完成；Phase 2 跑分：locomo-r2-n3（2026-08-30，mem0 / graphiti /
+rag_baseline × 10 conv × n=3）、mandol-full-10conv（09-04）、amem-ab-3conv（含 amem_fixed 全量）；
+**intent 臂 2026-09-07 重写为 Robust Baseline v1 并跑完 3-conv 消融阶梯**（主线 65.3，见
+[servers/intent/HANDOFF.md](servers/intent/HANDOFF.md)），10-conv 全量待跑。路线与阶段划分见 [PLAN.md](PLAN.md)。
 
 ---
 
@@ -92,6 +93,35 @@ MCP 六工具的逐字段语义（含 canonical envelope 与各臂原生粒度�
 
 ---
 
+## intent 快速开始（意图系统 Robust Baseline v1）
+
+意图层叠在记忆库之上：原文全留、摘要/事实/向量只做索引、session 级 envelope 按事实时间升序交付。
+完整的设计理由、借鉴了哪些记忆系统、分从哪里来、在别人电脑上怎么跑，都在
+**[servers/intent/HANDOFF.md](servers/intent/HANDOFF.md)**；这里只给最短路径。
+
+1. **运行时**：用 Bun 不用 venv——`curl -fsSL https://bun.sh/install | bash`，然后
+   `cd servers/intent && bun install`。
+2. **LLM**：只读共享的 `MEMBENCH_LLM_API_KEY / MEMBENCH_LLM_BASE_URL / MEMBENCH_LLM_MODEL`（与其他臂同一组，
+   公平性约定）；embedding 从同一 base URL 去 `/coding` 推导，可用 `MEMBENCH_EMBED_*` 覆盖。
+   构建期每 session 2 次 LLM；**查询期零文本 LLM**（A 档被动检索面）。
+3. **门禁**：`python main.py smoke intent_full`（8/8；注意 smoke 会 reset 共享 state）。
+4. **跑分**：
+
+   ```bash
+   python main.py run --arms intent_full --convs conv-26,conv-30,conv-49 \
+     --n 3 --top-k 20 --run-id intent-mine-3conv --concurrency 16
+   .venv/bin/python scripts/slice_anchors.py --runs intent-mine-3conv,mandol-full-10conv,locomo-r2-n3
+   ```
+
+5. **三个臂共享一份 state**：`intent_full`（主线）/ `intent_facts`（归因臂，裸事实）/ `intent_tier2`
+   （agent 形态，检索期 LLM 精读，不与被动臂混表）。先跑 `intent_full` 入库，其余用
+   `scripts/seed_progress.py` 复用，不重灌。消融开关（`MEMBENCH_INTENT_NUMTOK` / `MIX` / `PRF` /
+   `DISTILL` / `ABLATE`）见 HANDOFF §4.4。
+6. **数字口径**：3-conv 阶梯主线 65.3（temporal 83.6 超 mandol 81.1；multi-hop 51.5 / single-hop 63.8
+   仍落后）。**3-conv 数不得与 10-conv 全量表混列**，并表前先跑 10-conv（S7，未跑）。
+
+---
+
 ## 八个臂
 
 | 臂 | 类型 | venv | 外部依赖 |
@@ -103,7 +133,8 @@ MCP 六工具的逐字段语义（含 canonical envelope 与各臂原生粒度�
 | `amem` | 记忆系统 | `.venv-amem` | LLM（走 OpenAI SDK env 约定） |
 | `mandol` | 记忆系统 | `.venv-mandol` | cloud embedding |
 | `rag_baseline` | 对照臂（裸向量） | `.venv` | embedding，无 LLM |
-| `intent` | 意图系统（TS/Bun） | — | LLM |
+| `intent_full` | 意图系统（TS/Bun），主线；`intent` 为旧名等价 | Bun | LLM（构建期）+ embedding |
+| `intent_facts` / `intent_tier2` | 同一份代码的归因臂 / agent 形态臂 | Bun | 同上（tier2 检索期另调 LLM） |
 | `full_context` | 对照臂（runner 内置，非 server） | — | — |
 
 **为什么是三个 venv**：`mandol` 锁 `numpy<2`，与 chromadb 冲突；`amem` 要 `pip -e` 装上游
@@ -165,6 +196,17 @@ servers.yaml    server 注册表：命令、解释器、必需环境变量
 | 第二轮：论文级可复现的模块拆分 | [docs/REPRO-PLAN.md](docs/REPRO-PLAN.md) |
 | Pi harness 工程量评估 | [docs/pi-harness-effort.md](docs/pi-harness-effort.md) |
 | 痛点—方法论—批评矩阵（选型来历） | [docs/agent-memory-pain-points.md](docs/agent-memory-pain-points.md) |
+
+## Benchmark 数据从哪来
+
+- **LoCoMo**（本仓当前唯一跑通的 benchmark）：`data/locomo/locomo10.json` **已随仓库提供**，不用另下；
+  来源 HF `mem0ai/locomo`（snap-research 原数据的 10 conv 子集）。loader 在 `loaders/locomo.py`，
+  统一把 session 时间编成 `[YYYY-MM-DD]` turn 前缀写进 content。
+- **LongMemEval / DMR** 等其他 benchmark**尚未接**；数据与官方评测代码的位置见
+  [DEPLOY.md](DEPLOY.md) 附录 A。接新 benchmark = 写一个 loader 产出同形的 `add_conversation` 载荷。
+- 找 benchmark 本身（有哪些、最近谁在用、题型分布）可用 **benchmark-radar CLI**：
+  `pip install 'git+https://github.com/ktwu01/benchmark-radar.git'` 后 `benchmark-radar --help`。
+  它是发现/检查工具，不提供数据本身。
 
 ## 公平性约定
 

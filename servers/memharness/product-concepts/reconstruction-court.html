@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<!--
+  MemHarness 产品形态 ① 重构审判庭 — 示意稿
+  memory-system-analysis §7 产出。2026-09-12。
+
+  机制依据（全部来自已核验文档，见页内说明区块引用的 file:line / §）：
+   · 核心机制：检索命中之后、真正用之前，同一策略额外做一次批判+重构前向，
+     判定 采纳 / 改写 / 驳回(<EMPTY>)（paper-architecture.md §3.2 Eq.3-6；
+     code-architecture.md mem_adaptor_rollout.py:556,732）
+   · 记忆条目结构：每条是 (经验 e, 来源观察 o_src) 二元组，重构时把 o_src 与
+     当前状态 h_t 并排比较识别"状态漂移"（paper-architecture.md §2/§3.3）
+   · 论文把 Reject Rate 当核心观测指标，画了 Reject/Traj、Accepted/Traj 曲线
+     （paper-architecture.md §5"批判阶段是否有独立产物"一节；Table 4(a)、Figure 3）
+
+  重要声明：memharness 项目本地目前没有真实跑分记录（不像 atommem 有
+  runs/atommem-p1-3conv），下面所有案例文本、推理摘要、拒绝率曲线均为
+  依据机制画像构造的示意数据，页面内已标注，不冒充真实模型输出。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MemHarness · 重构审判庭</title>
+<style>
+  :root{
+    --bg:#100e14; --panel:#19151f; --panel2:#211b29; --line:#33293f;
+    --tx:#ede8f5; --tx2:#a99fc0; --tx3:#726587;
+    --accept:#3fb950; --revise:#d29922; --reject:#f85149; --acc:#a371f7;
+    --shadow:0 8px 28px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);
+       font:14px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 22px 70px}
+  header h1{font-size:21px;margin:0 0 6px}
+  header p{color:var(--tx2);margin:0 0 8px;font-size:13px;max-width:880px}
+  .disclaim{background:#241a2c;border:1px solid #4a3660;border-radius:9px;padding:10px 14px;
+    font-size:12px;color:#d9b8ff;margin-bottom:20px}
+  code{background:var(--panel2);padding:1px 5px;border-radius:4px;color:var(--tx2);font-size:12px}
+
+  .layout{display:grid;grid-template-columns:300px 1fr;gap:18px}
+  @media (max-width:920px){.layout{grid-template-columns:1fr}}
+
+  .card{background:var(--panel);border-radius:13px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px}
+  .card h2{font-size:15.5px;margin:0 0 4px}
+  .sub{color:var(--tx2);font-size:12.3px;margin:0 0 14px}
+
+  .caselist{display:flex;flex-direction:column;gap:8px}
+  .citem{background:var(--panel2);border-radius:9px;padding:10px 12px;cursor:pointer;
+    border:1.5px solid transparent;transition:.14s}
+  .citem:hover{transform:translateX(2px)}
+  .citem.on{border-color:var(--acc);background:#241d30}
+  .citem .env{font-size:10.5px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px}
+  .citem .q{font-size:12.8px;margin:4px 0 6px}
+  .vbadge{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:20px;font-weight:600}
+  .v-accept{background:rgba(63,185,80,.16);color:var(--accept)}
+  .v-revise{background:rgba(210,153,34,.16);color:var(--revise)}
+  .v-reject{background:rgba(248,81,73,.16);color:var(--reject)}
+
+  .diffrow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+  .diffcol{background:var(--panel2);border-radius:10px;padding:14px 16px}
+  .diffcol h3{font-size:11.5px;color:var(--tx3);margin:0 0 8px;text-transform:uppercase;letter-spacing:.4px;
+    display:flex;align-items:center;gap:6px}
+  .diffcol h3 i{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .h3-src i{background:var(--tx3)}
+  .h3-cur i{background:var(--acc)}
+  .diffcol p{margin:0;font-size:13.5px}
+  .arrow{text-align:center;color:var(--tx3);font-size:20px;margin:2px 0}
+
+  .verdictbox{border-radius:11px;padding:16px 18px;margin-top:2px}
+  .vb-accept{background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.32)}
+  .vb-revise{background:rgba(210,153,34,.08);border:1px solid rgba(210,153,34,.32)}
+  .vb-reject{background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.32)}
+  .verdictbox .vtitle{font-size:13.5px;font-weight:600;margin-bottom:6px}
+  .verdictbox .vtext{font-size:13px;color:var(--tx2);line-height:1.7}
+  .verdictbox .reason{margin-top:10px;font-size:12px;color:var(--tx3);font-style:italic;
+    border-top:1px dashed var(--line);padding-top:8px}
+
+  .chartwrap{margin-top:4px}
+  .bars{display:flex;align-items:flex-end;gap:6px;height:120px;padding:6px 0}
+  .bar{flex:1;display:flex;flex-direction:column-reverse;border-radius:3px 3px 0 0;overflow:hidden;
+    background:var(--panel2);position:relative;cursor:default}
+  .bar .seg-acc{background:var(--accept)}
+  .bar .seg-rej{background:var(--reject)}
+  .bar:hover::after{content:attr(data-tip);position:absolute;bottom:104%;left:50%;transform:translateX(-50%);
+    background:#000;color:#fff;font-size:10.5px;padding:3px 7px;border-radius:5px;white-space:nowrap;z-index:9}
+  .xaxis{display:flex;justify-content:space-between;color:var(--tx3);font-size:10.5px;margin-top:4px}
+  .legend2{display:flex;gap:16px;font-size:12px;color:var(--tx2);margin-top:10px}
+  .legend2 span{display:flex;align-items:center;gap:6px}
+  .legend2 i{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  details{background:var(--panel2);border-radius:10px;margin-top:14px;overflow:hidden}
+  summary{padding:12px 16px;cursor:pointer;font-size:13px;color:var(--acc);user-select:none;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸ ";transition:.2s;display:inline-block}
+  details[open] summary::before{transform:rotate(90deg)}
+  .why{padding:0 18px 16px;font-size:12.8px;color:var(--tx2);line-height:1.75}
+  .why p{margin:0 0 9px}
+  .why .neg{color:#ffb4ae}
+  footer{color:var(--tx3);font-size:11.5px;margin-top:26px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>MemHarness 产品形态 ① · 重构审判庭</h1>
+  <p>MemHarness 的核心机制不是"取出记忆就用"，而是取回之后先质疑一遍：这条历史经验放到当前状态下
+     还成不成立？由同一策略做一次独立判决——采纳、改写，或整条驳回。这个形态把这次判决摊开成
+     可审阅的一条条"庭审记录"。</p>
+  <div class="disclaim">⚠️ memharness 在本项目里还没有真实跑分记录（不同于 atommem 有实测数据可引用）。
+    下面的案例文本、判决理由、拒绝率曲线都是依据机制画像构造的<b>示意数据</b>，用于传达界面概念，不是真实模型日志。</div>
+</header>
+
+<div class="layout">
+  <div class="card" style="align-self:start">
+    <h2>庭审案卷</h2>
+    <p class="sub">点一条看详细判决</p>
+    <div class="caselist" id="list"></div>
+  </div>
+
+  <div>
+    <div class="card">
+      <h2 id="ctitle">—</h2>
+      <p class="sub" id="csub">—</p>
+
+      <div class="diffrow">
+        <div class="diffcol">
+          <h3 class="h3-src"><i></i>来源观察 o_src（这条经验当初是在什么状态下学到的）</h3>
+          <p id="osrc">—</p>
+        </div>
+        <div class="diffcol">
+          <h3 class="h3-cur"><i></i>当前状态 h_t（现在遇到的情境）</h3>
+          <p id="hcur">—</p>
+        </div>
+      </div>
+
+      <div class="arrow">↓ 取回的原始经验 e，交给同一策略批判 + 重构</div>
+
+      <div id="verdictbox" class="verdictbox">
+        <div class="vtitle" id="vtitle">—</div>
+        <div class="vtext" id="vtext">—</div>
+        <div class="reason" id="vreason">—</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>拒绝率走势（示意）</h2>
+      <p class="sub">论文把 Reject Rate 当核心观测指标之一（Table 4(a)、Figure 3 的 Reject/Traj、Accepted/Traj 曲线）。
+        产品里可以把它做成一条可追踪的质量信号：这条曲线往上走，说明记忆库里"过时经验"的占比在上升，
+        该触发一次人工审阅或调整剪枝阈值了。</p>
+      <div class="chartwrap">
+        <div class="bars" id="bars"></div>
+        <div class="xaxis" id="xaxis"></div>
+      </div>
+      <div class="legend2">
+        <span><i style="background:var(--accept)"></i>采纳/改写（accepted）</span>
+        <span><i style="background:var(--reject)"></i>驳回 &lt;EMPTY&gt;（rejected）</span>
+      </div>
+    </div>
+
+    <details>
+      <summary>为什么这个形态配 MemHarness</summary>
+      <div class="why">
+        <p>论文的标题就是这个机制："Memory Is Reconstructed, Not Replayed"——批判+重构是这套系统
+           唯一区别于"检索到就拼进 prompt"的那一步，也是论文花最多篇幅论证、消融实验最集中的部分
+           （Table 2 的 raw memory / generic LLM reconstruction 对照组，Table 4 的 source state 消融）。
+           一个产品形态如果不呈现这一步，等于没碰这个系统的机制内核。</p>
+        <p>记忆条目本身就是 <code>(e, o_src)</code> 二元组，天然适合做"来源状态 vs 当前状态"的并排比较——
+           这是数据结构直接给出的版式，不是界面设计者硬凑的。判决从这个比较里产生，"状态漂移"越大，
+           越可能被改写或驳回，这个因果关系可以在界面上直接可见。</p>
+        <p>拒绝率是论文自己选定的核心指标，把它做成一条可持续观察的曲线，能让"记忆库质量"从一个
+           抽象概念变成一个可以盯着看、可以设阈值告警的运营信号。</p>
+        <p class="neg">要诚实的一点：论文里"批判"这一步没有独立的可观测输出，唯一能拿到的判决结果是
+           <code>g_t</code> 是否等于 <code>&lt;EMPTY&gt;</code>（paper-architecture.md §5）。也就是说，
+           真做这个产品，"判决理由"这一栏（页面里的斜体小字）目前没有模型直接产出的对应字段，
+           需要额外做一次"解释性重述"调用，或接受这栏本身就是产品团队自己加的可解释性功能，
+           而不是机制自带的。</p>
+      </div>
+    </details>
+  </div>
+</div>
+
+<footer>
+  产出位置 <code>servers/memharness/product-concepts/reconstruction-court.html</code>　·　
+  依据 <code>servers/memharness/paper-architecture.md</code>（§2/§3.2/§3.3/§5）、
+  <code>code-architecture.md</code>（mem_adaptor_rollout.py:556,732）<br>
+  示意稿，不追求生产可用；案例数据为构造示例，非真实跑分。
+</footer>
+
+</div>
+
+<script>
+const CASES = [
+ {env:'ALFWorld', q:'把苹果放进冰箱',
+  osrc:'在厨房场景里，"洗完的物品要放回原位再关柜门"——之前这么做没被环境判定超时。',
+  hcur:'这次任务的冰箱门本身是关着的且没有上锁，环境提示"直接开门放入"，中间不需要先经过水槽。',
+  verdict:'revise',
+  vtitle:'改写 · 保留核心动作序列，删除不适用的前置步骤',
+  vtext:'重构后的 guidance："先打开冰箱门，把苹果放进去，再关门"——去掉了原经验里"先去水槽清洗"这一步，因为当前任务描述里苹果已经是干净的，且没有水槽相关的观察线索。',
+  reason:'（示意）两个状态的差别在于"物品初始是否需要清洗"，这一差异被判定为需要改写而非直接沿用。'},
+ {env:'ALFWorld', q:'把两个遥控器放在同一张桌子上',
+  osrc:'客厅场景里，遥控器散落在沙发和茶几，之前的经验是"先在整个房间里搜索一遍再决定去哪拿"。',
+  hcur:'当前房间很小，一进门就能看到两个遥控器都在电视柜上，观察窗口里已经包含了两个目标物体。',
+  verdict:'reject',
+  vtitle:'驳回 &lt;EMPTY&gt; · 判定该经验在当前状态下不适用',
+  vtext:'历史经验假设"目标物体分散、需要地毯式搜索"，但当前状态里两个目标已经同时可见，继续套用会浪费步数（论文里这类多余的探索步骤会拖累 outcome reward）。系统回退到 p_self，让策略基于当前观察自主推理，而不是被一条过时假设带偏。',
+  reason:'（示意）状态漂移体现在"目标物体是否已经在当前观察窗口内"，这是判定失配的关键信号。'},
+ {env:'WebShop', q:'找一件三十美元以内的黑色连帽衫',
+  osrc:'之前搜索"黑色连帽衫"时，结果页第一页没有价格筛选项，需要点进详情页逐一核对价格。',
+  hcur:'这次搜索结果页顶部直接带了价格区间筛选控件，可以先筛选再看列表，不需要逐条点开。',
+  verdict:'revise',
+  vtitle:'改写 · 保留目标约束，替换执行路径',
+  vtext:'重构后的 guidance："先用价格筛选控件把区间设到 30 美元以内，再从筛选后的列表里挑黑色款"——目标（价格上限、颜色）保留，但执行方式因为页面提供了新工具而被替换。',
+  reason:'（示意）经验里"要不要逐条点开核对"这部分和当前页面的可用工具直接相关，属于典型的执行路径级改写。'},
+ {env:'WebShop', q:'买一份无麸质的燕麦棒，追加尺码 large',
+  osrc:'之前的任务里，"追加尺码 large"这个动作是在加入购物车之后的选项弹窗里完成的。',
+  hcur:'当前商品页在加入购物车之前，商品详情区就直接带了尺码选择器，购物车环节不再弹出选项窗口。',
+  verdict:'revise',
+  vtitle:'改写 · 把动作提前到正确的界面阶段',
+  vtext:'重构后的 guidance："在加入购物车之前，先在商品详情页选好 large 尺码，再点击加入购物车"——顺序被倒转，因为页面结构变了，原经验里的时序假设不成立。',
+  reason:'（示意）这里的漂移不是"该不该做"，是"该在哪一步做"，重构主要在调整时序而非否定动作本身。'},
+ {env:'ALFWorld', q:'把台灯打开，检查桌上的书',
+  osrc:'之前遇到过的台灯开关在灯座底部，需要先移动台灯才能摸到开关。',
+  hcur:'当前场景描述里台灯是壁挂式，开关就在墙上，且与台灯本体分离。',
+  verdict:'reject',
+  vtitle:'驳回 &lt;EMPTY&gt; · 物理结构假设完全不适用',
+  vtext:'历史经验里"开关和灯体是一体的"这一前提在当前状态下不成立（壁挂式台灯的开关是独立墙面开关），继续套用会导向错误动作（去移动台灯而不是找墙上开关）。系统判定整条经验作废，回退自主推理。',
+  reason:'（示意）当来源观察里的物理结构假设与当前观察直接矛盾时，判决更容易落在"驳回"而不是"改写"。'},
+ {env:'WebShop', q:'比较两款蓝牙耳机，选评分更高的下单',
+  osrc:'之前的经验是"评分显示为星级图标，需要数星星个数来判断分数高低"。',
+  hcur:'当前页面的评分直接显示成数字（如 4.6/5），旁边还带了评论数。',
+  verdict:'accept',
+  vtitle:'采纳 · 核心判断逻辑保持不变',
+  vtext:'虽然评分的展示形式变了（数字 vs 星级），但经验里真正的决策逻辑——"优先比较评分数值，评分接近时参考评论数"——不依赖具体展示形式，可以直接沿用，不需要改写措辞。',
+  reason:'（示意）当历史经验的抽象层级本来就高于具体 UI 细节时，表层的状态变化不足以触发改写。'}
+];
+
+const TREND = [
+ {step:'ep 20',  acc:0.62, rej:0.38},
+ {step:'ep 60',  acc:0.58, rej:0.42},
+ {step:'ep 100', acc:0.71, rej:0.29},
+ {step:'ep 140', acc:0.69, rej:0.31},
+ {step:'ep 180', acc:0.77, rej:0.23},
+ {step:'ep 220', acc:0.74, rej:0.26},
+ {step:'ep 260', acc:0.81, rej:0.19}
+];
+
+const list = document.getElementById('list');
+list.innerHTML = CASES.map((c,i)=>{
+  const vb = c.verdict==='accept' ? '<span class="vbadge v-accept">采纳</span>'
+           : c.verdict==='revise' ? '<span class="vbadge v-revise">改写</span>'
+           : '<span class="vbadge v-reject">驳回</span>';
+  return `<div class="citem${i===0?' on':''}" data-i="${i}">
+    <div class="env">${c.env}</div>
+    <div class="q">${c.q}</div>
+    ${vb}
+  </div>`;
+}).join('');
+
+function render(i){
+  const c = CASES[i];
+  document.querySelectorAll('.citem').forEach((el,idx)=>el.classList.toggle('on', idx===i));
+  document.getElementById('ctitle').textContent = c.q;
+  document.getElementById('csub').textContent = c.env + ' · 一次检索命中之后的重构判决';
+  document.getElementById('osrc').textContent = c.osrc;
+  document.getElementById('hcur').textContent = c.hcur;
+  const vb = document.getElementById('verdictbox');
+  vb.className = 'verdictbox vb-' + (c.verdict==='accept'?'accept':c.verdict==='revise'?'revise':'reject');
+  document.getElementById('vtitle').innerHTML = c.vtitle;
+  document.getElementById('vtext').textContent = c.vtext;
+  document.getElementById('vreason').textContent = c.reason;
+}
+list.addEventListener('click', e=>{
+  const item = e.target.closest('.citem');
+  if(!item) return;
+  render(+item.dataset.i);
+});
+render(0);
+
+/* 拒绝率趋势条 */
+const bars = document.getElementById('bars');
+bars.innerHTML = TREND.map(t=>{
+  const accH = Math.round(t.acc*100), rejH = Math.round(t.rej*100);
+  return `<div class="bar" data-tip="采纳 ${accH}% / 驳回 ${rejH}%">
+    <div class="seg-rej" style="height:${rejH}%"></div>
+    <div class="seg-acc" style="height:${accH}%"></div>
+  </div>`;
+}).join('');
+document.getElementById('xaxis').innerHTML = TREND.map(t=>`<span>${t.step}</span>`).join('');
+</script>
+</body>
+</html>

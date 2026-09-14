@@ -1,0 +1,204 @@
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      graphmemix, 3.4.7                           │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 4.0.3                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[09/13/26 16:04:55] INFO     Starting MCP server 'graphmemix'   transport.py:241
+                             with transport 'stdio'                             
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      rag_baseline, 3.4.7                         │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 4.0.3                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[09/13/26 18:27:12] INFO     Starting MCP server 'rag_baseline' transport.py:241
+                             with transport 'stdio'                             
+run: /Users/guanhongli/Documents/repo/memory-bench/runs/graphmemix-p1-3conv-v3
+arms=['graphmemix', 'rag_baseline'] convs=3 n=3
+  [graphmemix] conv-26 灌完（19 sessions）
+  [graphmemix] conv-30 灌完（19 sessions）
+  [graphmemix] conv-49 灌完（25 sessions）
+  [graphmemix] 补灌 3 conv / 1297 turns → snapshot OK
+  [graphmemix] conv-26 retrieve 完成（累计新增 597）
+  [graphmemix] conv-30 retrieve 完成（累计新增 912）
+  [graphmemix] conv-49 retrieve 完成（累计新增 1500）
+  [graphmemix] evidence 就绪（skip 0，新增 1500）
+  [rag_baseline] 全部已灌，restore(locomo_full) OK
+  [rag_baseline] conv-26 retrieve 完成（累计新增 597）
+  [rag_baseline] conv-30 retrieve 完成（累计新增 912）
+  [rag_baseline] conv-49 retrieve 完成（累计新增 1500）
+  [rag_baseline] evidence 就绪（skip 0，新增 1500）
+Phase B: 待答 3000 题，并发 16，答题=glm-5.3，判分=glm-5.3
+  进度 25/3000（1.2 题/s，ETA 41.4 min）
+  进度 50/3000（1.3 题/s，ETA 36.5 min）
+  进度 75/3000（1.3 题/s，ETA 37.5 min）
+  进度 100/3000（1.2 题/s，ETA 41.3 min）
+  进度 125/3000（1.1 题/s，ETA 44.2 min）
+  进度 150/3000（1.0 题/s，ETA 45.9 min）
+  进度 175/3000（1.0 题/s，ETA 47.1 min）
+  进度 200/3000（1.0 题/s，ETA 47.2 min）
+  进度 225/3000（1.0 题/s，ETA 46.5 min）
+  进度 250/3000（1.0 题/s，ETA 45.2 min）
+  进度 275/3000（1.0 题/s，ETA 43.8 min）
+  进度 300/3000（1.1 题/s，ETA 42.8 min）
+  进度 325/3000（1.1 题/s，ETA 41.8 min）
+  进度 350/3000（1.1 题/s，ETA 40.5 min）
+  进度 375/3000（1.1 题/s，ETA 39.4 min）
+  进度 400/3000（1.1 题/s，ETA 38.2 min）
+  进度 425/3000（1.1 题/s，ETA 38.0 min）
+  进度 450/3000（1.1 题/s，ETA 38.1 min）
+  进度 475/3000（1.1 题/s，ETA 37.7 min）
+  进度 500/3000（1.1 题/s，ETA 37.0 min）
+  进度 525/3000（1.1 题/s，ETA 36.8 min）
+  进度 550/3000（1.1 题/s，ETA 36.2 min）
+  进度 575/3000（1.1 题/s，ETA 36.1 min）
+  LLM 失败（连续 1）: graphmemix|conv-26|q80|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  LLM 失败（连续 1）: graphmemix|conv-26|q104|rep1: 重试耗尽（4 次）: HTTP 500: {"type":"error","error":{"type":"api_error","code":"1234","message":"[1234][网络错误，错误id 20260913184113fe3d3beb5d924a15 ，请稍
+  进度 600/3000（1.1 题/s，ETA 35.7 min）
+  进度 625/3000（1.1 题/s，ETA 35.4 min）
+  进度 650/3000（1.1 题/s，ETA 35.0 min）
+  进度 675/3000（1.1 题/s，ETA 34.6 min）
+  进度 700/3000（1.1 题/s，ETA 34.6 min）
+  进度 725/3000（1.1 题/s，ETA 34.2 min）
+  进度 750/3000（1.1 题/s，ETA 33.7 min）
+  进度 775/3000（1.1 题/s，ETA 33.3 min）
+  进度 800/3000（1.1 题/s，ETA 32.9 min）
+  进度 825/3000（1.1 题/s，ETA 32.5 min）
+  进度 850/3000（1.1 题/s，ETA 32.0 min）
+  进度 875/3000（1.1 题/s，ETA 31.4 min）
+  进度 900/3000（1.1 题/s，ETA 30.8 min）
+  进度 925/3000（1.1 题/s，ETA 30.4 min）
+  进度 950/3000（1.1 题/s，ETA 30.2 min）
+  进度 975/3000（1.1 题/s，ETA 29.9 min）
+  进度 1000/3000（1.1 题/s，ETA 29.6 min）
+  进度 1025/3000（1.1 题/s，ETA 29.3 min）
+  进度 1050/3000（1.1 题/s，ETA 29.0 min）
+  进度 1075/3000（1.1 题/s，ETA 28.8 min）
+  LLM 失败（连续 1）: graphmemix|conv-30|q60|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 1100/3000（1.1 题/s，ETA 28.5 min）
+  进度 1125/3000（1.1 题/s，ETA 28.1 min）
+  进度 1150/3000（1.1 题/s，ETA 27.6 min）
+  LLM 失败（连续 1）: graphmemix|conv-30|q87|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 1175/3000（1.1 题/s，ETA 27.0 min）
+  进度 1200/3000（1.1 题/s，ETA 26.6 min）
+  进度 1225/3000（1.1 题/s，ETA 26.3 min）
+  进度 1250/3000（1.1 题/s，ETA 26.0 min）
+  进度 1275/3000（1.1 题/s，ETA 25.7 min）
+  进度 1300/3000（1.1 题/s，ETA 25.3 min）
+  进度 1325/3000（1.1 题/s，ETA 24.8 min）
+  进度 1350/3000（1.1 题/s，ETA 24.5 min）
+  进度 1375/3000（1.1 题/s，ETA 24.2 min）
+  进度 1400/3000（1.1 题/s，ETA 23.9 min）
+  进度 1425/3000（1.1 题/s，ETA 23.5 min）
+  LLM 失败（连续 1）: graphmemix|conv-49|q73|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 1450/3000（1.1 题/s，ETA 23.0 min）
+  进度 1475/3000（1.1 题/s，ETA 22.6 min）
+  进度 1500/3000（1.1 题/s，ETA 22.2 min）
+  进度 1525/3000（1.1 题/s，ETA 21.7 min）
+  进度 1550/3000（1.1 题/s，ETA 21.3 min）
+  进度 1575/3000（1.1 题/s，ETA 20.9 min）
+  进度 1600/3000（1.1 题/s，ETA 20.7 min）
+  进度 1625/3000（1.1 题/s，ETA 20.4 min）
+  LLM 失败（连续 1）: graphmemix|conv-49|q131|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 1650/3000（1.1 题/s，ETA 20.0 min）
+  进度 1675/3000（1.1 题/s，ETA 19.7 min）
+  进度 1700/3000（1.1 题/s，ETA 19.4 min）
+  进度 1725/3000（1.1 题/s，ETA 19.0 min）
+  进度 1750/3000（1.1 题/s，ETA 18.6 min）
+  进度 1775/3000（1.1 题/s，ETA 18.2 min）
+  进度 1800/3000（1.1 题/s，ETA 17.8 min）
+  进度 1825/3000（1.1 题/s，ETA 17.5 min）
+  进度 1850/3000（1.1 题/s，ETA 17.1 min）
+  进度 1875/3000（1.1 题/s，ETA 16.7 min）
+  进度 1900/3000（1.1 题/s，ETA 16.4 min）
+  进度 1925/3000（1.1 题/s，ETA 16.0 min）
+  进度 1950/3000（1.1 题/s，ETA 15.7 min）
+  进度 1975/3000（1.1 题/s，ETA 15.3 min）
+  进度 2000/3000（1.1 题/s，ETA 14.9 min）
+  进度 2025/3000（1.1 题/s，ETA 14.5 min）
+  进度 2050/3000（1.1 题/s，ETA 14.2 min）
+  LLM 失败（连续 1）: rag_baseline|conv-26|q87|rep1: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 2075/3000（1.1 题/s，ETA 13.8 min）
+  进度 2100/3000（1.1 题/s，ETA 13.5 min）
+  进度 2125/3000（1.1 题/s，ETA 13.3 min）
+  进度 2150/3000（1.1 题/s，ETA 13.0 min）
+  LLM 失败（连续 1）: rag_baseline|conv-26|q134|rep1: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 2175/3000（1.1 题/s，ETA 12.6 min）
+  进度 2200/3000（1.1 题/s，ETA 12.3 min）
+  进度 2225/3000（1.1 题/s，ETA 11.9 min）
+  进度 2250/3000（1.1 题/s，ETA 11.5 min）
+  进度 2275/3000（1.1 题/s，ETA 11.2 min）
+  进度 2300/3000（1.1 题/s，ETA 10.8 min）
+  进度 2325/3000（1.1 题/s，ETA 10.4 min）
+  LLM 失败（连续 1）: rag_baseline|conv-26|q197|rep1: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 2350/3000（1.1 题/s，ETA 10.0 min）
+  进度 2375/3000（1.1 题/s，ETA 9.6 min）
+  进度 2400/3000（1.1 题/s，ETA 9.2 min）
+  进度 2425/3000（1.1 题/s，ETA 8.9 min）
+  LLM 失败（连续 1）: rag_baseline|conv-30|q26|rep1: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 2450/3000（1.1 题/s，ETA 8.5 min）
+  进度 2475/3000（1.1 题/s，ETA 8.2 min）
+  进度 2500/3000（1.1 题/s，ETA 7.8 min）
+  进度 2525/3000（1.1 题/s，ETA 7.4 min）
+  进度 2550/3000（1.1 题/s，ETA 7.0 min）
+  进度 2575/3000（1.1 题/s，ETA 6.6 min）
+  进度 2600/3000（1.1 题/s，ETA 6.2 min）
+  进度 2625/3000（1.1 题/s，ETA 5.8 min）
+  进度 2650/3000（1.1 题/s，ETA 5.5 min）
+  进度 2675/3000（1.1 题/s，ETA 5.1 min）
+  进度 2700/3000（1.1 题/s，ETA 4.7 min）
+  进度 2725/3000（1.1 题/s，ETA 4.3 min）
+  进度 2750/3000（1.1 题/s，ETA 3.9 min）
+  进度 2775/3000（1.1 题/s，ETA 3.5 min）
+  进度 2800/3000（1.1 题/s，ETA 3.1 min）
+  进度 2825/3000（1.1 题/s，ETA 2.7 min）
+  进度 2850/3000（1.1 题/s，ETA 2.3 min）
+  LLM 失败（连续 1）: rag_baseline|conv-49|q46|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 2875/3000（1.1 题/s，ETA 1.9 min）
+  进度 2900/3000（1.1 题/s，ETA 1.5 min）
+  进度 2925/3000（1.1 题/s，ETA 1.2 min）
+  进度 2950/3000（1.1 题/s，ETA 0.8 min）
+  进度 2975/3000（1.1 题/s，ETA 0.4 min）
+Phase B 完成：2989 题，2804s
+
+arm               n judge_acc     F1  cat 切片（1=multihop 2=temporal 3=open 4=single 5=adv）
+graphmemix     1494     0.481  0.213  c1:77/240 c2:191/286 c3:35/78 c4:391/558 c5:25/332
+rag_baseline   1495     0.419  0.183  c1:47/240 c2:177/287 c3:35/77 c4:342/559 c5:25/332
+（judge 解析失败行: 0）
+
+完成。产物：/Users/guanhongli/Documents/repo/memory-bench/runs/graphmemix-p1-3conv-v3/answers.jsonl

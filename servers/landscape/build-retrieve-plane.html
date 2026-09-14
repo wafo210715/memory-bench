@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<!--
+  记忆系统的「构建 × 检索」投入平面 — 自包含单文件，无任何外部依赖
+  2026-09-13。memory-system-analysis §2 分析链的横向视图。
+
+  数据来源（已全部内嵌进页面底部的「证据附录」，脱离仓库也可自证）：
+   · 结构：servers/METHODOLOGY-SKELETON.md §3 覆盖矩阵（13 系统 × 14 阶段，论文侧|代码侧）
+   · 机制：各系统 servers/<name>/paper-vs-code.md 的 A 段/B 段表格
+   · 配置：docs/interface-spec.md §7 逐系统实际配置清单
+   · 实测：runs/atommem-p1-3conv（ingest 7h14m / 690 万 internal_llm token / 1297 turns）
+
+  轴的定义（打分规则也内嵌在页面里）：
+   Y 构建强度 0-7 = 写入一条记忆要花多少 LLM、做多少改写
+   X 检索强度 0-6 = 取回一次要花多少计算、是否多轮
+  两轴都按「代码侧实际行为」打分，不按论文声称。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>记忆系统：构建 × 检索 投入平面</title>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#161b22; --panel2:#1c2129; --line:#2a313c;
+    --tx:#e6edf3; --tx2:#9fb0c3; --tx3:#6b7a8c;
+    --dia:#58a6ff; --traj:#d29922; --param:#a371f7; --ctrl:#6b7a8c; --intent:#3fb950;
+    --shadow:0 8px 28px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);
+       font:14px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",sans-serif}
+  .wrap{max-width:1300px;margin:0 auto;padding:26px 22px 60px}
+  h1{font-size:20px;margin:0 0 6px}
+  .lead{color:var(--tx2);font-size:13px;margin:0 0 18px;max-width:920px}
+  code{background:var(--panel2);padding:1px 5px;border-radius:4px;font-size:12px;color:var(--tx2);
+       font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  b{color:var(--tx)}
+
+  .grid{display:grid;grid-template-columns:1fr 400px;gap:16px;align-items:start}
+  @media(max-width:1100px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border-radius:13px;padding:18px;box-shadow:var(--shadow)}
+  svg{width:100%;height:auto;display:block}
+
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--tx2)}
+  .lg{display:flex;align-items:center;gap:6px}
+  .lg .sw{width:12px;height:12px;border-radius:50%;display:inline-block}
+  .lg .sq{width:11px;height:11px;display:inline-block}
+  .lg .dm{width:11px;height:11px;display:inline-block;transform:rotate(45deg)}
+  .lg .hollow{background:transparent;border:2px solid var(--tx3)}
+
+  .node{cursor:pointer}
+  .node:hover .hit{stroke-width:3.2}
+  .node.sel .hit{stroke:#fff;stroke-width:3.2}
+  .nlabel{font-size:10.5px;fill:var(--tx2);pointer-events:none}
+  .node.sel .nlabel{fill:#fff;font-weight:600}
+  .axis{stroke:var(--line);stroke-width:1.5}
+  .tick{font-size:10px;fill:var(--tx3)}
+  .axlabel{font-size:12px;fill:var(--tx2)}
+  .quad{font-size:11.5px;fill:var(--tx3);font-weight:600;opacity:.75}
+  .qbg{opacity:.05}
+
+  #panel{position:sticky;top:18px}
+  #panel h2{font-size:15px;margin:0 0 3px}
+  #panel .meta{font-size:11.5px;color:var(--tx3);margin-bottom:13px}
+  .sec{margin-bottom:13px}
+  .sec .h{font-size:11.5px;color:var(--tx3);letter-spacing:.4px;margin-bottom:5px}
+  .sec .b{font-size:12.8px;color:var(--tx);line-height:1.72}
+  .sec.build .h{color:var(--traj)}
+  .sec.retr .h{color:var(--dia)}
+  .tagrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .tag{font-size:10.5px;padding:2px 7px;border-radius:5px;background:var(--panel2);color:var(--tx2)}
+  .tag.warn{background:rgba(248,81,73,.14);color:#ffb4ae}
+  .src{font-size:11px;color:var(--tx3);border-top:1px solid var(--line);padding-top:9px;margin-top:12px}
+  .rowmini{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--tx2);
+           background:#0d1117;border-radius:6px;padding:8px 10px;margin-top:9px;line-height:1.9;overflow-x:auto}
+  .rowmini .k{color:var(--tx3)}
+
+  .how{background:var(--panel2);border-radius:9px;padding:12px 14px;font-size:12.2px;color:var(--tx2);line-height:1.75}
+  .how h3{font-size:12.5px;margin:0 0 7px;color:var(--tx)}
+  .how table{width:100%;border-collapse:collapse;margin-top:7px}
+  .how td{padding:2px 0;vertical-align:top}
+  .how td:first-child{color:var(--tx);width:26px;font-family:ui-monospace,Menlo,monospace}
+
+  .note{background:var(--panel2);border-radius:9px;padding:11px 13px;font-size:12px;
+        color:var(--tx2);margin-top:14px;line-height:1.7}
+
+  details.appendix{background:var(--panel);border-radius:13px;margin-top:16px;box-shadow:var(--shadow);overflow:hidden}
+  details.appendix summary{padding:15px 18px;cursor:pointer;font-size:13.5px;color:var(--dia);
+                           user-select:none;list-style:none}
+  details.appendix summary::-webkit-details-marker{display:none}
+  details.appendix summary::before{content:"▸ ";display:inline-block;transition:.2s}
+  details.appendix[open] summary::before{transform:rotate(90deg)}
+  .apx{padding:0 18px 18px}
+  .apx p{font-size:12.3px;color:var(--tx2);margin:0 0 12px;line-height:1.75}
+  table.mx{width:100%;border-collapse:collapse;font-size:11px;
+           font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  table.mx th{color:var(--tx3);font-weight:500;padding:5px 3px;border-bottom:1px solid var(--line);text-align:center}
+  table.mx th:first-child{text-align:left;padding-left:6px}
+  table.mx td{padding:4px 3px;text-align:center;border-bottom:1px solid #1e242c;color:var(--tx2)}
+  table.mx td:first-child{text-align:left;padding-left:6px;color:var(--tx);white-space:nowrap}
+  table.mx tr.hl td{background:rgba(88,166,255,.09)}
+  table.mx .gA{background:rgba(210,153,34,.05)}
+  table.mx .gB{background:rgba(88,166,255,.05)}
+  .sym{font-size:11px;color:var(--tx3);margin-top:10px;line-height:1.8}
+  footer{color:var(--tx3);font-size:11.5px;margin-top:20px;line-height:1.85}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>记忆系统：构建 × 检索 投入平面</h1>
+<p class="lead">
+  纵轴是「写入一条记忆要花多少 LLM、做多少改写」，横轴是「取回一次要花多少计算、是否多轮」。
+  两轴都按<b>代码侧实际行为</b>打分，不按论文声称——所以像 A-MEM 这种论文写了但代码从未调用的，落在低位。
+  点任意节点看它两期各做了什么；底部附录内嵌了打分所依据的完整覆盖矩阵。
+</p>
+
+<div class="grid">
+  <div class="card">
+    <svg id="plane" viewBox="0 0 900 560" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="legend">
+      <div class="lg"><span class="sw" style="background:var(--dia)"></span>对话记忆</div>
+      <div class="lg"><span class="sq" style="background:var(--traj)"></span>agent 轨迹记忆</div>
+      <div class="lg"><span class="dm" style="background:var(--param)"></span>参数化家族</div>
+      <div class="lg"><span class="sw" style="background:var(--ctrl)"></span>对照臂</div>
+      <div class="lg"><span class="sw hollow"></span>未复现</div>
+      <div class="lg"><span class="sw" style="background:var(--intent);opacity:.55"></span>意图系统（估计位）</div>
+    </div>
+    <div class="note">
+      <b>同坐标的点已做视觉错开</b>：GraphMemix 与 Mandol 同为 (检索 5, 构建 0)；mock 与 rag_baseline 同为 (1, 0)；
+      TransMem / LiveMem / Memory Decoder 三个同为 (0, 7)。错开只为可点，不代表分数有差。
+    </div>
+  </div>
+
+  <div class="card" id="panel"></div>
+</div>
+
+<details class="appendix">
+  <summary>证据附录：覆盖矩阵原始数据（点开）</summary>
+  <div class="apx">
+    <p>
+      下表是本图打分的结构依据，来自 <code>servers/METHODOLOGY-SKELETON.md</code> §3。
+      把任何记忆系统拆成两期十四阶段：<b>A 段形成期</b>（查询还不知道时就能做完的）、<b>B 段动员期</b>（必须等查询到达才能做的）。
+      每格格式为 <code>论文侧|代码侧</code>。选中左图某个系统时，对应行会高亮。
+    </p>
+    <div style="overflow-x:auto"><table class="mx" id="mx"></table></div>
+    <div class="sym">
+      ✓ 有　◐ 有但退化或部分　~ 可选 / 默认关 / 论文未展开　✗ 无<br>
+      阶段：A1 接住素材 · A2 炼成记忆单元 · A3 准入并轨 · A4 建立可寻址性 · A5 落到载体 · A6 压进参数<br>
+      　　　B1 查询侧线索 · B2 首轮召回 · B3 关联扩展 · B4 逐个评估 · B5 成套定选 · B6 交付推理体 · B7 产出 · B8 回环再检索
+    </div>
+  </div>
+</details>
+
+<footer>
+  自包含单文件，无外部依赖，可直接分享。数据来源：<code>servers/METHODOLOGY-SKELETON.md</code> §3 ·
+  各系统 <code>paper-vs-code.md</code> 的 A/B 段 · <code>docs/interface-spec.md</code> §7 ·
+  <code>runs/atommem-p1-3conv</code> 实测（2026-09-11）<br>
+  口径提醒：PlugMem 与 MemHarness 记的是 agent 轨迹（ALFWorld / WebShop），不是对话。
+  同处一图仅在「智能放在哪一期」这个抽象层面成立，不可据此比较优劣。
+</footer>
+
+</div>
+
+<script>
+/* x=检索强度(0-6)  y=构建强度(0-7)  lp=标签方位  dx/dy=视觉错开(px) */
+const S=[
+ {id:'GraphMemix',x:5,y:0,kind:'dia',done:1,dx:-30,lp:'up',
+  build:'turn 级文本转成 canonical 记录，<b>零生成式 LLM 调用</b>。A2 抽取在 LoCoMo 上完全空——论文侧唯一的生成式调用是给图片做 caption，纯文本数据集没有这个场景。<b>A3 准入两侧都不存在</b>。全部构建工作就是离线建一张 discovery graph：schema 边（same_round / consecutive_turn 等结构关系）+ 语义边（共享编码器算 mutual top-8 近邻）。不改写任何内容。',
+  retr:'在 discovery graph 上跑完整 B1–B5。B5 用 Kruskal 最大生成森林<b>一次性算出最优记忆集合</b>，属于「一次算准」路线。',
+  tags:['构建期零 LLM','A3 完全缺席','B5 一次算准'],src:'graphmemix/paper-vs-code.md'},
+
+ {id:'Mandol',x:5,y:0,kind:'dia',done:1,dx:40,lp:'right',
+  build:'纯 embedding 聚合建塔，<b>ingest 零 LLM 调用</b>（interface-spec §7 逐系统清单写明「无 LLM（纯 embedding 聚合）」）。',
+  retr:'多塔检索 + 级联仲裁定选（B5）。智能几乎全部放在检索侧，是「弱构建靠强检索补偿」的代表。',
+  tags:['构建期零 LLM','B5 级联仲裁'],src:'interface-spec §7 · METHODOLOGY-SKELETON §3'},
+
+ {id:'ReFind',x:6,y:0,kind:'dia',done:0,lp:'up',
+  build:'turn 粒度 BM25 倒排索引：小写化 + 空格标点切分 + Porter 词干 + 停用词，k1=1.2 / b=0.75。论文原话「Indexing requires no model call and no summarization pass」——<b>建索引零模型调用</b>，新 turn 追加即可搜。',
+  retr:'ReAct 循环最多 4 轮，三个工具：search_chatrecord / take_note / finish_search。BM25 top-K=5、±2 轮上下文窗口、RRF 双层（turn 级 + session 聚合）融合、时间过滤、seen-session 去重。<b>控制权在模型手里</b>，属 B 档。',
+  tags:['构建期零 LLM','B 档 agent 循环','无开源 repo'],src:'Li-2026 arXiv:2608.12888 §Implementation Details'},
+
+ {id:'mock',x:1,y:0,kind:'ctrl',done:1,dx:-26,lp:'up',
+  build:'只存文本 + 关键词索引，零 LLM。契约靶，用来验证评测台本身。',
+  retr:'关键词匹配取 top-k。',tags:['对照臂'],src:'servers/mock/server.py'},
+
+ {id:'rag_baseline',x:1,y:0,kind:'ctrl',done:1,dx:40,lp:'right',
+  build:'turn 级切块 + embedding-3 向量化，<b>零 LLM</b>。回应「记忆系统是不是只是向量检索」这个质疑的对照锚点。',
+  retr:'本地余弦暴力扫 top-k，无重排无扩展。',tags:['对照臂','构建期零 LLM'],src:'servers/rag_baseline/server.py'},
+
+ {id:'A-MEM',x:2,y:1,kind:'dia',done:1,lp:'up',
+  build:'论文 Eq.2 的 note construction（生成 keywords / tags / context）在上游代码里<b>从未被调用过</b>——<code>analyze_content</code> 全仓零调用点。实际只剩 embed + 存。这是覆盖矩阵里 A2 退化最极端的一例。',
+  retr:'向量检索 + 沿链扩展，但扩展被 <code>return memories[:k]</code> 全部截断，实测 is_neighbor 恒为 0。论文的记忆演化机制在默认路径上不生效。',
+  tags:['A2 论文有代码零调用','链扩展实测失效'],src:'METHODOLOGY-SKELETON §4③ · servers/amem/server.py'},
+
+ {id:'Letta',x:2,y:2,kind:'dia',done:0,lp:'up',
+  build:'由 agent 自己决定往 core memory / archival memory 里写什么，没有独立的抽取管线。',
+  retr:'子串 / SQL LIKE 包含匹配作<b>主召回通道</b>（无词项权重、无相关性打分），加上心跳触发的多轮自省（B8）。B3 扩展与 B4/B5 评估定选三格全空。',
+  tags:['B 档 agent 循环','主召回无打分'],src:'METHODOLOGY-SKELETON §2.3 P-SUBSTR'},
+
+ {id:'Mem0',x:3,y:2,kind:'dia',done:1,lp:'up',
+  build:'LLM 抽取事实。论文的 A3 四操作（ADD / UPDATE / DELETE / NOOP）在代码里<b>退化成 ADD-only + md5 精确去重</b>——这是「论文贡献落在准入步、实现里被省掉」的典型。',
+  retr:'向量检索 + threshold=0.1 卡语义分（融合前排除）+ 融合。B3 关联扩展论文可选、代码无。',
+  tags:['A3 四操作退化为 ADD-only'],src:'METHODOLOGY-SKELETON §4③ · interface-spec §7'},
+
+ {id:'MRAgent',x:6,y:2,kind:'dia',done:0,lp:'left',
+  build:'抽取。<b>A3 论文根本没有</b>，代码只有去重——构建侧是这批系统里最薄的之一。',
+  retr:'最多 8 轮工具循环，agent 自主决定查什么、查几次、何时停。论文 Theorem 4.1 论证 active 检索不劣于 passive。',
+  tags:['B 档 agent 循环','A3 论文即缺席'],src:'METHODOLOGY-SKELETON §4③④'},
+
+ {id:'MemOS',x:5,y:3,kind:'dia',done:1,lp:'left',
+  build:'LLM 抽取；<b>A3 准入默认关闭</b>（代码完整但配置不可达）。',
+  retr:'多路召回 + MMR 定选（B5）+ 服务端 relativity=0.45 卡 metadata 分。',
+  tags:['A3 默认关','B5 MMR'],src:'METHODOLOGY-SKELETON §3 · interface-spec §7'},
+
+ {id:'Zep/Graphiti',x:5,y:4,kind:'dia',done:1,lp:'left',
+  build:'抽取 + <b>实体消解 + 边去重 + 边失效</b>三项齐全，是覆盖矩阵里 A3 最完整的系统；双时间轴（tvalid / tinvalid）也在这一步建立。',
+  retr:'BM25 + cosine + BFS 三通道并行 + 重排；sim_min_score=0.6 只卡 cosine 通道，BM25 / BFS 不受影响。',
+  tags:['A3 最完整','三通道检索'],src:'METHODOLOGY-SKELETON §2.4 · interface-spec §7'},
+
+ {id:'AtomMem',x:4,y:5,kind:'dia',done:1,lp:'left',
+  build:'五条规则抽原子事实（滤噪 / 指代消解 / 时间锚定 / 第三人称改写 / 多模态）→ 元数据解析（人物·关键词·时间·是否进画像队列）→ 0.95 余弦去重 → LLM 冲突检测并整条覆盖 → 事件归属 + 摘要重写 → 画像批量抽取 + 版本链。<b>实测 1297 turns 烧 690 万 token、7 小时 14 分</b>。抽完即<b>丢弃原文</b>。',
+  retr:'人物 + 时间符号过滤 → 混合相似度（α·余弦 + β·Jaccard）主召回 5 条 → 事件层补偿召回 5 条 → 三通道 PPR 图扩散（关键词 .45 / 事件 .40 / 轮次 .15）取 top-k。前两段朴素，第三段是重头戏。',
+  tags:['构建期最重（对话域）','原文不保留','论文 A6 代码为空'],
+  src:'atommem/paper-vs-code.md · REPRO-NOTES.md · runs/atommem-p1-3conv'},
+
+ {id:'PlugMem',x:3,y:6,kind:'traj',done:1,lp:'up',
+  build:'<b>每走一步问三次 LLM</b>（当前状态滚动摘要 / 在追哪个子目标 / 动作有没有效）；另抽一组语义命题（≤10 条、要求消解指代、单条≤4 句）；整条轨迹按相邻子目标相似度切段；每段抽一对意图与处方；每条处方再由独立评委打 1–10 分。论文 A3 的 embedding 余弦合并在代码里<b>退化成字典 key 字符串精确匹配</b>，<code>insert()</code> 全程零余弦。',
+  retr:'论文有多跳，代码退化。向量库自带的四个近邻查询方法<b>全仓零调用</b>，召回是全量读出后逐个算余弦。',
+  tags:['构建期最重','A3 退化为字符串匹配','agent 轨迹域'],src:'plugmem/paper-vs-code.md'},
+
+ {id:'MemHarness',x:2,y:7,kind:'traj',done:1,lp:'right',
+  build:'训练态 rollout 进候选池（成功 / 失败配额均衡，保留 50%）→ 由<b>正在训练的策略自己蒸馏</b>成 situation / memory 两段 → 0.85 最近邻去重 → BGE-M3 编码 → Milvus 落盘。外加离线 SFT 冷启动 + GRPO 端到端训练。<b>覆盖矩阵里唯一 A1–A6 六格全满的系统</b>。',
+  retr:'向量取回 + 重构循环（B8）。B3 关联扩展与 B5 成套定选两格空，检索侧相当简单。',
+  tags:['唯一 A 段全满','含训练','GRPO 重构不进梯度'],
+  warn:'论文声称由 GRPO 学出的「批判与重构能力」，在实际配置下训练开关直接返回否，重构那次生成完全不进梯度——A6 实际只塑造了动作生成能力。与 AtomMem 抽取器同类：最核心的主张落在代码没实现的地方。',
+  src:'memharness/paper-vs-code.md'},
+
+ {id:'TransMem',x:0,y:7,kind:'param',done:0,lp:'right',
+  build:'把动员期的全部工作<b>前移进训练</b>。A2 蒸馏、A3 准入、B1–B5 全空，只有 A5 落载体 + A6 压进参数。',
+  retr:'<b>推理时不检索</b>。B6 交付靠改隐状态（门控残差注入）。',
+  tags:['参数化家族','推理时零检索'],src:'METHODOLOGY-SKELETON §4②'},
+
+ {id:'LiveMem',x:0,y:7,kind:'param',done:0,dy:26,lp:'right',
+  build:'同 TransMem，动员期全部前移进形成期。',
+  retr:'<b>推理时不检索</b>。B6 靠 o_main + o_side 的旁路输出合并。',
+  tags:['参数化家族','推理时零检索'],src:'METHODOLOGY-SKELETON §4①②'},
+
+ {id:'Memory Decoder',x:0,y:7,kind:'param',done:0,dy:52,lp:'right',
+  build:'建 datastore（稠密检索 <code>P-DENSE</code> 真实存在，但<b>发生在 A4 建库期</b>）+ 训练一个旁路解码器。',
+  retr:'<b>推理时一次检索都不做</b>。B6 靠改输出分布：p_final = (1−λ)·p_θ + λ·p_ψ。最干净地演示了「动员期前移」。',
+  tags:['参数化家族','检索发生在建库期'],src:'METHODOLOGY-SKELETON §4①②'},
+
+ {id:'意图系统',x:5,y:5,kind:'intent',done:1,est:1,lp:'right',
+  build:'构建期提取意图、组装三层递归意图体（v1 只做前两层）、按时间线性拼接；<b>原文完整保留不压缩</b>（原则①）——这一条让它和同区的 AtomMem / Graphiti 走向分岔。',
+  retr:'查询期竞拍 confidence + MMR → 组装 → 注入。',
+  tags:['估计位置','原文不压缩','右上角 + 全量留档'],
+  warn:'这个坐标是按六条设计原则估的，<b>未按同一标准核实代码侧行为</b>，与其他节点不同源。要进正式对照必须先按 paper-vs-code 口径核一遍。',
+  src:'memory-vs-intention-system-report.md 六条设计原则'}
+];
+
+/* 覆盖矩阵原始数据（METHODOLOGY-SKELETON.md §3，格式 论文|代码） */
+const MX=[
+ ['AtomMem','✓|✓','✓|◐','✓|✓','✓|✓','✓|✓','✓|✗','✓|✓','✓|✓','✓|~','✓|✓','✗|✓','✓|✓','✓|✓','✗|✗'],
+ ['Mem0','✓|✓','✓|✓','✓|◐','~|✓','✓|✓','✗|✗','✗|✓','✓|✓','~|✗','✗|✓','✗|✓','✓|✓','✓|✓','✗|✗'],
+ ['Zep/Graphiti','✓|✓','✓|✓','✓|✓','✓|✓','✓|✓','✗|✗','✗|✓','✓|✓','✓|✓','✓|✓','✗|✓','✓|✓','✓|✓','✗|✗'],
+ ['MemOS','✓|✓','✓|✓','✓|~','~|✓','✓|✓','~|✗','✓|✓','✓|✓','~|✓','✓|✓','✓|✓','✓|✓','✓|✓','✗|✗'],
+ ['A-MEM','✓|✓','✓|✗','✓|✓','✓|◐','✓|✓','✗|✗','✗|✗','✓|✓','~|◐','✗|✗','✗|✓','✓|✓','✓|✓','✗|✗'],
+ ['Mandol','✓|✓','✓|✓','✓|✓','✓|✓','✓|✓','✗|✗','✓|✓','✓|✓','✓|~','✓|✓','✓|✓','✓|✓','✓|✓','✗|✗'],
+ ['MRAgent','✓|✓','✓|✓','✗|◐','✓|✓','✓|✓','✗|✗','✓|✓','✓|✓','✓|✓','✓|◐','✗|✗','✓|✓','✓|✓','✓|✓'],
+ ['GraphMemix','✓|✓','~|~','✗|✗','✓|✓','~|✓','✗|✗','✓|✓','✓|✓','✓|✓','✓|✓','✓|✓','✓|✓','✓|✓','✗|✗'],
+ ['PlugMem','✓|✓','✓|✓','✓|◐','✓|✓','✓|✓','✗|✗','✓|✓','✓|✓','✓|✓','✓|◐','✗|✗','✓|✓','✓|✓','✓|✗'],
+ ['MemHarness','✓|✓','✓|✓','✓|✓','✓|✓','✓|✓','✓|✓','~|~','✓|✓','✗|✗','✓|✓','✗|✗','✓|✓','✓|✓','✓|✓'],
+ ['Letta/MemGPT','✓|✓','✓|✓','✓|✓','✓|◐','✓|✓','✗|✗','✓|✓','✓|◐','✗|✗','✗|✗','✗|✗','✓|✓','✓|✓','✓|✓'],
+ ['TransMem','~|~','✗|✗','✗|✗','✗|✗','✓|✓','✓|✓','✗|✗','✗|✗','✗|✗','✗|✗','✗|✗','✓|✓','✓|✓','✗|✗'],
+ ['LiveMem','~|✓','✗|✗','✗|✗','✗|✗','✓|✓','✓|✓','✗|✗','✗|✗','✗|✗','✗|✗','✗|✗','✓|✓','✓|✓','✗|✗'],
+ ['Memory Decoder','✓|✓','✗|✗','✗|✗','✓|✓','✓|✓','✓|✓','✗|✗','✗|✗','✗|✗','✗|✗','✗|✗','✓|✓','✓|✓','✗|✗']
+];
+const STAGES=['A1','A2','A3','A4','A5','A6','B1','B2','B3','B4','B5','B6','B7','B8'];
+/* 图上名字 → 矩阵行名 */
+const MXKEY={'Letta':'Letta/MemGPT'};
+
+const COL={dia:'#58a6ff',traj:'#d29922',param:'#a371f7',ctrl:'#6b7a8c',intent:'#3fb950'};
+const X0=96,X1=824,Y0=462,Y1=62, XMAX=6, YMAX=7;
+const px=v=>X0+(v/XMAX)*(X1-X0), py=v=>Y0-(v/YMAX)*(Y0-Y1);
+const svg=document.getElementById('plane');
+
+function shape(d,cx,cy){
+  const c=COL[d.kind], f=d.done?c:'none', sw=d.done?1.5:2.2, op=d.est?.6:1;
+  if(d.kind==='traj')  return `<rect class="hit" x="${cx-7}" y="${cy-7}" width="14" height="14" rx="2"
+      fill="${f}" stroke="${c}" stroke-width="${sw}" opacity="${op}"/>`;
+  if(d.kind==='param') return `<rect class="hit" x="${cx-7}" y="${cy-7}" width="14" height="14" rx="2"
+      transform="rotate(45 ${cx} ${cy})" fill="${f}" stroke="${c}" stroke-width="${sw}" opacity="${op}"/>`;
+  return `<circle class="hit" cx="${cx}" cy="${cy}" r="8" fill="${f}" stroke="${c}" stroke-width="${sw}"
+      opacity="${op}" ${d.est?'stroke-dasharray="3 2"':''}/>`;
+}
+/* 标签按 lp 摆放，避开轴与邻居 */
+function label(d,cx,cy){
+  const m={up:[0,-14,'middle'],down:[0,20,'middle'],left:[-13,4,'end'],right:[13,4,'start']}[d.lp||'up'];
+  return `<text class="nlabel" x="${cx+m[0]}" y="${cy+m[1]}" text-anchor="${m[2]}">${d.id}</text>`;
+}
+
+function draw(sel){
+  let s='';
+  const mx=px(3), my=py(3.5);
+  s+=`<rect class="qbg" x="${X0}" y="${Y1}" width="${mx-X0}" height="${my-Y1}" fill="#d29922"/>`;
+  s+=`<rect class="qbg" x="${mx}" y="${Y1}" width="${X1-mx}" height="${my-Y1}" fill="#f85149"/>`;
+  s+=`<rect class="qbg" x="${X0}" y="${my}" width="${mx-X0}" height="${Y0-my}" fill="#6b7a8c"/>`;
+  s+=`<rect class="qbg" x="${mx}" y="${my}" width="${X1-mx}" height="${Y0-my}" fill="#3fb950"/>`;
+  /* 象限标签放在各象限的空白处（已对照节点坐标选位） */
+  s+=`<text class="quad" x="${px(.35)}" y="${py(4.3)}">构建重 · 检索轻</text>`;
+  s+=`<text class="quad" x="${px(5.55)}" y="${py(6.8)}" text-anchor="end">两边都重</text>`;
+  s+=`<text class="quad" x="${px(.35)}" y="${py(.55)}">两边都轻</text>`;
+  s+=`<text class="quad" x="${px(3.4)}" y="${py(1.6)}">构建轻 · 检索重</text>`;
+  for(let i=0;i<=XMAX;i++){s+=`<line x1="${px(i)}" y1="${Y0}" x2="${px(i)}" y2="${Y1}" stroke="#2a313c" stroke-width=".6" opacity=".5"/>
+     <text class="tick" x="${px(i)}" y="${Y0+19}" text-anchor="middle">${i}</text>`;}
+  for(let i=0;i<=YMAX;i++){s+=`<line x1="${X0}" y1="${py(i)}" x2="${X1}" y2="${py(i)}" stroke="#2a313c" stroke-width=".6" opacity=".5"/>
+     <text class="tick" x="${X0-11}" y="${py(i)+4}" text-anchor="end">${i}</text>`;}
+  s+=`<line class="axis" x1="${X0}" y1="${Y0}" x2="${X1}" y2="${Y0}"/>`;
+  s+=`<line class="axis" x1="${X0}" y1="${Y0}" x2="${X0}" y2="${Y1}"/>`;
+  s+=`<text class="axlabel" x="${(X0+X1)/2}" y="${Y0+44}" text-anchor="middle">检索强度 →　取回一次花多少计算 · 是否多轮</text>`;
+  s+=`<text class="axlabel" transform="translate(28,${(Y0+Y1)/2}) rotate(-90)" text-anchor="middle">构建强度 →　写入一条花多少 LLM · 多少改写</text>`;
+  /* 参数化家族三个点实际同为 (0,7)，垂直错开只为可点——画一个分组框，
+     否则会被误读成 7 / 6.5 / 6 三个不同的构建强度 */
+  const gx=px(0), gy=py(7);
+  s+=`<rect x="${gx-15}" y="${gy-15}" width="152" height="84" rx="9" fill="none"
+        stroke="${COL.param}" stroke-width="1" stroke-dasharray="3 3" opacity=".38"/>`;
+  s+=`<text x="${gx-12}" y="${gy+82}" class="quad" style="font-size:10px;fill:${COL.param};opacity:.7">三者同为 (0, 7)</text>`;
+  S.forEach((d,i)=>{
+    const cx=px(d.x)+(d.dx||0), cy=py(d.y)+(d.dy||0);
+    s+=`<g class="node ${sel===i?'sel':''}" onclick="pick(${i})">${shape(d,cx,cy)}${label(d,cx,cy)}</g>`;
+  });
+  svg.innerHTML=s;
+}
+
+const HOW=`<div class="how">
+  <h3>怎么读这张图</h3>
+  两轴都按代码侧实际行为打分，不按论文声称。分值是序数不是比例——「7」只表示比「5」更重，不表示重 1.4 倍。
+  <table>
+    <tr><td>0</td><td>构建期零 LLM，或推理期完全不检索</td></tr>
+    <tr><td>1–2</td><td>单步操作：只 embed / 只抽一次 / 单次向量取</td></tr>
+    <tr><td>3–4</td><td>多步管线：抽取 + 准入，或多阶段召回 + 重排</td></tr>
+    <tr><td>5–6</td><td>重管线：多次 LLM 改写 + 结构化，或图扩散 / agent 多轮</td></tr>
+    <tr><td>7</td><td>含训练（SFT / RL），把工作前移进参数</td></tr>
+  </table>
+  <div style="margin-top:9px;color:var(--tx3)">四个象限不是评价，是设计取舍的位置。两边都重和两边都轻都真实存在——构建与检索不是此消彼长的资源分配。</div>
+</div>`;
+
+function mxTable(hl){
+  let h='<tr><th>系统</th>'+STAGES.map(s=>`<th class="${s[0]==='A'?'gA':'gB'}">${s}</th>`).join('')+'</tr>';
+  MX.forEach(r=>{
+    const on = hl && (MXKEY[hl]||hl)===r[0];
+    h+=`<tr class="${on?'hl':''}"><td>${r[0]}</td>`+
+       r.slice(1).map((v,i)=>`<td class="${STAGES[i][0]==='A'?'gA':'gB'}">${v}</td>`).join('')+'</tr>';
+  });
+  document.getElementById('mx').innerHTML=h;
+}
+
+window.pick=i=>{
+  const d=S[i];
+  const kindName={dia:'对话记忆',traj:'agent 轨迹记忆',param:'参数化家族',ctrl:'对照臂',intent:'自家系统'}[d.kind];
+  const row=MX.find(r=>r[0]===(MXKEY[d.id]||d.id));
+  const rowHtml = row ? `<div class="rowmini"><span class="k">覆盖矩阵行（论文|代码）</span><br>`+
+      STAGES.map((s,j)=>`${s} ${row[j+1]}`).join('　')+`</div>` : '';
+  document.getElementById('panel').innerHTML=`
+    <h2 style="color:${COL[d.kind]}">${d.id}</h2>
+    <div class="meta">构建 ${d.y} · 检索 ${d.x}　|　${kindName}　|　${d.done?'已复现':'未复现'}</div>
+    <div class="tagrow">${(d.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    <div class="sec build"><div class="h">构建期做了什么</div><div class="b">${d.build}</div></div>
+    <div class="sec retr"><div class="h">检索期做了什么</div><div class="b">${d.retr}</div></div>
+    ${d.warn?`<div class="tagrow"><span class="tag warn">注意</span></div>
+      <div class="sec"><div class="b" style="color:#ffb4ae">${d.warn}</div></div>`:''}
+    ${rowHtml}
+    <div class="src">出处：${d.src}</div>`;
+  draw(i); mxTable(d.id);
+};
+
+document.getElementById('panel').innerHTML=HOW;
+draw(-1); mxTable(null);
+</script>
+</body>
+</html>

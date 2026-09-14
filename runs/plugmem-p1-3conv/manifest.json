@@ -1,0 +1,34 @@
+{
+  "run_id": "plugmem-p1-3conv",
+  "benchmark": "locomo10",
+  "convs": [
+    "conv-26",
+    "conv-30",
+    "conv-49"
+  ],
+  "arms": [
+    "plugmem"
+  ],
+  "n": 3,
+  "top_k": 20,
+  "concurrency": 16,
+  "answer_model": "glm-5.3",
+  "judge_model": "glm-5.3",
+  "answer_protocol": "anthropic",
+  "answer_temp": 0.0,
+  "answer_endpoint": "open.bigmodel.cn/api/anthropic",
+  "judge_endpoint": "open.bigmodel.cn/api/anthropic",
+  "answer_thinking": "on(provider-default)",
+  "judge_thinking": "on(provider-default)",
+  "answer_max_tokens": 2048,
+  "judge_max_tokens": 2048,
+  "prompt_version": "bench-design-v0.1",
+  "started_at": "2026-09-13T06:39:40+00:00",
+  "status": "DONE",
+  "phase_b": {
+    "completed": 1495,
+    "wall_s": 1340.2,
+    "ts": "2026-09-13T18:17:17+00:00"
+  },
+  "finished_at": "2026-09-13T18:17:17+00:00"
+}

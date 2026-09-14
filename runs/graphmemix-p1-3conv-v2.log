@@ -1,0 +1,384 @@
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      graphmemix, 3.4.7                           │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 4.0.3                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[09/12/26 23:33:57] INFO     Starting MCP server 'graphmemix'   transport.py:241
+                             with transport 'stdio'                             
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，10s 后原样重发（2/8）
+[graphmemix-node] RateLimitError，10s 后原样重发（2/8）
+[graphmemix-node] RateLimitError，20s 后原样重发（3/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      graphmemix, 3.4.7                           │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 4.0.3                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[09/12/26 23:38:52] INFO     Starting MCP server 'graphmemix'   transport.py:241
+                             with transport 'stdio'                             
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，10s 后原样重发（2/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，10s 后原样重发（2/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，10s 后原样重发（2/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，10s 后原样重发（2/8）
+[graphmemix-ecv] RateLimitError，20s 后原样重发（3/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，10s 后原样重发（2/8）
+[graphmemix-node] RateLimitError，20s 后原样重发（3/8）
+[graphmemix-node] RateLimitError，30s 后原样重发（4/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，10s 后原样重发（2/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，10s 后原样重发（2/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，10s 后原样重发（2/8）
+[graphmemix-node] InternalServerError，20s 后原样重发（3/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，10s 后原样重发（2/8）
+[graphmemix-ecv] RateLimitError，20s 后原样重发（3/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-ecv] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，5s 后原样重发（1/8）
+[graphmemix-node] RateLimitError，10s 后原样重发（2/8）
+run: /Users/guanhongli/Documents/repo/memory-bench/runs/graphmemix-p1-3conv-v2
+arms=['graphmemix'] convs=3 n=3
+  [graphmemix] 全部已灌，restore(locomo_full) OK
+  [graphmemix] conv-26 retrieve 完成（累计新增 558）
+  [graphmemix] conv-30 retrieve 完成（累计新增 873）
+  [graphmemix] conv-49 retrieve 完成（累计新增 1461）
+  [graphmemix] evidence 就绪（skip 39，新增 1461）
+Phase B: 待答 1500 题，并发 16，答题=glm-5.3，判分=glm-5.3
+  进度 25/1500（1.1 题/s，ETA 23.0 min）
+  进度 50/1500（0.9 题/s，ETA 28.1 min）
+  进度 75/1500（0.9 题/s，ETA 26.9 min）
+  进度 100/1500（0.8 题/s，ETA 30.7 min）
+  进度 125/1500（0.7 题/s，ETA 30.9 min）
+  进度 150/1500（0.8 题/s，ETA 29.7 min）
+  进度 175/1500（0.8 题/s，ETA 28.3 min）
+  进度 200/1500（0.8 题/s，ETA 27.5 min）
+  进度 225/1500（0.8 题/s，ETA 25.9 min）
+  进度 250/1500（0.9 题/s，ETA 24.1 min）
+  进度 275/1500（0.9 题/s，ETA 22.7 min）
+  进度 300/1500（0.9 题/s，ETA 21.5 min）
+  进度 325/1500（1.0 题/s，ETA 20.5 min）
+  进度 350/1500（1.0 题/s，ETA 19.8 min）
+  LLM 失败（连续 1）: graphmemix|conv-26|q27|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 375/1500（1.0 题/s，ETA 18.9 min）
+  进度 400/1500（1.0 题/s，ETA 18.2 min）
+  进度 425/1500（1.0 题/s，ETA 17.6 min）
+  进度 450/1500（1.0 题/s，ETA 17.1 min）
+  进度 475/1500（1.0 题/s，ETA 16.5 min）
+  进度 500/1500（1.1 题/s，ETA 15.9 min）
+  进度 525/1500（1.1 题/s，ETA 15.4 min）
+  进度 550/1500（1.1 题/s，ETA 14.8 min）
+  进度 575/1500（1.1 题/s，ETA 14.4 min）
+  进度 600/1500（1.1 题/s，ETA 14.0 min）
+  进度 625/1500（1.1 题/s，ETA 13.7 min）
+  进度 650/1500（1.1 题/s，ETA 13.2 min）
+  LLM 失败（连续 1）: graphmemix|conv-26|q105|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 675/1500（1.1 题/s，ETA 12.8 min）
+  进度 700/1500（1.1 题/s，ETA 12.4 min）
+  进度 725/1500（1.1 题/s，ETA 12.0 min）
+  进度 750/1500（1.1 题/s，ETA 11.5 min）
+  进度 775/1500（1.1 题/s，ETA 11.1 min）
+  LLM 失败（连续 1）: graphmemix|conv-26|q151|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 800/1500（1.1 题/s，ETA 10.6 min）
+  进度 825/1500（1.1 题/s，ETA 10.5 min）
+  进度 850/1500（1.1 题/s，ETA 10.1 min）
+  进度 875/1500（1.1 题/s，ETA 9.6 min）
+  进度 900/1500（1.1 题/s，ETA 9.2 min）
+  进度 925/1500（1.1 题/s，ETA 8.8 min）
+  进度 950/1500（1.1 题/s，ETA 8.4 min）
+  进度 975/1500（1.1 题/s，ETA 8.0 min）
+  进度 1000/1500（1.1 题/s，ETA 7.7 min）
+  进度 1025/1500（1.1 题/s，ETA 7.3 min）
+  进度 1050/1500（1.1 题/s，ETA 6.9 min）
+  进度 1075/1500（1.1 题/s，ETA 6.5 min）
+  进度 1100/1500（1.1 题/s，ETA 6.1 min）
+  进度 1125/1500（1.1 题/s，ETA 5.7 min）
+  进度 1150/1500（1.1 题/s，ETA 5.3 min）
+  进度 1175/1500（1.1 题/s，ETA 4.9 min）
+  进度 1200/1500（1.1 题/s，ETA 4.5 min）
+  进度 1225/1500（1.1 题/s，ETA 4.1 min）
+  进度 1250/1500（1.1 题/s，ETA 3.7 min）
+  进度 1275/1500（1.1 题/s，ETA 3.4 min）
+  进度 1300/1500（1.1 题/s，ETA 3.0 min）
+  LLM 失败（连续 1）: graphmemix|conv-49|q25|rep1: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 1325/1500（1.1 题/s，ETA 2.6 min）
+  LLM 失败（连续 1）: graphmemix|conv-49|q27|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 1350/1500（1.1 题/s，ETA 2.3 min）
+  进度 1375/1500（1.1 题/s，ETA 1.9 min）
+  进度 1400/1500（1.1 题/s，ETA 1.5 min）
+  进度 1425/1500（1.0 题/s，ETA 1.2 min）
+  进度 1450/1500（1.0 题/s，ETA 0.8 min）
+  进度 1475/1500（1.0 题/s，ETA 0.4 min）
+  LLM 失败（连续 1）: graphmemix|conv-49|q168|rep0: 重试耗尽（4 次）: ConnectError: All connection attempts failed
+  LLM 失败（连续 1）: graphmemix|conv-49|q110|rep0: 重试耗尽（4 次）: ConnectError: All connection attempts failed
+  LLM 失败（连续 1）: graphmemix|conv-49|q157|rep2: 重试耗尽（4 次）: ConnectError: All connection attempts failed
+  LLM 失败（连续 2）: graphmemix|conv-49|q170|rep2: 重试耗尽（4 次）: ConnectError: All connection attempts failed
+Phase B 完成：1491 题，1614s
+
+arm               n judge_acc     F1  cat 切片（1=multihop 2=temporal 3=open 4=single 5=adv）
+graphmemix     1491     0.477  0.218  c1:74/240 c2:195/287 c3:34/76 c4:388/558 c5:20/330
+（judge 解析失败行: 0）
+
+完成。产物：/Users/guanhongli/Documents/repo/memory-bench/runs/graphmemix-p1-3conv-v2/answers.jsonl
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      graphmemix, 3.4.7                           │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 4.0.3                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[09/13/26 13:52:44] INFO     Starting MCP server 'graphmemix'   transport.py:241
+                             with transport 'stdio'                             
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      rag_baseline, 3.4.7                         │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 4.0.3                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[09/13/26 13:52:45] INFO     Starting MCP server 'rag_baseline' transport.py:241
+                             with transport 'stdio'                             
+run: /Users/guanhongli/Documents/repo/memory-bench/runs/graphmemix-p1-3conv-v2
+arms=['graphmemix', 'rag_baseline'] convs=3 n=3
+  [graphmemix] 全部已灌，restore(locomo_full) OK
+  [graphmemix] conv-26 retrieve 完成（累计新增 0）
+  [graphmemix] conv-30 retrieve 完成（累计新增 0）
+  [graphmemix] conv-49 retrieve 完成（累计新增 0）
+  [graphmemix] evidence 就绪（skip 1500，新增 0）
+  [rag_baseline] 全部已灌，restore(locomo_full) OK
+  [rag_baseline] conv-26 retrieve 完成（累计新增 597）
+  [rag_baseline] conv-30 retrieve 完成（累计新增 912）
+  [rag_baseline] conv-49 retrieve 完成（累计新增 1500）
+  [rag_baseline] evidence 就绪（skip 0，新增 1500）
+Phase B: 待答 1509 题，并发 16，答题=glm-5.3，判分=glm-5.3
+  进度 25/1509（1.1 题/s，ETA 23.5 min）
+  进度 50/1509（1.2 题/s，ETA 20.5 min）
+  进度 75/1509（1.2 题/s，ETA 19.8 min）
+  进度 100/1509（1.1 题/s，ETA 21.3 min）
+  进度 125/1509（1.0 题/s，ETA 23.9 min）
+  进度 150/1509（1.0 题/s，ETA 23.4 min）
+  进度 175/1509（1.0 题/s，ETA 23.3 min）
+  进度 200/1509（1.0 题/s，ETA 22.4 min）
+  进度 225/1509（1.0 题/s，ETA 22.2 min）
+  进度 250/1509（1.0 题/s，ETA 21.0 min）
+  进度 275/1509（1.0 题/s，ETA 20.3 min）
+  LLM 失败（连续 1）: rag_baseline|conv-26|q1|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 300/1509（1.0 题/s，ETA 19.9 min）
+  进度 325/1509（1.0 题/s，ETA 19.1 min）
+  LLM 失败（连续 1）: rag_baseline|conv-26|q12|rep1: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 350/1509（1.1 题/s，ETA 18.3 min）
+  进度 375/1509（1.1 题/s，ETA 17.5 min）
+  进度 400/1509（1.1 题/s，ETA 16.8 min）
+  进度 425/1509（1.1 题/s，ETA 16.2 min）
+  进度 450/1509（1.1 题/s，ETA 15.8 min）
+  进度 475/1509（1.1 题/s，ETA 15.4 min）
+  进度 500/1509（1.1 题/s，ETA 14.9 min）
+  进度 525/1509（1.1 题/s，ETA 14.4 min）
+  进度 550/1509（1.2 题/s，ETA 13.9 min）
+  进度 575/1509（1.2 题/s，ETA 13.4 min）
+  进度 600/1509（1.2 题/s，ETA 13.0 min）
+  进度 625/1509（1.2 题/s，ETA 12.6 min）
+  进度 650/1509（1.2 题/s，ETA 12.4 min）
+  进度 675/1509（1.1 题/s，ETA 12.1 min）
+  进度 700/1509（1.1 题/s，ETA 11.9 min）
+  进度 725/1509（1.1 题/s，ETA 11.4 min）
+  进度 750/1509（1.1 题/s，ETA 11.1 min）
+  进度 775/1509（1.1 题/s，ETA 10.7 min）
+  LLM 失败（连续 1）: rag_baseline|conv-26|q149|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 800/1509（1.1 题/s，ETA 10.4 min）
+  进度 825/1509（1.1 题/s，ETA 10.0 min）
+  进度 850/1509（1.1 题/s，ETA 9.6 min）
+  LLM 失败（连续 1）: rag_baseline|conv-26|q184|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 875/1509（1.1 题/s，ETA 9.3 min）
+  进度 900/1509（1.1 题/s，ETA 8.9 min）
+  进度 925/1509（1.1 题/s，ETA 8.6 min）
+  进度 950/1509（1.1 题/s，ETA 8.2 min）
+  进度 975/1509（1.1 题/s，ETA 7.9 min）
+  进度 1000/1509（1.1 题/s，ETA 7.5 min）
+  进度 1025/1509（1.1 题/s，ETA 7.1 min）
+  进度 1050/1509（1.1 题/s，ETA 6.8 min）
+  进度 1075/1509（1.1 题/s，ETA 6.5 min）
+  进度 1100/1509（1.1 题/s，ETA 6.1 min）
+  进度 1125/1509（1.1 题/s，ETA 5.7 min）
+  进度 1150/1509（1.1 题/s，ETA 5.3 min）
+  进度 1175/1509（1.1 题/s，ETA 4.9 min）
+  进度 1200/1509（1.1 题/s，ETA 4.5 min）
+  进度 1225/1509（1.1 题/s，ETA 4.2 min）
+  进度 1250/1509（1.1 题/s，ETA 3.8 min）
+  进度 1275/1509（1.1 题/s，ETA 3.4 min）
+  进度 1300/1509（1.1 题/s，ETA 3.1 min）
+  进度 1325/1509（1.1 题/s，ETA 2.7 min）
+  进度 1350/1509（1.1 题/s，ETA 2.3 min）
+  进度 1375/1509（1.1 题/s，ETA 2.0 min）
+  进度 1400/1509（1.1 题/s，ETA 1.6 min）
+  进度 1425/1509（1.1 题/s，ETA 1.2 min）
+  进度 1450/1509（1.1 题/s，ETA 0.9 min）
+  进度 1475/1509（1.1 题/s，ETA 0.5 min）
+  进度 1500/1509（1.1 题/s，ETA 0.1 min）
+Phase B 完成：1505 题，1361s
+
+arm               n judge_acc     F1  cat 切片（1=multihop 2=temporal 3=open 4=single 5=adv）
+graphmemix     1500     0.477  0.217  c1:74/240 c2:196/288 c3:36/78 c4:389/561 c5:20/333
+rag_baseline   1496     0.427  0.184  c1:49/240 c2:176/286 c3:35/78 c4:353/560 c5:26/332
+（judge 解析失败行: 0）
+
+完成。产物：/Users/guanhongli/Documents/repo/memory-bench/runs/graphmemix-p1-3conv-v2/answers.jsonl

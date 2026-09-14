@@ -1,0 +1,70 @@
+{
+  "run_id": "atommem-p1-3conv",
+  "frozen_at": "2026-09-10T12:46:54+00:00",
+  "purpose": "atommem 首跑（新臂验证），对齐 mandol-p1-baseline-3conv 的 3conv 惯例",
+  "code_fingerprint": {
+    "servers/atommem/server.py": "c931c027c5dc64d5",
+    "servers/atommem/extractor.py": "5ff4482d4cbdf29b",
+    "servers/atommem/embedding.py": "444c1d3ff0e4b982",
+    "servers/common/base.py": "7f1cc99ccccedcf9",
+    "servers/common/envelope.py": "ef045397d1c24db9",
+    "servers/common/stats.py": "16f17bfc659d5c57",
+    "servers.yaml": "9ec573f0eeed730b",
+    "bench/runner.py": "a701bb92554f0c81",
+    "loaders/locomo.py": "7b6cb771b8405a82",
+    "docs/interface-spec.md": "e2ead301c77e6b7c"
+  },
+  "upstream": {
+    "repo": "MINE-USTC/AtomMem",
+    "head": "776f880941a02b10c495c126fe775d5e88ede5d4",
+    "modified": false
+  },
+  "config": {
+    "arms": [
+      "atommem"
+    ],
+    "convs": [
+      "conv-26",
+      "conv-30",
+      "conv-49"
+    ],
+    "n": 3,
+    "top_k": 20,
+    "concurrency": 16,
+    "internal_llm": "glm-5.3",
+    "internal_thinking": "low",
+    "embed_model": "embedding-3",
+    "answer_model": "glm-5.3",
+    "answer_thinking": "on",
+    "answer_protocol": "anthropic"
+  },
+  "scale": {
+    "sessions": 63,
+    "turns": 1297,
+    "qa_non_cat5": 389,
+    "answer_calls": 1167,
+    "judge_calls": 1167
+  },
+  "gate": {
+    "smoke": "6/8",
+    "smoke_failed_steps": [
+      2,
+      7
+    ],
+    "waiver": "MAJOR 豁免。步骤 2/7 归零源于上游 src/retrieval.py:284-288 主召回 people 硬交集过滤，在 smoke 的中文无具名样本上必然触发；非封装缺陷。LoCoMo 端到端验证全部通过，风险面量化 1.0%（200 题采样）。详见 servers/atommem/REPRO-NOTES.md §1、§2。",
+    "pytest": "green",
+    "adversarial_review": "fable-5.1, 3 CRITICAL 全修并实证, 无遗留 CRITICAL",
+    "known_observables": [
+      "PEOPLE_FILTER_EMPTY 逐题上报",
+      "threshold_probes: duplicate_0.95 / conflict_0.6 / profile_0.55 / people_filter_empty"
+    ]
+  },
+  "deviations": {
+    "embedding": "embedding-3 (2048d)，偏离论文与上游的 all-MiniLM-L6-v2 (384d)；spec §7 已登记",
+    "extractor": "论文 Figure A.1 五条规则 + 统一 glm-5.3（上游无权重无推理代码，差异 1）",
+    "event_summary_in_envelope": "按论文补齐（差异 3）",
+    "retrieve_llm_calls": "每次 retrieve 有 1 次 B1 意图解析调用，不与零 LLM 检索臂并列做成本对比",
+    "max_tokens": "沿用上游 2000（代码原生）"
+  },
+  "discipline": "跑中只看吞吐与失败，不据部分分数改参数；失败题同配置重试；结构性错误另开 v2 版本边界"
+}

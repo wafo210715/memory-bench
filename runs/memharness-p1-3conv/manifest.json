@@ -1,0 +1,38 @@
+{
+  "run_id": "memharness-p1-3conv",
+  "benchmark": "locomo10",
+  "convs": [
+    "conv-26",
+    "conv-30",
+    "conv-49"
+  ],
+  "arms": [
+    "memharness",
+    "memharness_noadapt",
+    "rag_baseline"
+  ],
+  "n": 3,
+  "top_k": 20,
+  "concurrency": 16,
+  "answer_model": "glm-5.3",
+  "judge_model": "glm-5.3",
+  "answer_protocol": "anthropic",
+  "answer_temp": 0.0,
+  "answer_endpoint": "open.bigmodel.cn/api/anthropic",
+  "judge_endpoint": "open.bigmodel.cn/api/anthropic",
+  "answer_thinking": "on(provider-default)",
+  "judge_thinking": "on(provider-default)",
+  "answer_max_tokens": 2048,
+  "judge_max_tokens": 2048,
+  "prompt_version": "bench-design-v0.1",
+  "started_at": "2026-09-12T15:12:34+00:00",
+  "status": "DONE",
+  "suspended_reason": "429 退避耗尽（9 次）: HTTP 429: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"code\":\"1302\",\"message\":\"[130",
+  "suspended_at": "2026-09-12T18:30:03+00:00",
+  "phase_b": {
+    "completed": 4403,
+    "wall_s": 3991.9,
+    "ts": "2026-09-12T21:35:25+00:00"
+  },
+  "finished_at": "2026-09-12T21:35:26+00:00"
+}

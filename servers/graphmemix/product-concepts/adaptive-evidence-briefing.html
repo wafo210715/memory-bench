@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>自适应证据简报卡 · GraphMemix 产品形态</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#191b22; --panel2:#1f2129; --text:#e8e9ee; --muted:#8a8e9c;
+    --accent:#8b9cf6; --good:#5fd1a0; --info:#78b4ff; --neutral:#565c6b; --bad:#f0748a;
+    --shadow: 0 10px 26px rgba(0,0,0,.4), 0 2px 6px rgba(0,0,0,.3);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;line-height:1.55}
+  .wrap{max-width:760px;margin:0 auto;padding:28px 20px 90px}
+  a.back{color:var(--accent);text-decoration:none;font-size:13px}
+  h1{font-size:20px;margin:14px 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 22px}
+  .rationale{background:var(--panel2);border-radius:14px;padding:16px 18px;margin-bottom:26px;border-left:3px solid var(--accent);box-shadow:var(--shadow)}
+  .rationale h2{font-size:14.5px;margin:0 0 8px;color:var(--accent)}
+  .rationale p{margin:6px 0;font-size:13px;color:#c7cbda}
+  .chat-thread{background:var(--panel);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
+  .msg{display:flex;gap:10px;margin-bottom:18px}
+  .avatar{width:30px;height:30px;border-radius:50%;background:#33384a;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  .avatar.user{background:var(--accent);color:#0b0f1a}
+  .bubble{background:var(--panel2);border-radius:12px;padding:11px 14px;font-size:13.5px;max-width:100%}
+  .bubble.user-bubble{background:#2a2f42}
+
+  .briefing{margin-top:10px;background:linear-gradient(150deg,#1c2030,#171922);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);border:1px solid #2a2f40}
+  .briefing-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+  .briefing-head .title{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .k-badge{background:var(--accent);color:#0b0f1a;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px}
+  .filtered-note{font-size:11.5px;color:var(--muted)}
+
+  .anchor-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .anchor-chip{background:#2c3350;border:1px solid #414a6e;border-radius:10px;padding:7px 11px;font-size:12.5px;cursor:pointer;transition:.15s;flex:1;min-width:150px}
+  .anchor-chip:hover{border-color:var(--accent)}
+  .anchor-chip .d{font-size:10.5px;color:var(--muted)}
+
+  .expand-btn{background:var(--panel2);border:none;color:var(--accent);font-size:12.5px;padding:7px 14px;border-radius:9px;cursor:pointer;width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center}
+  .expand-btn:hover{background:#242732}
+  .expand-icon{transition:transform .2s}
+  .expand-icon.open{transform:rotate(90deg)}
+
+  .followups{display:none;margin-top:10px;padding-left:6px}
+  .followups.open{display:block}
+  .tree-item{display:flex;gap:8px;margin:6px 0;padding-left:calc(var(--depth,0) * 18px)}
+  .tree-item .role-pill{font-size:10px;padding:1px 7px;border-radius:999px;white-space:nowrap;height:fit-content;margin-top:2px}
+  .role-新事实{background:var(--good);color:#08201a}
+  .role-澄清{background:var(--info);color:#08131f}
+  .role-佐证{background:#9fe6c9;color:#08201a}
+  .tree-item .txt{background:var(--panel2);border-radius:9px;padding:6px 10px;font-size:12.5px;flex:1}
+  .tree-item .txt .d{font-size:10.5px;color:var(--muted);margin-bottom:2px}
+
+  .answer-text{margin-top:12px;font-size:13.5px;color:#dfe1e8;border-top:1px solid #2a2f40;padding-top:10px}
+  #detail{position:fixed;left:0;right:0;bottom:0;background:var(--panel);box-shadow:0 -8px 30px rgba(0,0,0,.5);transform:translateY(100%);transition:transform .2s;padding:18px 24px;z-index:50;max-height:40vh;overflow-y:auto}
+  #detail.open{transform:translateY(0)}
+  #detail .close{position:absolute;top:14px;right:18px;cursor:pointer;color:var(--muted)}
+  #detail h4{margin:0 0 8px;font-size:14px}
+  .meta-line{color:var(--muted);font-size:12px;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 返回形态列表</a>
+  <h1>自适应证据简报卡 <span style="color:var(--muted);font-weight:400">Adaptive Evidence Briefing Card</span></h1>
+  <p class="sub">嵌入在 agent 聊天回复下方的证据说明卡：锚点优先展示，补充证据按关系树可展开，并诚实标出"本来预算给 24 条，这次算下来只用了几条"。</p>
+
+  <div class="rationale">
+    <h2>为什么这个形态配这个系统</h2>
+    <p><b>对应机制画像的哪一步：</b>证据交付阶段——分量按根节点价值排序、分量内部广度优先展开，以及森林优化里"证据数量是变基数精确求解出来的"这一特性。卡片上的 K 徽章、"已排除 N 条"提示、可展开的关系树，都是把这两处内部产物直接暴露给终端用户。</p>
+    <p><b>为什么换个记忆系统做不出来：</b>固定 top-k 检索系统给出的证据数永远是设置好的那个 k（比如"总是给 5 条"），无法诚实地说"这次算下来只需要 3 条"；同时它也没有锚点/补充证据的层级关系，只能平铺一个列表，做不出"点开锚点看它拉出来的补充证据"这种可展开树。这两点都要求证据数量与结构本身是查询期算出来的，不是配置项。</p>
+  </div>
+
+  <div class="chat-thread">
+    <div class="msg">
+      <div class="avatar user">我</div>
+      <div class="bubble user-bubble">我们最终选定的厨房台面材质和颜色是什么？为什么放弃了大理石？</div>
+    </div>
+    <div class="msg">
+      <div class="avatar">AI</div>
+      <div style="flex:1">
+        <div class="bubble">
+          最终用的是<b>石英石</b>，颜色是「云雾白」。放弃大理石的主要原因是报价出来后大理石比石英石贵约 4200 元，加上工人反馈石英石耐用性接近、耐刮花，于是把预算让给了橱柜五金。5 月初安装完成后也用照片确认了效果。
+        </div>
+        <div class="briefing">
+          <div class="briefing-head">
+            <span class="title">📎 证据依据 <span class="k-badge" id="kBadge">8 条</span></span>
+            <span class="filtered-note" id="filterNote">预算上限 24 条 · 已按需精确求解，未用满预算</span>
+          </div>
+          <div class="anchor-row" id="anchorRow"></div>
+          <button class="expand-btn" id="expandBtn" onclick="toggleExpand()">
+            <span>展开由关系拉回的补充证据（6 条）</span>
+            <span class="expand-icon" id="expandIcon">▶</span>
+          </button>
+          <div class="followups" id="followups"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="detail">
+  <span class="close" onclick="closeDetail()">✕</span>
+  <h4 id="detailTitle"></h4>
+  <div class="meta-line" id="detailMeta"></div>
+  <div id="detailBody" style="font-size:13.5px"></div>
+</div>
+
+<script>
+const MEM = {
+  M7:{date:'04-15', content:'"最后决定用石英石了，省下的钱加到橱柜五金上"', anchor:true, val:5},
+  M9:{date:'05-03', content:'"邻居问台面材质,回复说是石英石,颜色叫云雾白"', anchor:true, val:4},
+  M8:{date:'05-01', content:'安装后照片："白色石英石台面已安装完成"', anchor:false, val:5, role:'佐证', from:'M9', depth:1},
+  M12:{date:'04-15', content:'"石英石决定后，五金预算加到2000"', anchor:false, val:3, role:'佐证', from:'M7', depth:1},
+  M5:{date:'04-02', content:'"预算有点紧张，工人建议看看石英石，说耐用性差不多"', anchor:false, val:4, role:'澄清', from:'M7', depth:1},
+  M4:{date:'03-20', content:'报价单 OCR："大理石 ¥15800 / 石英石 ¥11600"', anchor:false, val:4, role:'澄清', from:'M5', depth:2},
+  M6:{date:'04-10', content:'建材市场视频转写："这个耐刮花,颜色也挺白"', anchor:false, val:3, role:'新事实', from:'M5', depth:2},
+  M3:{date:'03-20', content:'"报价单出来了，大理石这块要多花4200"', anchor:false, val:3, role:'佐证', from:'M4', depth:3},
+};
+const ANCHORS = ['M7','M9'];
+const FOLLOWUPS = ['M12','M5','M9_child_placeholder']; // 仅用于说明，实际渲染走下面顺序
+const FOLLOW_ORDER = ['M12','M5','M8','M4','M6','M3']; // BFS 顺序（去掉已是锚点的 M9，其子节点 M8 单独放入）
+
+function anchorChip(id){
+  const m = MEM[id];
+  return `<div class="anchor-chip" onclick="showDetail('${id}')">
+    <div class="d">${id} · ${m.date} · 锚点</div>
+    ${m.content}
+  </div>`;
+}
+document.getElementById('anchorRow').innerHTML = ANCHORS.map(anchorChip).join('');
+
+function followItem(id){
+  const m = MEM[id];
+  return `<div class="tree-item" style="--depth:${m.depth-1}">
+    <span class="role-pill role-${m.role}">${m.role}</span>
+    <div class="txt" onclick="showDetail('${id}')">
+      <div class="d">${id} · ${m.date} · 由 ${m.from} 拉回</div>
+      ${m.content}
+    </div>
+  </div>`;
+}
+document.getElementById('followups').innerHTML = FOLLOW_ORDER.map(followItem).join('');
+
+function toggleExpand(){
+  const f = document.getElementById('followups');
+  const icon = document.getElementById('expandIcon');
+  const btn = document.getElementById('expandBtn').querySelector('span');
+  const open = f.classList.toggle('open');
+  icon.classList.toggle('open', open);
+  btn.innerText = open ? '收起补充证据' : '展开由关系拉回的补充证据（6 条）';
+}
+
+function showDetail(id){
+  const m = MEM[id];
+  document.getElementById('detailTitle').innerText = id + (m.anchor? '（锚点）':'（补充证据）');
+  document.getElementById('detailMeta').innerText = `${m.date} · 节点价值分 ${m.val}` + (m.role? ` · 关系角色：${m.role}（相对 ${m.from}）`:'');
+  document.getElementById('detailBody').innerText = m.content;
+  document.getElementById('detail').classList.add('open');
+}
+function closeDetail(){ document.getElementById('detail').classList.remove('open'); }
+</script>
+</body>
+</html>

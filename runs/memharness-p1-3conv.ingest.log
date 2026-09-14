@@ -1,0 +1,32 @@
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      memharness, 3.4.7                           │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 4.0.3                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[09/12/26 23:12:35] INFO     Starting MCP server 'memharness'   transport.py:241
+                             with transport 'stdio'                             
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError

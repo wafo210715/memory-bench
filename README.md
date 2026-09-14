@@ -7,9 +7,10 @@
 对照锚点：`rag_baseline`（裸向量检索，无 LLM）与 `full_context`（整段历史塞进上下文）。
 没有这两个，"记忆系统是不是只是向量检索"这个质疑就没有落点。
 
-**当前状态**：Phase 1（8 臂封装 + 契约门禁）完成；Phase 2 第一轮跑分完成
-（locomo-r2-n3，2026-08-30：mem0 / graphiti / rag_baseline × 10 conv × n=3，top_k=20；
-intent 因有效性威胁退出该轮，evidence 已保留）。路线与阶段划分见 [PLAN.md](PLAN.md)。
+**当前状态**：Phase 1（8 臂封装 + 契约门禁）完成；Phase 2 跑分：locomo-r2-n3（2026-08-30，mem0 / graphiti /
+rag_baseline × 10 conv × n=3）、mandol-full-10conv（09-04）、amem-ab-3conv（含 amem_fixed 全量）；
+**2026-09-10–13 新入矩阵四臂** atommem / memharness / graphmemix / plugmem（各有 3-conv 首轮 run，
+见下方快速开始；**仅 atommem 结果已审查，其余三臂待审**）。路线与阶段划分见 [PLAN.md](PLAN.md)。
 
 ---
 
@@ -92,7 +93,29 @@ MCP 六工具的逐字段语义（含 canonical envelope 与各臂原生粒度�
 
 ---
 
-## 八个臂
+## 新四臂快速开始（atommem / memharness / graphmemix / plugmem，2026-09-10–13 入矩阵）
+
+四臂都跑在**主 venv**，只读共享的 `MEMBENCH_LLM_*` 三个变量，embedding 统一 embedding-3（均偏离各自论文/上游的
+原生编码器，代价是上游硬编码阈值的尺度漂移，由各臂 `stats().threshold_probes` 逐次观测）。
+
+| 臂 | 上游代码 | 检索面 | 口径与门禁记录 | 首轮 run | 审查 |
+|---|---|---|---|---|---|
+| `atommem` | 需 clone `MINE-USTC/AtomMem` 到 `~/Documents/repo/AtomMem`（`MEMBENCH_ATOMMEM_REPO` 可覆盖）；脚本式仓库，`sys.path` 引入不 pip 装 | retrieve 有 1 次 B1 意图解析 LLM（只读 query 不读记忆，不算 active）；符号过滤人物不交则拒（`SEED_LIMITED`） | [servers/atommem/REPRO-NOTES.md](servers/atommem/REPRO-NOTES.md) | `atommem-p1-3conv` | ✅ 已审 |
+| `memharness` | 不依赖上游运行（上游是 verl/Ray 训练栈），存取引擎按论文重写 | **active**：retrieve 读记忆内容并调 LLM 批判重构；不保证返回满 top_k（拒绝率实测 ~70%） | [servers/memharness/REPRO-NOTES.md](servers/memharness/REPRO-NOTES.md) | `memharness-p1-3conv` | 待审 |
+| `memharness_noadapt` | 同上，`MEMBENCH_MEMHARNESS_ADAPTOR=off` | 消融对照：关掉批判重构，零 LLM 纯检索面；**必须复用主臂快照**不单独灌 | 同上 | — | 待审 |
+| `graphmemix` | 需 clone 上游（`MEMBENCH_GRAPHMEMIX_REPO` 可覆盖） | **active**：节点 verifier + 锰点条件关系验证两处 LLM 并行；变基数返回（`VARIABLE_CARDINALITY`），排序为森林 BFS 非 score 降序；查询级缓存保幂等（`MEMBENCH_GRAPHMEMIX_CACHE=off` 测方差） | [servers/graphmemix/REPRO-NOTES.md](servers/graphmemix/REPRO-NOTES.md) | `graphmemix-p1-3conv-v3`（v1/v2 已 VOID） | 待审 |
+| `plugmem` | 需 clone 到 `~/Documents/repo/PlugMem`（`MEMBENCH_PLUGMEM_REPO` 可覆盖） | 默认 `T_max=2` 多跳属 **active**；纯被动对照设 `MEMBENCH_PLUGMEM_MAX_HOPS=1`；记忆类型由 LLM 三选一，不足时 `MODE_LIMITED` | [servers/plugmem/arm-reproduction.md](servers/plugmem/arm-reproduction.md) | `plugmem-p1-3conv` | 待审 |
+
+跑法与通用八步相同：`python main.py smoke <arm>`（8/8）→ `python main.py run --arms <arm> --convs conv-26,conv-30,conv-49 --n 3 --top-k 20`。
+
+> [!warning] 三个 active 臂不与零 LLM 检索臂并列成本/延迟
+> memharness / graphmemix / plugmem(T_max=2) 在 retrieve 路径里调 LLM，属 active retrieval 面（同 intent_tier2）。
+> 分数可比，但成本/延迟表必须分栏，见 [docs/interface-spec.md](docs/interface-spec.md) §7 “retrieve 路径是否调 LLM”。
+> 各臂的论文↔代码分歧清单在 `servers/<arm>/paper-vs-code.md`；可视化流程图在 `servers/flowgen/`（方法论骨架 `servers/METHODOLOGY-SKELETON.md`）。
+
+---
+
+## 臂矩阵
 
 | 臂 | 类型 | venv | 外部依赖 |
 |---|---|---|---|
@@ -103,6 +126,10 @@ MCP 六工具的逐字段语义（含 canonical envelope 与各臂原生粒度�
 | `amem` | 记忆系统 | `.venv-amem` | LLM（走 OpenAI SDK env 约定） |
 | `mandol` | 记忆系统 | `.venv-mandol` | cloud embedding |
 | `rag_baseline` | 对照臂（裸向量） | `.venv` | embedding，无 LLM |
+| `atommem` | 记忆系统（原子事实 + 画像 + 符号过滤） | `.venv` | LLM + 上游 repo clone |
+| `memharness` / `memharness_noadapt` | 记忆系统（批判重构，active）/ 其消融对照 | `.venv` | LLM |
+| `graphmemix` | 记忆系统（关系图 + 变基数定选，active） | `.venv` | LLM + 上游 repo clone |
+| `plugmem` | 记忆系统（三层知识图 + 多跳，默认 active） | `.venv` | LLM + 上游 repo clone |
 | `intent` | 意图系统（TS/Bun） | — | LLM |
 | `full_context` | 对照臂（runner 内置，非 server） | — | — |
 
@@ -165,6 +192,10 @@ servers.yaml    server 注册表：命令、解释器、必需环境变量
 | 第二轮：论文级可复现的模块拆分 | [docs/REPRO-PLAN.md](docs/REPRO-PLAN.md) |
 | Pi harness 工程量评估 | [docs/pi-harness-effort.md](docs/pi-harness-effort.md) |
 | 痛点—方法论—批评矩阵（选型来历） | [docs/agent-memory-pain-points.md](docs/agent-memory-pain-points.md) |
+| 14 个记忆系统的跨系统方法论骨架（A1–A6 / B1–B8 泳道） | [servers/METHODOLOGY-SKELETON.md](servers/METHODOLOGY-SKELETON.md) |
+| 各系统论文↔代码分歧（逐机制带 file:line） | `servers/<arm>/paper-vs-code.md`（14 份） |
+| 新四臂复现口径与门禁记录 | `servers/{atommem,memharness,graphmemix}/REPRO-NOTES.md`、`servers/plugmem/arm-reproduction.md` |
+| 机制→产品形态示意 | `servers/<arm>/product-concepts/`（atommem / memharness / graphmemix / plugmem） |
 
 ## 公平性约定
 

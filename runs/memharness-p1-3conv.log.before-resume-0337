@@ -1,0 +1,553 @@
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      memharness, 3.4.7                           │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 4.0.3                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[09/12/26 23:22:04] INFO     Starting MCP server 'memharness'   transport.py:241
+                             with transport 'stdio'                             
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，3.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.2s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，3.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.2s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，3.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.9s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.7s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，8.3s 后重试（3/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.6s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，8.1s 后重试（3/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.6s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.6s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，3.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.7s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.2s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.7s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.8s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.3s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，8.7s 后重试（3/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.5s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.1s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.6s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，3.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.1s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，4.1s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.3s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，3.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，3.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，3.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.4s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，8.1s 后重试（3/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.8s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，5.0s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，3.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，3.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，3.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，3.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.7s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.9s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.1s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，4.5s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，4.9s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.1s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，3.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.4s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.2s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，4.2s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.0s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.8s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.6s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，4.6s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，4.4s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，4.5s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，8.1s 后重试（3/3）：RateLimitError
+[memharness] 可恢复错误，4.6s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.8s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，2.9s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.6s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.1s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.2s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.5s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，2.3s 后重试（1/3）：RateLimitError
+[memharness] 可恢复错误，4.1s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，4.1s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，4.2s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，4.6s 后重试（2/3）：RateLimitError
+[memharness] 可恢复错误，8.5s 后重试（3/3）：RateLimitError
+[memharness] 可恢复错误，8.6s 后重试（3/3）：RateLimitError
+[memharness] 可恢复错误，8.9s 后重试（3/3）：RateLimitError
+[memharness] 重构调用失败（不降级为 reject，直接上抛）：Error code: 429 - {'error': {'code': '1302', 'message': '您的账户已达到速率限制，请您控制请求频率'}}
+[09/13/26 02:09:22] Error calling tool 'retrieve'                               
+                    ╭─────────── Traceback (most recent call last) ────────────╮
+                    │ /Users/guanhongli/Documents/repo/memory-bench/servers/me │
+                    │ mharness/server.py:574 in _reconstruct_one               │
+                    │                                                          │
+                    │   571 │   if len(user) > ADAPTOR_MAX_PROMPT_CHARS:       │
+                    │   572 │   │   user = user[:ADAPTOR_MAX_PROMPT_CHARS]     │
+                    │   573 │   try:                                           │
+                    │ ❱ 574 │   │   text, used, finish = _chat(ADAPTOR_SYSTEM_ │
+                    │       max_tokens=_adaptor_max_tokens())                  │
+                    │   575 │   except Exception as exc:                       │
+                    │   576 │   │   _adaptor_counters["api_fail"] += 1         │
+                    │   577 │   │   _log(f"重构调用失败（不降级为 reject，直接 │
+                    │                                                          │
+                    │ /Users/guanhongli/Documents/repo/memory-bench/servers/me │
+                    │ mharness/server.py:316 in _chat                          │
+                    │                                                          │
+                    │   313 │   last: Exception | None = None                  │
+                    │   314 │   for attempt in range(_RETRY_MAX):              │
+                    │   315 │   │   try:                                       │
+                    │ ❱ 316 │   │   │   r = _llm_client().chat.completions.cre │
+                    │   317 │   │   │   │   model=os.environ["MEMBENCH_LLM_MOD │
+                    │   318 │   │   │   │   messages=[{"role": "system", "cont │
+                    │       "content": user}],                                 │
+                    │   319 │   │   │   │   temperature=0,                     │
+                    │                                                          │
+                    │                 ... 2 frames hidden ...                  │
+                    │                                                          │
+                    │ /Users/guanhongli/Documents/repo/memory-bench/.venv/lib/ │
+                    │ python3.12/site-packages/openai/_base_client.py:1375 in  │
+                    │ post                                                     │
+                    │                                                          │
+                    │   1372 │   │   opts = FinalRequestOptions.construct(     │
+                    │   1373 │   │   │   method="post", url=path, json_data=bo │
+                    │        files=to_httpx_files(files), **options            │
+                    │   1374 │   │   )                                         │
+                    │ ❱ 1375 │   │   return cast(ResponseT, self.request(cast_ │
+                    │        stream_cls=stream_cls))                           │
+                    │   1376 │                                                 │
+                    │   1377 │   def patch(                                    │
+                    │   1378 │   │   self,                                     │
+                    │                                                          │
+                    │ /Users/guanhongli/Documents/repo/memory-bench/.venv/lib/ │
+                    │ python3.12/site-packages/openai/_base_client.py:1148 in  │
+                    │ request                                                  │
+                    │                                                          │
+                    │   1145 │   │   │   │   │   err.response.read()           │
+                    │   1146 │   │   │   │                                     │
+                    │   1147 │   │   │   │   log.debug("Re-raising status erro │
+                    │ ❱ 1148 │   │   │   │   raise self._make_status_error_fro │
+                    │   1149 │   │   │                                         │
+                    │   1150 │   │   │   break                                 │
+                    │   1151                                                   │
+                    ╰──────────────────────────────────────────────────────────╯
+                    RateLimitError: Error code: 429 - {'error': {'code': '1302',
+                    'message': '您的账户已达到速率限制，请您控制请求频率'}}     
+                                                                                
+                    The above exception was the direct cause of the following   
+                    exception:                                                  
+                                                                                
+                    ╭─────────── Traceback (most recent call last) ────────────╮
+                    │ /Users/guanhongli/Documents/repo/memory-bench/.venv/lib/ │
+                    │ python3.12/site-packages/fastmcp/server/server.py:1312   │
+                    │ in call_tool                                             │
+                    │                                                          │
+                    │ /Users/guanhongli/Documents/repo/memory-bench/.venv/lib/ │
+                    │ python3.12/site-packages/fastmcp/tools/base.py:421 in    │
+                    │ _run                                                     │
+                    │                                                          │
+                    │                 ... 14 frames hidden ...                 │
+                    │                                                          │
+                    │ /Users/guanhongli/Documents/repo/memory-bench/servers/me │
+                    │ mharness/server.py:768 in <lambda>                       │
+                    │                                                          │
+                    │   765 │   │   with ThreadPoolExecutor(max_workers=worker │
+                    │   766 │   │   │   outs = list(                           │
+                    │   767 │   │   │   │   pool.map(                          │
+                    │ ❱ 768 │   │   │   │   │   lambda h: _reconstruct_one(que │
+                    │       h[0]["principle"]),                                │
+                    │   769 │   │   │   │   │   targets,                       │
+                    │   770 │   │   │   │   )                                  │
+                    │   771 │   │   │   )                                      │
+                    │                                                          │
+                    │ /Users/guanhongli/Documents/repo/memory-bench/servers/me │
+                    │ mharness/server.py:578 in _reconstruct_one               │
+                    │                                                          │
+                    │   575 │   except Exception as exc:                       │
+                    │   576 │   │   _adaptor_counters["api_fail"] += 1         │
+                    │   577 │   │   _log(f"重构调用失败（不降级为 reject，直接 │
+                    │ ❱ 578 │   │   raise AdaptorCallFailed(str(exc)) from exc │
+                    │   579 │   guidance, rejected = _normalize_adaptor_output │
+                    │   580 │   return guidance, rejected, used, finish        │
+                    │   581                                                    │
+                    ╰──────────────────────────────────────────────────────────╯
+                    AdaptorCallFailed: Error code: 429 - {'error': {'code':     
+                    '1302', 'message':                                          
+                    '您的账户已达到速率限制，请您控制请求频率'}}                
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      memharness_noadapt, 3.4.7                   │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 4.0.3                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[09/13/26 02:09:23] INFO     Starting MCP server                transport.py:241
+                             'memharness_noadapt' with                          
+                             transport 'stdio'                                  
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      rag_baseline, 3.4.7                         │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 4.0.3                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[09/13/26 02:16:09] INFO     Starting MCP server 'rag_baseline' transport.py:241
+                             with transport 'stdio'                             
+run: /Users/guanhongli/Documents/repo/memory-bench/runs/memharness-p1-3conv
+arms=['memharness', 'memharness_noadapt', 'rag_baseline'] convs=3 n=3
+  [memharness] 全部已灌，restore(locomo_full) OK
+  [memharness] conv-26 retrieve 完成（累计新增 566）
+  [memharness] conv-30 retrieve 完成（累计新增 881）
+  ⚠️ [memharness] Phase A 失败: ToolError: Error calling tool 'retrieve': Error code: 429 - {'error': {'code': '1302', 'message': '您的账户已达到速率限制，请您控制请求频率'}}
+  [memharness_noadapt] 全部已灌，restore(locomo_full) OK
+  [memharness_noadapt] conv-26 retrieve 完成（累计新增 597）
+  [memharness_noadapt] conv-30 retrieve 完成（累计新增 912）
+  [memharness_noadapt] conv-49 retrieve 完成（累计新增 1500）
+  [memharness_noadapt] evidence 就绪（skip 0，新增 1500）
+  [rag_baseline] 全部已灌，restore(locomo_full) OK
+  [rag_baseline] conv-26 retrieve 完成（累计新增 597）
+  [rag_baseline] conv-30 retrieve 完成（累计新增 912）
+  [rag_baseline] conv-49 retrieve 完成（累计新增 1500）
+  [rag_baseline] evidence 就绪（skip 0，新增 1500）
+Phase B: 待答 4072 题，并发 16，答题=glm-5.3，判分=glm-5.3
+  进度 25/4072（0.2 题/s，ETA 328.6 min）
+  进度 50/4072（0.2 题/s，ETA 285.7 min）
+  进度 75/4072（0.3 题/s，ETA 247.6 min）
+  LLM 失败（连续 1）: memharness|conv-26|q2|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  LLM 失败（连续 2）: memharness|conv-26|q4|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  LLM 失败（连续 3）: memharness|conv-26|q0|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  LLM 失败（连续 4）: memharness|conv-26|q1|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  LLM 失败（连续 5）: memharness|conv-26|q3|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+⚠️ 挂起：429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130（已答 79/4072 落盘；--resume 续跑）
+  LLM 失败（连续 6）: memharness|conv-26|q3|rep1: 重试耗尽（4 次）: ReadError: 
+  LLM 失败（连续 7）: memharness|conv-26|q4|rep2: 重试耗尽（4 次）: ReadError: 
+  LLM 失败（连续 8）: memharness|conv-26|q3|rep0: 重试耗尽（4 次）: ReadError: 
+  LLM 失败（连续 9）: memharness|conv-26|q4|rep1: 重试耗尽（4 次）: ReadError: 

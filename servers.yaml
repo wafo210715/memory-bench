@@ -36,6 +36,63 @@ servers:
     args: ["servers/amem/server_fixed.py"]
     env_required: [OPENAI_API_KEY, OPENAI_BASE_URL, MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL]
 
+  atommem:
+    # 主 venv 即可：上游 MINE-USTC/AtomMem 是脚本式仓库（无 setup.py），server.py 用
+    # sys.path + chdir 引入，不 pip 安装、不改上游仓库。
+    # 上游 clone 路径默认 ~/Documents/repo/AtomMem，可用 MEMBENCH_ATOMMEM_REPO 覆盖。
+    # embedding 走 embedding-3（2026-09-10 用户定，偏离论文/上游的 all-MiniLM-L6-v2），
+    # 与 mem0/graphiti/mandol/rag_baseline 同口径；构建侧硬编码阈值的尺度漂移由
+    # stats().threshold_probes 观测，见 servers/atommem/server.py 口径 3。
+    command: ".venv/bin/python"
+    args: ["servers/atommem/server.py"]
+    env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL, MEMBENCH_LLM_MODEL]
+
+  memharness:
+    # 主 venv 即可：本臂不依赖上游 MemHarness 代码运行（上游是 verl/Ray 训练栈，只在文档层被对照），
+    # 存取引擎按论文与上游配置在本文件内重写：蒸馏 + 向量召回 + 批判重构 + 去重。
+    # 关键：retrieve 路径会读记忆内容并调 LLM（论文一号机制「重构」），属 active retrieval，
+    # 与 intent Tier2 同栏，成本/延迟不可与零 LLM 检索面并列（interface-spec §7）。
+    # embedding 走 embedding-3，偏离论文/上游的 BGE-M3，与 mem0/graphiti/rag_baseline/atommem 同口径；
+    # 两条 0.85 去重阈值的尺度漂移由 stats().threshold_probes 观测。口径决策见 servers/memharness/REPRO-NOTES.md。
+    command: ".venv/bin/python"
+    args: ["servers/memharness/server.py"]
+    env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL, MEMBENCH_LLM_MODEL]
+
+  memharness_noadapt:
+    # 同一份 server.py，以 MEMBENCH_MEMHARNESS_ADAPTOR=off 拉起（入口：servers/memharness/server_noadapt.py）。
+    # 消融对照臂：关掉论文一号机制「批判+重构」，检索命中后不改写也不丢弃，
+    # 对应论文 Table 2 的「去掉重构」行。它的 retrieve 零 LLM，属纯检索面。
+    # 两臂要可比，必须读同一份记忆库：正式 run 先由主臂灌入并出 locomo_full 快照，
+    # 再把快照复制到本臂命名空间（蒸馏层非确定，各灌一遍会把记忆库差异混进结论）。
+    command: ".venv/bin/python"
+    args: ["servers/memharness/server_noadapt.py"]
+    env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL, MEMBENCH_LLM_MODEL]
+
+  graphmemix:
+    # 主 venv 即可：上游 ligeng0197/graphmemix 是脚本式仓库，server.py 用 sys.path 引入
+    # scripts/ 下的三段核心算法（candidate_pool / solve_forest_greedy / exact_subset），
+    # 不 pip 安装、不改上游仓库。上游 clone 路径默认 ~/Documents/repo/graphmemix，
+    # 可用 MEMBENCH_GRAPHMEMIX_REPO 覆盖。
+    # ⚠️ retrieve 路径有 2 次 listwise LLM 调用且读记忆正文（node verifier + ECV），
+    #   属 active retrieval 面，与纯检索臂不同口径，见 servers/graphmemix/server.py 口径 10。
+    # embedding 走 embedding-3（偏离论文/上游的 gme-Qwen2-VL-2B），与其余四臂同口径；
+    #   节点效用 p_i 的尺度漂移由 stats().prize_probes 观测，见口径 3。
+    command: ".venv/bin/python"
+    args: ["servers/graphmemix/server.py"]
+    env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL, MEMBENCH_LLM_MODEL]
+
+  plugmem:
+    # 主 venv 即可：上游 TIMAN-group/PlugMem 的 plugmem/ 包用 sys.path 引入，不 pip 安装、不改上游仓库；
+    # 它的运行时依赖（chromadb / openai / numpy）主 venv 已备。
+    # 上游 clone 路径默认 ~/Documents/repo/PlugMem，可用 MEMBENCH_PLUGMEM_REPO 覆盖。
+    # 论文补齐项（处方质量分、意图语义判重、多跳控制器）与默认关的推理压缩模块，
+    # 逐条口径见 servers/plugmem/server.py 头部。默认 T_max=2（论文默认）使本臂属
+    # active retrieval 面，成本/延迟表不与零 LLM 检索臂并列（interface-spec §7）；
+    # 需要纯被动对照时设 MEMBENCH_PLUGMEM_MAX_HOPS=1。
+    command: ".venv/bin/python"
+    args: ["servers/plugmem/server.py"]
+    env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL, MEMBENCH_LLM_MODEL]
+
   memos:
     command: ".venv/bin/python"            # 纯 REST，主 venv
     args: ["servers/memos/server.py"]
@@ -51,6 +108,7 @@ servers:
     args: ["run", "servers/intent/server.ts"]
     env_required: [MEMBENCH_LLM_API_KEY, MEMBENCH_LLM_BASE_URL, MEMBENCH_LLM_MODEL]
 
-  # 待封装（Phase 1 后续）：
-  # graphiti: Neo4j Docker + neo4j-admin dump 快照
-  # memos / a-mem / mandol / intent
+  # 尚未封装的目标系统及其原因（上方字典里有的即为已封装，不在此处重复枚举以免过时）：
+  # · letta、mragent：需 agent loop / SDK 驱动，测的是 agentic 面，不宜硬塞静态 stdio MCP（interface-spec §9）
+  # · transmem、livemem、memorydecoder：参数化家族，记忆在权重/隐状态里，检索期零召回，
+  #   走 model+weights SUT 轨道而非六工具契约（retrieve 对它们无语义，B6 需 hook 推理前向）

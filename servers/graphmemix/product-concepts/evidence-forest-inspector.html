@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>证据森林检视器 · GraphMemix 产品形态</title>
+<style>
+  :root{
+    --bg:#12141a; --panel:#1b1e27; --panel2:#20232e; --text:#e7e9ee; --muted:#8b8fa3;
+    --accent:#6ea8fe; --good:#4fd1a5; --warn:#f2b84b; --bad:#f27a7a; --neutral:#5c6270;
+    --shadow: 0 8px 24px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.25);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;line-height:1.55}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 24px 80px}
+  header h1{font-size:22px;margin:0 0 6px}
+  header p.sub{color:var(--muted);margin:0 0 20px;font-size:13.5px}
+  .card{background:var(--panel);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:18px}
+  .rationale{background:var(--panel2);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:24px;border-left:3px solid var(--accent)}
+  .rationale h2{font-size:15px;margin:0 0 8px;color:var(--accent)}
+  .rationale p{margin:6px 0;font-size:13.5px;color:#c7cbda}
+  .qbox{display:flex;gap:14px;align-items:flex-start;background:linear-gradient(135deg,#22263380,#1b1e2780);border-radius:12px;padding:14px 16px;margin-bottom:20px}
+  .qbox .tag{background:var(--accent);color:#0b0f1a;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .qbox .qtext{font-size:15px}
+  .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .tab-btn{background:var(--panel2);color:var(--muted);border:none;padding:9px 16px;border-radius:10px;font-size:13.5px;cursor:pointer;box-shadow:var(--shadow);transition:.15s}
+  .tab-btn.active{background:var(--accent);color:#0b0f1a;font-weight:600}
+  .tab-btn:hover{color:var(--text)}
+  .stage{display:none}
+  .stage.active{display:block}
+  .stage-desc{color:var(--muted);font-size:13px;margin-bottom:14px}
+  .mem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+  .mem-card{background:var(--panel2);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s, box-shadow .12s;border:1px solid transparent}
+  .mem-card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.4)}
+  .mem-card.dim{opacity:.35}
+  .mem-card .mid{font-size:11px;color:var(--muted);display:flex;justify-content:space-between}
+  .mem-card .content{font-size:13px;margin:6px 0 8px}
+  .mem-card .meta-row{display:flex;gap:6px;flex-wrap:wrap}
+  .pill{font-size:10.5px;padding:2px 7px;border-radius:999px;background:#2b2f3c;color:var(--muted)}
+  .pill.score{background:var(--accent);color:#0b0f1a;font-weight:600}
+  .pill.role-新事实{background:var(--good);color:#0b1a14}
+  .pill.role-澄清{background:#77b7ff;color:#08131f}
+  .pill.role-佐证{background:#9fe6c9;color:#08201a}
+  .pill.role-冗余{background:var(--neutral);color:#fff}
+  .pill.role-冲突{background:var(--bad);color:#1a0808}
+  .pill.role-无关{background:#33373f;color:var(--muted)}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;font-size:12px}
+  .legend span{display:flex;align-items:center;gap:5px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  #detail{position:fixed;right:0;top:0;bottom:0;width:340px;background:var(--panel);box-shadow:-8px 0 30px rgba(0,0,0,.5);transform:translateX(100%);transition:transform .2s;padding:22px;overflow-y:auto;z-index:50}
+  #detail.open{transform:translateX(0)}
+  #detail h3{margin-top:0;font-size:15px}
+  #detail .close{position:absolute;top:16px;right:18px;cursor:pointer;color:var(--muted);font-size:18px}
+  .edge-row{background:var(--panel2);border-radius:8px;padding:8px 10px;margin:6px 0;font-size:12.5px}
+  .forest-tree{padding:8px 0}
+  .tree-node{margin-left:0}
+  .tree-line{display:flex;align-items:center;gap:8px;padding:6px 10px;margin:4px 0;border-radius:8px;background:var(--panel2);box-shadow:var(--shadow)}
+  .tree-line.root{background:linear-gradient(135deg,#2c3550,#1b1e27);border:1px solid var(--accent)}
+  .tree-children{margin-left:26px;border-left:1px dashed #3a3f4d;padding-left:16px}
+  .stat-bar{display:flex;gap:18px;margin-bottom:16px;flex-wrap:wrap}
+  .stat{background:var(--panel2);border-radius:10px;padding:10px 16px;box-shadow:var(--shadow);font-size:12.5px;color:var(--muted)}
+  .stat b{color:var(--text);font-size:16px;display:block}
+  .order-chip{display:inline-flex;align-items:center;gap:6px;background:var(--panel2);padding:6px 12px;border-radius:999px;margin:4px 4px 4px 0;font-size:12.5px;box-shadow:var(--shadow)}
+  .order-chip .step{background:var(--accent);color:#0b0f1a;font-weight:700;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px}
+  footer{color:var(--muted);font-size:12px;text-align:center;margin-top:40px}
+  a.back{color:var(--accent);text-decoration:none;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 返回形态列表</a>
+  <header>
+    <h1>证据森林检视器 <span style="color:var(--muted);font-weight:400">Evidence Forest Inspector</span></h1>
+    <p class="sub">面向需要审计「agent 为什么给出这个答案」的高级用户 / 开发者：把 GraphMemix 查询期的五步组合优化过程逐级展开可视化。</p>
+  </header>
+
+  <div class="rationale">
+    <h2>为什么这个形态配这个系统</h2>
+    <p><b>对应机制画像的哪一步：</b>覆盖查询期全部五步——种子检索 → 候选扩展 → 节点验证 + 关系验证(ECV) → 森林优化(自适应 K) → BFS 交付顺序。每个 Tab 对应一步的中间产物。</p>
+    <p><b>为什么换个记忆系统做不出来：</b>纯相似度检索的记忆系统（如 mem0 式 top-k 向量召回）在查询时只有一份「按分数排序的列表」，没有显式的关系判定过程，也没有「可信图 → 森林 → 变基数子集选择」这条链路——它们的检视器最多只能展示一个排好序的列表，画不出这棵带角色标签的树。GraphMemix 因为把冗余/冲突/佐证等关系判定做成一等公民，且最终证据数是精确子集搜索算出来的（而不是固定 top-k），才有「查这道题为什么最终只给了 8 条而不是 24 条」这种可审计、可展开的结构可看。</p>
+  </div>
+
+  <div class="qbox">
+    <span class="tag">用户提问</span>
+    <span class="qtext">"我们最终选定的厨房台面材质和颜色是什么？为什么放弃了大理石？"</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-stage="s1">① 种子检索</button>
+    <button class="tab-btn" data-stage="s2">② 候选扩展</button>
+    <button class="tab-btn" data-stage="s3">③ 双重验证</button>
+    <button class="tab-btn" data-stage="s4">④ 森林优化</button>
+    <button class="tab-btn" data-stage="s5">⑤ BFS 交付顺序</button>
+  </div>
+
+  <!-- Stage 1: seeds -->
+  <div class="stage active" id="s1">
+    <div class="card">
+      <div class="stage-desc">多视角检索：每条记忆按「原文 / 图片描述 / OCR / 视频帧转写」中相似度最高的视角打分，取前 24 条为种子。下方展示分数最高的 10 条（其余 14 条已省略）。点击卡片查看该记忆命中的具体视角。</div>
+      <div class="mem-grid" id="seedGrid"></div>
+    </div>
+  </div>
+
+  <!-- Stage 2: candidates -->
+  <div class="stage" id="s2">
+    <div class="card">
+      <div class="stage-desc">从 24 条种子沿「发现图」（结构边：同轮次/相邻轮次；语义边：互为 top-8 近邻）各走 1 跳，凑齐 48 条候选。图中标灰的是本次被结构邻接「捎带」进来但与问题基本无关的候选（如客厅沙发、灯具报价）。</div>
+      <div class="mem-grid" id="candGrid"></div>
+    </div>
+  </div>
+
+  <!-- Stage 3: verification -->
+  <div class="stage" id="s3">
+    <div class="card">
+      <div class="stage-desc">两条并行验证线：<b>节点验证</b>给全部候选打 0-5 分「有用度」；<b>关系验证 ECV</b> 只看检索序前 10 名「锚点」与候选之间的结构边，判断新增信息量并六选一贴角色标签。只有「新事实/澄清/佐证」且分数为正的边留下，构成右侧的可信图。</div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--good)"></i>新事实</span>
+        <span><i class="dot" style="background:#77b7ff"></i>澄清</span>
+        <span><i class="dot" style="background:#9fe6c9"></i>佐证</span>
+        <span><i class="dot" style="background:var(--neutral)"></i>冗余（被丢弃）</span>
+        <span><i class="dot" style="background:var(--bad)"></i>冲突（被丢弃）</span>
+        <span><i class="dot" style="background:#33373f"></i>无关（被丢弃）</span>
+      </div>
+      <div id="edgeList"></div>
+    </div>
+  </div>
+
+  <!-- Stage 4: forest -->
+  <div class="stage" id="s4">
+    <div class="card">
+      <div class="stage-desc">在预算 K≤24 内，1-swap 局部搜索每换一个节点都用 Kruskal 精确重算最大权森林；提案定下后，在提案内部穷举全部非空子集精确求解「到底给几条」。本题最终只用了 8 条，而不是把预算 24 用满——这是算出来的，不是设置了固定 top-k。</div>
+      <div class="stat-bar">
+        <div class="stat"><b>24</b>预算上限 K</div>
+        <div class="stat"><b>48</b>候选池规模</div>
+        <div class="stat"><b>8</b>最终选中节点数</div>
+        <div class="stat"><b>1</b>连通分量数</div>
+      </div>
+      <div id="forestTree" class="forest-tree"></div>
+    </div>
+  </div>
+
+  <!-- Stage 5: delivery -->
+  <div class="stage" id="s5">
+    <div class="card">
+      <div class="stage-desc">分量按根节点价值排序（本题只有一个分量），分量内部广度优先展开：锚点先出现，被关系边拉回来的补充证据按跳数依次跟上。</div>
+      <div id="orderChips"></div>
+      <div style="margin-top:16px;color:var(--muted);font-size:12.5px">这个顺序直接决定了回答里证据引用的先后：先给「最终决定用石英石」和它的直接佐证/邻居确认，再展开「为什么换材质」的报价与预算链条，最后才是最早的报价单细节。</div>
+    </div>
+  </div>
+
+  <footer>示意数据，用于演示 GraphMemix 查询期组合优化的可审计性；非真实运行结果。</footer>
+</div>
+
+<div id="detail">
+  <span class="close" onclick="closeDetail()">✕</span>
+  <h3 id="detailTitle"></h3>
+  <div id="detailBody"></div>
+</div>
+
+<script>
+const MEM = {
+  M1:{date:'03-02', content:'"想要厨房用意大利大理石台面，很有质感"', views:['原文'], score:0.70, node:3},
+  M2:{date:'03-05', content:'设计师效果图（图片描述："浅灰色大理石台面效果图"）', views:['图片描述'], score:0.74, node:2},
+  M13:{date:'03-10', content:'"周末又跟设计师确认了一次要大理石台面"', views:['原文'], score:0.68, node:2},
+  M3:{date:'03-20', content:'"报价单出来了，大理石这块要多花4200"', views:['原文'], score:0.77, node:3},
+  M4:{date:'03-20', content:'报价单照片 OCR："台面报价：大理石 ¥15800 / 石英石 ¥11600"', views:['OCR'], score:0.81, node:4},
+  M11:{date:'03-20', content:'"报价单里灯具那部分贵得离谱,得砍价"', views:['原文'], score:0.31, node:1},
+  M5:{date:'04-02', content:'"预算有点紧张，工人建议看看石英石，说耐用性差不多"', views:['原文'], score:0.83, node:4},
+  M6:{date:'04-10', content:'建材市场视频帧转写："这个耐刮花,颜色也挺白"（工人指石英石样品）', views:['视频帧'], score:0.69, node:3},
+  M7:{date:'04-15', content:'"最后决定用石英石了，省下的钱加到橱柜五金上"', views:['原文'], score:0.91, node:5},
+  M12:{date:'04-15', content:'"石英石决定后，五金预算加到2000"', views:['原文'], score:0.66, node:3},
+  M8:{date:'05-01', content:'安装后照片（图片描述："白色石英石台面已安装完成"）', views:['图片描述'], score:0.87, node:5},
+  M9:{date:'05-03', content:'"邻居问台面材质,回复说是石英石,颜色叫云雾白"', views:['原文'], score:0.89, node:4},
+  M10:{date:'02-10', content:'"客厅沙发选深灰色布艺的"', views:['原文'], score:0.12, node:0},
+};
+const SEED_ORDER = ['M7','M9','M8','M5','M4','M3','M2','M1','M6','M12'];
+const CAND_EXTRA = ['M13','M11','M10'];
+const EDGES = [
+  {a:'M7',b:'M12',role:'佐证',kept:true,note:'决定用石英石后，五金预算随之上调——直接支持这一决策的落地细节'},
+  {a:'M7',b:'M5', role:'澄清',kept:true,note:'预算紧张是促使换材质的原因，澄清了 M7 决策的动机'},
+  {a:'M5',b:'M4', role:'澄清',kept:true,note:'报价单具体数字澄清了"预算紧张"具体紧张在哪'},
+  {a:'M4',b:'M3', role:'佐证',kept:true,note:'"大理石多花4200"这句话佐证了报价单里的价差数字'},
+  {a:'M5',b:'M6', role:'新事实',kept:true,note:'建材市场演示补充了石英石耐用性的新证据，M5 里只是工人口头说'},
+  {a:'M7',b:'M9', role:'佐证',kept:true,note:'回复邻居时复述的材质与最终决定一致，佐证决策的稳定性'},
+  {a:'M9',b:'M8', role:'佐证',kept:true,note:'安装后照片确认了颜色叫"云雾白"这一说法'},
+  {a:'M2',b:'M1', role:'冗余',kept:false,note:'效果图与最初想法都是表达"想要大理石"，没有新增信息'},
+  {a:'M13',b:'M1',role:'冗余',kept:false,note:'"又确认一次要大理石"与 M1 重复，无新增信息'},
+  {a:'M11',b:'M4',role:'无关',kept:false,note:'灯具报价与台面材质决策无关'},
+  {a:'M10',b:'M7',role:'无关',kept:false,note:'客厅沙发颜色与厨房台面问题无关'},
+];
+const FOREST = {id:'M7', root:true, children:[
+  {id:'M12', children:[]},
+  {id:'M5', children:[
+    {id:'M4', children:[
+      {id:'M3', children:[]}
+    ]},
+    {id:'M6', children:[]}
+  ]},
+  {id:'M9', children:[
+    {id:'M8', children:[]}
+  ]}
+]};
+const DELIVERY = ['M7','M12','M5','M9','M4','M6','M8','M3'];
+
+function scoreColor(s){ return s>0.8? 'var(--good)': s>0.6?'var(--accent)':'var(--muted)'; }
+
+function memCard(id, opts={}){
+  const m = MEM[id];
+  const dim = opts.dim ? 'dim':'';
+  return `<div class="mem-card ${dim}" onclick="showDetail('${id}')">
+    <div class="mid"><span>${id} · ${m.date}</span><span class="pill score">${m.score.toFixed(2)}</span></div>
+    <div class="content">${m.content}</div>
+    <div class="meta-row">${m.views.map(v=>`<span class="pill">${v}</span>`).join('')}</div>
+  </div>`;
+}
+
+document.getElementById('seedGrid').innerHTML = SEED_ORDER.map(id=>memCard(id)).join('') + `<div class="mem-card dim" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12.5px">+ 14 条种子（省略）</div>`;
+
+document.getElementById('candGrid').innerHTML = SEED_ORDER.map(id=>memCard(id)).join('')
+  + CAND_EXTRA.map(id=>memCard(id,{dim:id!=='M13'})).join('')
+  + `<div class="mem-card dim" style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12.5px">+ 35 条候选（省略）</div>`;
+
+document.getElementById('edgeList').innerHTML = EDGES.map(e=>{
+  const roleCls = 'role-'+e.role;
+  const strike = e.kept? '' : 'text-decoration:line-through;opacity:.55';
+  return `<div class="edge-row" style="${strike}">
+    <span class="pill ${roleCls}">${e.role}</span>
+    <b>${e.a}</b> → <b>${e.b}</b>　${e.note}${e.kept?'':'　<span style="color:var(--bad)">（已丢弃，不进入可信图）</span>'}
+  </div>`;
+}).join('');
+
+function renderTree(node, isRoot){
+  const m = MEM[node.id];
+  let html = `<div class="tree-line ${isRoot?'root':''}" onclick="showDetail('${node.id}')">
+    <b>${node.id}</b><span style="color:var(--muted);font-size:12px">${m.date}</span>
+    <span class="pill score">节点分 ${m.node}</span>
+    <span style="font-size:12.5px;color:#c7cbda">${m.content}</span>
+  </div>`;
+  if(node.children && node.children.length){
+    html += `<div class="tree-children">${node.children.map(c=>renderTree(c,false)).join('')}</div>`;
+  }
+  return html;
+}
+document.getElementById('forestTree').innerHTML = renderTree(FOREST, true);
+
+document.getElementById('orderChips').innerHTML = DELIVERY.map((id,i)=>
+  `<span class="order-chip" onclick="showDetail('${id}')"><span class="step">${i+1}</span>${id} · ${MEM[id].content.slice(0,16)}…</span>`
+).join('');
+
+function showDetail(id){
+  const m = MEM[id];
+  document.getElementById('detailTitle').innerText = id + ' · ' + m.date;
+  const relatedEdges = EDGES.filter(e=>e.a===id||e.b===id);
+  document.getElementById('detailBody').innerHTML = `
+    <p style="font-size:13.5px">${m.content}</p>
+    <div class="meta-row" style="margin:10px 0">${m.views.map(v=>`<span class="pill">${v}</span>`).join('')}<span class="pill score">检索分 ${m.score.toFixed(2)}</span><span class="pill">节点验证分 ${m.node}</span></div>
+    <h4 style="font-size:13px;margin:16px 0 6px;color:var(--muted)">相关关系边</h4>
+    ${relatedEdges.length? relatedEdges.map(e=>`<div class="edge-row"><span class="pill role-${e.role}">${e.role}</span> ${e.a}→${e.b}：${e.note}</div>`).join('') : '<div style="color:var(--muted);font-size:12.5px">无锚点关系边（非锚点或未命中结构边）</div>'}
+  `;
+  document.getElementById('detail').classList.add('open');
+}
+function closeDetail(){ document.getElementById('detail').classList.remove('open'); }
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.stage).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<!--
+  MemHarness 产品形态 ② 记忆保质期货架 — 示意稿
+  memory-system-analysis §7 产出。2026-09-12。
+
+  机制依据（见页内说明区块引用）：
+   · 效用分驱动的物理淘汰：s(p) = (成功次数+1) / (使用次数+2)，Laplace 平滑；
+     低于阈值(默认0.3/训练脚本)且已用满 min_uses(默认3)次的记忆被物理删除
+     （paper-architecture.md §2"效用分驱动的记忆淘汰"；
+      code-architecture.md experience_utility.py:14,30；milvus_store.py:613）
+   · 记忆条目结构：situation + memory 两段自然语言，是蒸馏而非原文
+     （paper-architecture.md §2"经验来自蒸馏而非原文"）
+   · 剪枝周期：训练脚本设为每 20 global steps 一次（milvus_store.py:613 附近；
+     code-architecture.md §4 架构图 MAINTAIN 分支）
+
+  重要声明：memharness 项目本地没有真实跑分记录，条目文本、效用分演化均为
+  依据机制画像构造的示意数据，用于传达界面概念，非真实模型输出。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MemHarness · 记忆保质期货架</title>
+<style>
+  :root{
+    --bg:#0f1210; --panel:#161c18; --panel2:#1d251f; --line:#2c372e;
+    --tx:#e7f0e9; --tx2:#9db3a3; --tx3:#657268;
+    --fresh:#5ec26a; --warn:#d29922; --stale:#f85149; --acc:#7fd99a;
+    --shadow:0 8px 28px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);
+       font:14px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 22px 70px}
+  header h1{font-size:21px;margin:0 0 6px}
+  header p{color:var(--tx2);margin:0 0 8px;font-size:13px;max-width:880px}
+  .disclaim{background:#1c2620;border:1px solid #3a4d3d;border-radius:9px;padding:10px 14px;
+    font-size:12px;color:#bfe8cc;margin-bottom:20px}
+  code{background:var(--panel2);padding:1px 5px;border-radius:4px;color:var(--tx2);font-size:12px}
+
+  .card{background:var(--panel);border-radius:13px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px}
+  .card h2{font-size:15.5px;margin:0 0 4px}
+  .sub{color:var(--tx2);font-size:12.3px;margin:0 0 14px}
+
+  .toolbar{display:flex;gap:22px;flex-wrap:wrap;align-items:center;margin-bottom:16px;
+    background:var(--panel2);border-radius:10px;padding:12px 16px}
+  .toolbar .grp{display:flex;flex-direction:column;gap:4px;min-width:170px}
+  .toolbar label{font-size:11.5px;color:var(--tx3)}
+  .toolbar .val{font-size:12.5px;color:var(--acc);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--acc)}
+  .btn{background:var(--fresh);color:#0c1a0f;border:none;border-radius:8px;padding:9px 18px;
+    font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.secondary{background:var(--panel2);color:var(--tx2);border:1px solid var(--line)}
+
+  .formula{background:#10160f;border:1px solid var(--line);border-radius:9px;padding:10px 14px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--acc);
+    margin-bottom:14px}
+  .formula span{color:var(--tx3)}
+
+  .shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+  .item{background:var(--panel2);border-radius:11px;padding:14px 15px;position:relative;
+    border:1.5px solid var(--line);transition:.35s;overflow:hidden}
+  .item.pulling{opacity:0;transform:scale(.86) translateY(14px);pointer-events:none}
+  .item .env{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.4px}
+  .item .sit{font-size:12px;color:var(--tx2);margin:6px 0 4px}
+  .item .prin{font-size:13px;margin:0 0 10px}
+  .metarow{display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:6px}
+  .scorebar{height:6px;border-radius:4px;background:#0d130f;overflow:hidden;margin-bottom:8px}
+  .scorebar .fill{height:100%;border-radius:4px;transition:width .3s}
+  .scorenum{display:flex;justify-content:space-between;align-items:center}
+  .scorenum b{font-variant-numeric:tabular-nums;font-size:14px}
+  .tag{font-size:10px;padding:1px 7px;border-radius:20px;font-weight:600}
+  .t-fresh{background:rgba(94,194,106,.16);color:var(--fresh)}
+  .t-warn{background:rgba(210,153,34,.16);color:var(--warn)}
+  .t-stale{background:rgba(248,81,73,.16);color:var(--stale)}
+  .item .ctl{display:flex;gap:8px;margin-top:10px}
+  .mini{flex:1;background:#10160f;border:1px solid var(--line);border-radius:6px;
+    color:var(--tx2);font-size:11px;padding:4px 0;cursor:pointer;text-align:center}
+  .mini:hover{color:var(--tx)}
+
+  details{background:var(--panel2);border-radius:10px;margin-top:14px;overflow:hidden}
+  summary{padding:12px 16px;cursor:pointer;font-size:13px;color:var(--acc);user-select:none;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸ ";transition:.2s;display:inline-block}
+  details[open] summary::before{transform:rotate(90deg)}
+  .why{padding:0 18px 16px;font-size:12.8px;color:var(--tx2);line-height:1.75}
+  .why p{margin:0 0 9px}
+  .why .neg{color:#ffb4ae}
+  footer{color:var(--tx3);font-size:11.5px;margin-top:26px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>MemHarness 产品形态 ② · 记忆保质期货架</h1>
+  <p>MemHarness 不会让记忆库无限膨胀：每条记忆有"被取用次数"和"取用后任务成功次数"，
+     用 Laplace 平滑算出一个效用分，分数持续走低、又确实被用过几次的记忆会被物理删除。
+     这个形态把记忆库画成一排会过期的货架——不是比喻意义上的"旧"，是这个系统真的会把
+     "看起来有理但实际没帮上忙"的经验清出库。</p>
+  <div class="disclaim">⚠️ 下面每条货架卡片的情境文本、初始效用分、点击"运行一次剪枝"后的结果，
+    都是依据机制画像构造的<b>示意数据</b>，用来演示公式和淘汰规则如何生效，不是真实训练跑出来的记忆库快照。</div>
+</header>
+
+<div class="card">
+  <h2>效用分公式（可调阈值，观察谁会被清出货架）</h2>
+  <p class="sub">来自 Appendix A.3，借鉴 EvolveR 式 Laplace 平滑；剪枝需同时满足"效用分低于阈值"且"已被检索满足够次数"。</p>
+  <div class="formula">s(p) = (成功次数 + 1) / (使用次数 + 2) <span>&nbsp;&nbsp;·&nbsp;&nbsp; 剪枝条件：s(p) &lt; θ_prune 且 使用次数 ≥ min_uses</span></div>
+  <div class="toolbar">
+    <div class="grp">
+      <label>剪枝阈值 θ_prune</label>
+      <input type="range" id="thresh" min="0.1" max="0.6" step="0.05" value="0.3">
+      <span class="val" id="threshVal">0.30</span>
+    </div>
+    <div class="grp">
+      <label>最少使用次数 min_uses</label>
+      <input type="range" id="minuse" min="1" max="6" step="1" value="3">
+      <span class="val" id="minuseVal">3</span>
+    </div>
+    <button class="btn" id="prune">运行一次剪枝</button>
+    <button class="btn secondary" id="reset">重置货架</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2>货架（<span id="cnt">—</span> 条记忆）</h2>
+  <p class="sub">每条卡片：situation（何时适用）+ memory（该做什么），配使用/成功计数与实时效用分。
+    点卡片上的 <code>+使用</code> / <code>+成功</code> 可以手动模拟一次检索命中或一次任务成功，观察分数如何变化。</p>
+  <div class="shelf" id="shelf"></div>
+</div>
+
+<details>
+  <summary>为什么这个形态配 MemHarness</summary>
+  <div class="why">
+    <p>这是这批系统里少数<b>会主动删除自己记忆</b>的机制：多数记忆系统的问题是"越存越多、越存越杂"，
+       MemHarness 用一个非常朴素的贝叶斯式平滑公式，把"检索命中但没帮上忙"的经验持续降权，
+       最终物理清除。这不是检索时的软性降权（比如相关性打分低就不召回），是真的从库里删掉——
+       产品上值得单独做一个可以盯着看的"货架"视图，而不是藏在后台日志里。</p>
+    <p>记忆条目的存储格式本身就是"situation + memory"两段自然语言（蒸馏自完整轨迹，
+       不是原文对话或结构化图谱），天然适合做成卡片：一句"何时适用"，一句"该做什么"，
+       信息密度和展示密度是匹配的，不需要额外裁剪。</p>
+    <p>把公式做成可调阈值的滑块，还有一个更实际的产品动机：论文里 θ_prune=0.3、min_uses=3
+       是训练脚本的固定值，但不同任务域（ALFWorld vs WebShop）对"容错"的需求不同——
+       让运营者能现场调阈值、立刻看到会多清掉哪些记忆或少清掉哪些，是这个机制天然支持、
+       但论文本身没有暴露给用户的一层可配置性。</p>
+    <p class="neg">要诚实的一点：论文和代码里的剪枝是<b>训练态</b>行为，服务于"不断跑 GRPO、记忆库持续增长"
+       这个场景（milvus_store.py 的剪枝在 rollout 训练循环里定期触发，不是面向最终用户的实时交互功能）。
+       如果要做成面向真实用户的产品面板，"运行一次剪枝"这个按钮在原始系统里对应的是一个后台调度任务，
+       不是用户可以随时点的操作——真做这个产品，需要先决定这个操作要不要开放给用户手动触发，
+       还是只做成只读的监控视图。</p>
+  </div>
+</details>
+
+<footer>
+  产出位置 <code>servers/memharness/product-concepts/memory-shelf-life.html</code>　·　
+  依据 <code>servers/memharness/paper-architecture.md</code>（§2）、
+  <code>code-architecture.md</code>（experience_utility.py:14,30；milvus_store.py:613）<br>
+  示意稿，不追求生产可用；货架数据为构造示例，非真实跑分。
+</footer>
+
+</div>
+
+<script>
+const SEED = [
+ {env:'ALFWorld', sit:'厨房场景，柜子里的物品需要清点数量', prin:'打开每个柜子前先读一遍任务描述里对数量的要求，避免多拿或漏拿', use:2, succ:2},
+ {env:'ALFWorld', sit:'需要把易碎物品从高处台面移到低处', prin:'移动前先确认双手是否已持有其他物品，必要时先放下再拿', use:5, succ:1},
+ {env:'ALFWorld', sit:'房间光线较暗、物体不易识别', prin:'先靠近再确认物体类别，不要在远距离直接下判定', use:4, succ:3},
+ {env:'ALFWorld', sit:'任务要求把多个同类物品集中到一处', prin:'先在房间里做一次全局观察记录所有同类物品位置，再规划取放顺序', use:6, succ:1},
+ {env:'WebShop', sit:'搜索结果超过一页、需要翻页比较', prin:'优先使用排序/筛选控件缩小范围，减少逐页翻看的次数', use:3, succ:3},
+ {env:'WebShop', sit:'商品详情页信息与搜索列表描述不完全一致', prin:'以商品详情页信息为准，列表页描述仅作初筛参考', use:7, succ:2},
+ {env:'WebShop', sit:'需要比较多个选项后再决定购买', prin:'先收集所有候选项的关键属性，最后统一比较，不要看到第一个合适的就下单', use:2, succ:0},
+ {env:'WebShop', sit:'商品页面加载出多个相似变体（颜色/尺码）', prin:'确认变体选择器的当前状态，再核对页面展示的价格是否随变体变化', use:8, succ:2},
+];
+
+let shelf = [];
+function util(s){ return (s.succ+1) / (s.use+2); }
+function tagOf(u){ return u>=0.55 ? 'fresh' : u>=0.35 ? 'warn' : 'stale'; }
+function label(t){ return t==='fresh'?'新鲜':t==='warn'?'渐弱':'过期'; }
+
+function seedShelf(){ shelf = SEED.map((s,i)=>({...s, id:i})); }
+seedShelf();
+
+function render(){
+  document.getElementById('cnt').textContent = shelf.length;
+  const el = document.getElementById('shelf');
+  el.innerHTML = shelf.map(s=>{
+    const u = util(s), t = tagOf(u);
+    return `<div class="item" id="it-${s.id}">
+      <div class="env">${s.env}</div>
+      <div class="sit"><b style="color:var(--tx3)">situation</b> ${s.sit}</div>
+      <div class="prin"><b style="color:var(--tx3)">memory</b> ${s.prin}</div>
+      <div class="metarow"><span>使用 ${s.use} 次</span><span>成功 ${s.succ} 次</span></div>
+      <div class="scorebar"><div class="fill" style="width:${Math.round(u*100)}%;background:var(--${t})"></div></div>
+      <div class="scorenum"><b style="color:var(--${t})">s = ${u.toFixed(2)}</b><span class="tag t-${t}">${label(t)}</span></div>
+      <div class="ctl">
+        <div class="mini" data-id="${s.id}" data-a="use">+使用</div>
+        <div class="mini" data-id="${s.id}" data-a="succ">+成功</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+render();
+
+document.getElementById('shelf').addEventListener('click', e=>{
+  const m = e.target.closest('.mini');
+  if(!m) return;
+  const s = shelf.find(x=>x.id==+m.dataset.id);
+  if(!s) return;
+  if(m.dataset.a==='use') s.use++; else { s.use++; s.succ++; }
+  render();
+});
+
+const threshEl = document.getElementById('thresh'), threshVal = document.getElementById('threshVal');
+const minuseEl = document.getElementById('minuse'), minuseVal = document.getElementById('minuseVal');
+threshEl.oninput = ()=> threshVal.textContent = (+threshEl.value).toFixed(2);
+minuseEl.oninput = ()=> minuseVal.textContent = minuseEl.value;
+
+document.getElementById('prune').onclick = ()=>{
+  const th = +threshEl.value, mu = +minuseEl.value;
+  const doomed = shelf.filter(s=> util(s) < th && s.use >= mu);
+  if(doomed.length===0){ 
+    document.getElementById('cnt').textContent = shelf.length + '（本次无符合剪枝条件的条目）';
+    return;
+  }
+  doomed.forEach(s=>{
+    const node = document.getElementById('it-'+s.id);
+    if(node) node.classList.add('pulling');
+  });
+  setTimeout(()=>{
+    shelf = shelf.filter(s=> !doomed.includes(s));
+    render();
+  }, 380);
+};
+document.getElementById('reset').onclick = ()=>{ seedShelf(); render(); };
+</script>
+</body>
+</html>

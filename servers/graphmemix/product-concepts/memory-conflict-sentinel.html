@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>记忆冲突哨兵 · GraphMemix 产品形态</title>
+<style>
+  :root{
+    --bg:#f5f6f9; --panel:#ffffff; --text:#20232b; --muted:#767c8c;
+    --accent:#3b6fe0; --good:#1f9d75; --warn:#c98a1a; --bad:#d1495b; --neutral:#8a8f9c;
+    --shadow: 0 6px 18px rgba(20,25,40,.08), 0 1px 3px rgba(20,25,40,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;line-height:1.55}
+  .app{display:flex;height:100vh}
+  .main{flex:1;padding:28px 32px;overflow-y:auto}
+  .side{width:360px;background:var(--panel);box-shadow:var(--shadow);border-radius:0;padding:22px 20px;overflow-y:auto;border-left:1px solid #ecedf2}
+  h1{font-size:20px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 20px}
+  a.back{color:var(--accent);text-decoration:none;font-size:13px}
+  .rationale{background:#eef3ff;border-radius:14px;padding:16px 18px;margin-bottom:22px;border-left:3px solid var(--accent)}
+  .rationale h2{font-size:14.5px;margin:0 0 8px;color:#2a4f9e}
+  .rationale p{margin:6px 0;font-size:13px;color:#3b4257}
+  .chat-mock{background:var(--panel);border-radius:14px;box-shadow:var(--shadow);padding:18px 20px;margin-bottom:20px}
+  .chat-mock h3{font-size:14px;margin:0 0 10px;color:var(--muted)}
+  .bubble{background:#f0f2f7;border-radius:10px;padding:9px 13px;margin:6px 0;font-size:13.5px;max-width:80%}
+  .bubble.me{margin-left:auto;background:#dde8ff}
+  .bubble .t{font-size:11px;color:var(--muted);margin-bottom:3px}
+  .section-title{font-size:14px;font-weight:600;margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+  .badge{background:var(--bad);color:#fff;font-size:11px;padding:2px 8px;border-radius:999px}
+  .badge.warn{background:var(--warn)}
+  .alert-card{background:var(--panel);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;cursor:pointer;transition:.15s;border:1px solid transparent}
+  .alert-card:hover{box-shadow:0 10px 26px rgba(20,25,40,.12);transform:translateY(-1px)}
+  .alert-card.selected{border-color:var(--accent)}
+  .alert-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .alert-head .kind{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .alert-head .time{font-size:11.5px;color:var(--muted)}
+  .alert-body{font-size:13px;color:#454b5c}
+  .alert-mems{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .mem-chip{background:#f5f6f9;border-radius:8px;padding:6px 10px;font-size:12px;flex:1;min-width:140px}
+  .mem-chip .d{color:var(--muted);font-size:10.5px}
+  .side h3{font-size:15px;margin:0 0 4px}
+  .side .placeholder{color:var(--muted);font-size:13px;margin-top:40px;text-align:center}
+  .detail-block{margin:16px 0}
+  .detail-block h4{font-size:12.5px;color:var(--muted);margin:0 0 6px;text-transform:uppercase;letter-spacing:.03em}
+  .compare-row{display:flex;gap:10px;margin-bottom:10px}
+  .compare-col{flex:1;background:#f8f9fb;border-radius:10px;padding:10px 12px;font-size:12.5px}
+  .compare-col .d{color:var(--muted);font-size:10.5px;margin-bottom:4px}
+  .btn-row{display:flex;gap:8px;margin-top:14px}
+  .btn{flex:1;padding:9px 0;border-radius:9px;border:none;font-size:12.5px;cursor:pointer;font-weight:600;transition:.15s}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.ghost{background:#eef0f5;color:#454b5c}
+  .btn:hover{opacity:.88}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#20232b;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s}
+  .toast.show{opacity:1}
+  .stat-row{display:flex;gap:14px;margin-bottom:20px}
+  .stat{background:var(--panel);border-radius:12px;padding:12px 16px;box-shadow:var(--shadow);flex:1;text-align:center}
+  .stat b{font-size:20px;display:block}
+  .stat.bad b{color:var(--bad)}
+  .stat.warn b{color:var(--warn)}
+  .stat span{font-size:11.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="main">
+    <a class="back" href="index.html">← 返回形态列表</a>
+    <h1>记忆冲突哨兵 <span style="color:var(--muted);font-weight:400">Memory Conflict Sentinel</span></h1>
+    <p class="sub">常驻在 agent 侧边的哨兵面板，主动把系统在回答问题过程中顺带发现的「记忆之间互相矛盾/重复」摆到用户面前，而不是等用户自己撞见前后不一致的回答。</p>
+
+    <div class="rationale">
+      <h2>为什么这个形态配这个系统</h2>
+      <p><b>对应机制画像的哪一步：</b>关系验证 ECV 那一步——判断候选相对锚点是「新事实 / 澄清 / 佐证 / 冗余 / 冲突 / 无关」六选一。本产品只取其中「冗余」与「冲突」两种角色，把它们从内部过滤逻辑升级成用户可见的提醒。</p>
+      <p><b>为什么换个记忆系统做不出来：</b>纯相似度检索系统只会把两条矛盾的记忆分别单独召回，最多因为向量接近而挤在结果列表里，但从不会显式判断"这两条是不是在打架"——冲突判定需要模型在锚点条件下逐边验证，这是 GraphMemix 特有的边级验证原语（ECV）。没有这一步，产品连"冲突"这个概念都构造不出来，只能做"相似记忆聚类"这种弱得多的功能。</p>
+    </div>
+
+    <div class="chat-mock">
+      <h3>触发场景：agent 在两次对话里给出了不一致的回答</h3>
+      <div class="bubble me"><div class="t">03-25</div>石英石台面除了纯白还有别的颜色吗？</div>
+      <div class="bubble"><div class="t">03-25 · agent</div>工人说石英石只有纯白和灰色两个颜色可选。</div>
+      <div class="bubble me" style="margin-top:14px"><div class="t">05-03</div>邻居问台面材质，我说是石英石，颜色叫云雾白。</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat bad"><b>1</b><span>待处理冲突</span></div>
+      <div class="stat warn"><b>2</b><span>待处理冗余</span></div>
+      <div class="stat"><b>12</b><span>本周新增记忆</span></div>
+    </div>
+
+    <div class="section-title">本周哨兵提醒 <span class="badge">1 冲突</span><span class="badge warn">2 冗余</span></div>
+
+    <div class="alert-card" data-id="conflict1" onclick="select('conflict1')">
+      <div class="alert-head">
+        <span class="kind"><span class="dot" style="background:var(--bad)"></span>颜色说法前后不一致</span>
+        <span class="time">05-03 发现</span>
+      </div>
+      <div class="alert-body">"石英石只有纯白/灰色可选" 与 "颜色叫云雾白" 两条记忆在颜色描述上互相矛盾，ECV 判定为<b>冲突</b>关系。</div>
+      <div class="alert-mems">
+        <div class="mem-chip"><div class="d">03-25</div>石英石只有纯白和灰色两个颜色可选</div>
+        <div class="mem-chip"><div class="d">05-03</div>颜色叫云雾白</div>
+      </div>
+    </div>
+
+    <div class="alert-card" data-id="redundant1" onclick="select('redundant1')">
+      <div class="alert-head">
+        <span class="kind"><span class="dot" style="background:var(--neutral)"></span>重复表达同一意向</span>
+        <span class="time">03-10 发现</span>
+      </div>
+      <div class="alert-body">效果图描述与"周末又确认一次要大理石"这两条都在表达同一件事（想要大理石台面），ECV 判定为<b>冗余</b>，未提供新增信息。</div>
+      <div class="alert-mems">
+        <div class="mem-chip"><div class="d">03-05</div>浅灰色大理石台面效果图</div>
+        <div class="mem-chip"><div class="d">03-10</div>周末又跟设计师确认一次要大理石台面</div>
+      </div>
+    </div>
+
+    <div class="alert-card" data-id="redundant2" onclick="select('redundant2')">
+      <div class="alert-head">
+        <span class="kind"><span class="dot" style="background:var(--neutral)"></span>重复确认同一决定</span>
+        <span class="time">05-01 发现</span>
+      </div>
+      <div class="alert-body">安装照片与最初的决定发言重复确认了同一件事（已改用石英石），信息量重叠度高。</div>
+      <div class="alert-mems">
+        <div class="mem-chip"><div class="d">04-15</div>最后决定用石英石了</div>
+        <div class="mem-chip"><div class="d">05-01</div>白色石英石台面已安装完成</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="side" id="sidePanel">
+    <div class="placeholder">点击左侧任意提醒卡片查看详情与处理选项</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = {
+  conflict1:{
+    title:'颜色说法前后不一致', kind:'冲突', color:'var(--bad)',
+    left:{d:'03-25', t:'"工人说石英石只有纯白和灰色两个颜色可选"'},
+    right:{d:'05-03', t:'"颜色叫云雾白"'},
+    explain:'ECV 在以 05-03 记忆为候选、检索出的高置信记忆为锚点时，判定这条边角色为「冲突」——两条记忆对同一属性（可选颜色）给出了不能同时成立的描述。系统不会替你决定谁对，只负责把矛盾摆出来。',
+    actions:['以后面为准（云雾白）','以前面为准（纯白/灰色）','两条都保留，标记为存疑']
+  },
+  redundant1:{
+    title:'重复表达同一意向', kind:'冗余', color:'var(--neutral)',
+    left:{d:'03-05', t:'"浅灰色大理石台面效果图"（图片描述）'},
+    right:{d:'03-10', t:'"周末又跟设计师确认一次要大理石台面"'},
+    explain:'ECV 判定后一条相对前一条没有新增信息量，两条记忆会被合并展示，避免占用后续检索的候选名额。',
+    actions:['合并为一条','保留两条（我认为有细微差别）']
+  },
+  redundant2:{
+    title:'重复确认同一决定', kind:'冗余', color:'var(--neutral)',
+    left:{d:'04-15', t:'"最后决定用石英石了，省下的钱加到橱柜五金上"'},
+    right:{d:'05-01', t:'安装后照片："白色石英石台面已安装完成"'},
+    explain:'这两条虽然媒介不同（文字 vs 图片），但语义上是"决定"与"执行结果确认"的重复表达；ECV 仍将其判定为信息增量偏低的冗余关系。',
+    actions:['合并为一条','保留两条（图片是重要凭证）']
+  }
+};
+
+function select(id){
+  document.querySelectorAll('.alert-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelector(`[data-id="${id}"]`).classList.add('selected');
+  const d = DATA[id];
+  document.getElementById('sidePanel').innerHTML = `
+    <h3>${d.title}</h3>
+    <span class="badge" style="background:${d.color}">${d.kind}</span>
+    <div class="detail-block">
+      <h4>涉及记忆</h4>
+      <div class="compare-row">
+        <div class="compare-col"><div class="d">${d.left.d}</div>${d.left.t}</div>
+        <div class="compare-col"><div class="d">${d.right.d}</div>${d.right.t}</div>
+      </div>
+    </div>
+    <div class="detail-block">
+      <h4>系统判定依据</h4>
+      <p style="font-size:12.5px;color:#454b5c;margin:0">${d.explain}</p>
+    </div>
+    <div class="detail-block">
+      <h4>处理方式</h4>
+      <div class="btn-row" style="flex-direction:column">
+        ${d.actions.map((a,i)=>`<button class="btn ${i===0?'primary':'ghost'}" style="margin-bottom:6px" onclick="resolve('${d.title}','${a}')">${a}</button>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function resolve(title, action){
+  const toast = document.getElementById('toast');
+  toast.innerText = `已处理「${title}」：${action}`;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 2200);
+}
+</script>
+</body>
+</html>

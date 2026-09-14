@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<!--
+  MemHarness 产品形态 ③ 检索心跳 — 示意稿
+  memory-system-analysis §7 产出。2026-09-12。
+
+  机制依据（见页内说明区块引用）：
+   · 检索由 agent 自己决定何时触发，不是每步都查
+     （paper-architecture.md §3.2 Step 1；code-architecture.md §3"触发时机"，
+      retrieval_mode 训练态被覆盖为 agentic）
+   · 检索次数被奖励函数约束在合理区间：每个 episode 1-5 次
+     （paper-architecture.md §3.4 Reward Design；code-architecture.md
+      require_memory_retrieve + format reward）
+   · 场景来源：ALFWorld（具身家务）与 WebShop（网购）——同类任务反复做、
+     经验可迁移但会过时（paper-architecture.md 机制画像第6条）
+
+  重要声明：memharness 项目本地没有真实跑分记录，下面两条 episode 轨迹、
+  检索时机、格式奖励扣分提示均为依据机制画像构造的示意数据，非真实模型日志。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MemHarness · 检索心跳</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#141a22; --panel2:#1a222c; --line:#2a3644;
+    --tx:#e6edf3; --tx2:#8fa3b8; --tx3:#5c6f83;
+    --pulse:#ff6b6b; --act:#58a6ff; --ok:#3fb950; --warn:#f0883e;
+    --shadow:0 8px 28px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);
+       font:14px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 22px 70px}
+  header h1{font-size:21px;margin:0 0 6px}
+  header p{color:var(--tx2);margin:0 0 8px;font-size:13px;max-width:880px}
+  .disclaim{background:#1a1418;border:1px solid #4a2a2a;border-radius:9px;padding:10px 14px;
+    font-size:12px;color:#ffc9c9;margin-bottom:20px}
+  code{background:var(--panel2);padding:1px 5px;border-radius:4px;color:var(--tx2);font-size:12px}
+
+  .tabs{display:flex;gap:8px;margin-bottom:18px}
+  .tab{background:var(--panel);border:none;border-radius:9px;padding:10px 16px;color:var(--tx2);
+       cursor:pointer;font-size:13px;box-shadow:var(--shadow)}
+  .tab.on{background:var(--panel2);outline:1.5px solid var(--act);color:var(--tx)}
+
+  .card{background:var(--panel);border-radius:13px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px}
+  .card h2{font-size:15.5px;margin:0 0 4px}
+  .sub{color:var(--tx2);font-size:12.3px;margin:0 0 14px}
+
+  .budgetbar{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .budgetbar .lbl{font-size:12.5px;color:var(--tx2);white-space:nowrap}
+  .slots{display:flex;gap:6px}
+  .slot{width:26px;height:26px;border-radius:6px;background:var(--panel2);border:1.5px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--tx3);transition:.2s}
+  .slot.used{background:rgba(255,107,107,.18);border-color:var(--pulse);color:var(--pulse)}
+  .slot.over{background:rgba(240,136,62,.22);border-color:var(--warn);color:var(--warn)}
+  .budgetnote{font-size:12px;color:var(--tx3)}
+  .budgetnote.bad{color:var(--warn)}
+
+  .ecg{position:relative;height:170px;background:var(--panel2);border-radius:11px;overflow:hidden}
+  svg{width:100%;height:100%;display:block}
+  .stepmarks{display:flex;margin-top:8px}
+  .stepmark{flex:1;text-align:center;font-size:10.5px;color:var(--tx3);cursor:pointer;padding:4px 0;border-radius:6px}
+  .stepmark:hover{background:var(--panel2)}
+  .stepmark.on{color:var(--tx);background:var(--panel2);outline:1px solid var(--act)}
+  .stepmark .icon{font-size:13px}
+
+  .detail{background:var(--panel2);border-radius:10px;padding:14px 16px;margin-top:12px;font-size:13px}
+  .detail .k{color:var(--tx3);font-size:11px;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:3px}
+  .detail .row{margin-bottom:10px}
+  .flag{background:rgba(240,136,62,.1);border:1px solid rgba(240,136,62,.35);border-radius:9px;
+    padding:10px 14px;margin-top:10px;font-size:12.3px;color:#ffcf9e}
+
+  details.acc{background:var(--panel2);border-radius:10px;margin-top:14px;overflow:hidden}
+  summary{padding:12px 16px;cursor:pointer;font-size:13px;color:var(--act);user-select:none;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸ ";transition:.2s;display:inline-block}
+  details[open] summary::before{transform:rotate(90deg)}
+  .why{padding:0 18px 16px;font-size:12.8px;color:var(--tx2);line-height:1.75}
+  .why p{margin:0 0 9px}
+  .why .neg{color:#ffcf9e}
+  footer{color:var(--tx3);font-size:11.5px;margin-top:26px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>MemHarness 产品形态 ③ · 检索心跳</h1>
+  <p>MemHarness 不是每一步都去查记忆库——agent 自己判断"这一步要不要查"，而且论文把检索次数
+     约束在每个 episode 1 到 5 次这个区间里，作为格式奖励的一部分。这个形态把一整个 episode
+     的执行过程画成一条心电图：大部分时候是平稳的"直接动作"，检索发生时是一次尖峰，
+     尖峰的疏密直接反映 agent 对自己经验库的依赖程度。</p>
+  <div class="disclaim">⚠️ 下面两条 episode 轨迹（ALFWorld / WebShop）、每一步的检索决策、
+    格式奖励提示，都是依据机制画像构造的<b>示意数据</b>，用于演示"自主决定检索时机 + 预算约束"
+    这条机制如何呈现，不是真实模型跑出来的日志。</div>
+</header>
+
+<div class="tabs">
+  <button class="tab on" data-e="alf">ALFWorld · 家务任务</button>
+  <button class="tab" data-e="web">WebShop · 网购任务</button>
+</div>
+
+<div class="card">
+  <h2>episode 内检索预算</h2>
+  <p class="sub">格式奖励要求：每个 episode 的检索次数落在 1–5 次之间才计满分这一项（§3.4 Reward Design）；
+    超出上限不会被禁止执行，但会被判定为格式不合规、拉低 R_format。</p>
+  <div class="budgetbar">
+    <span class="lbl">已检索次数</span>
+    <div class="slots" id="slots"></div>
+    <span class="budgetnote" id="budgetnote">—</span>
+  </div>
+</div>
+
+<div class="card">
+  <h2>心电图</h2>
+  <p class="sub">横轴是 episode 内的执行步。基线代表"直接生成动作"，尖峰代表"这一步触发了检索"。
+    点下方任意一步查看当步细节。</p>
+  <div class="ecg"><svg id="svg" viewBox="0 0 900 170" preserveAspectRatio="none"></svg></div>
+  <div class="stepmarks" id="marks"></div>
+  <div class="detail" id="detail"></div>
+</div>
+
+<details class="acc">
+  <summary>为什么这个形态配 MemHarness</summary>
+  <div class="why">
+    <p>这批系统里，"什么时候查记忆"通常是被动的——固定每步查，或者按相似度阈值查。MemHarness 把这个
+       决策权交给 agent 自己（§3.2 Step 1："the agent decides whether to query"），而且这个决策本身
+       被纳入训练目标（检索频率是格式奖励的一项）。这意味着"检索的节奏"本身就是一个有信息量的信号——
+       一个 agent 如果检索过密，可能说明它对当前任务不熟悉、缺乏自信；查得过疏或完全不查，
+       可能说明它在完全依赖参数化能力硬扛。心电图这个视觉隐喻直接对应"这是一个由 agent 自主控制节奏的过程"，
+       不是外部调度器按固定间隔触发的。</p>
+        <p>把预算（1-5 次/episode）做成可视化的"插槽"，是因为这个约束在论文里是训练信号的一部分而非
+       检索机制本身的硬限制（paper-architecture.md §5 明确指出这个数字只出现在格式奖励段落，
+       检索机制描述本身没提频率上下限）——产品上正适合做成一个"参考区间"提示，而不是强制拦截，
+       与论文的实际设计保持一致。</p>
+        <p>ALFWorld 和 WebShop 都是"同类任务反复做、经验会过时"的场景，这正是心电图节奏最有意义的场合：
+       同一个 agent 在跑第 1 次和跑第 100 次同类任务时，检索心跳的疏密理应不同——早期该多查，
+       经验积累后该少查——这条曲线的变化趋势本身可以是一个训练进度/记忆库成熟度的可读信号。</p>
+    <p class="neg">要诚实的一点：论文自己在"检索触发方式"上有内部张力——正文说"agent 自己决定"，
+       附录另一处又写"每步都检索"（paper-architecture.md §3 已指出这处矛盾未被论文调和）。
+       这个形态默认呈现的是训练脚本实际生效的 agentic 模式（论文两个训练脚本都显式启用），
+       但如果部署方式切回 fixed 模式，"心跳"这个隐喻就不成立了——那时每一步都是尖峰，
+       图表退化成一条平的直线，这个形态需要显式声明自己依赖 agentic 检索模式这个前提。</p>
+  </div>
+</details>
+
+<footer>
+  产出位置 <code>servers/memharness/product-concepts/retrieval-heartbeat.html</code>　·　
+  依据 <code>servers/memharness/paper-architecture.md</code>（§3.2/§3.4/§5）、
+  <code>code-architecture.md</code>（§3 触发时机、require_memory_retrieve）<br>
+  示意稿，不追求生产可用；episode 轨迹为构造示例，非真实跑分。
+</footer>
+
+</div>
+
+<script>
+const EPISODES = {
+ alf: {
+  title:'任务：把两片吐司放进烤面包机再端到餐桌',
+  steps:[
+   {t:'观察厨房', act:'direct', desc:'环境观察显示厨房整体布局，没有触发检索的必要，直接生成"移动到冰箱"这一动作。'},
+   {t:'走向冰箱', act:'direct', desc:'继续按当前观察执行导航动作。'},
+   {t:'找面包', act:'query', q:'面包一般放在哪类容器里', desc:'历史窗口里没有直接看到面包位置，agent 判断值得先查一次经验，再决定去哪个柜子找。'},
+   {t:'打开柜子', act:'direct', desc:'重构后的 guidance 已经并入下一步观察，agent 据此直接执行"打开面包柜"。'},
+   {t:'放入烤面包机', act:'query', q:'烤面包机通常需要几片面包/如何触发烘烤', desc:'这是一个新的子任务节点（操作电器），agent 判断这里存在经验可以复用，再次触发检索。'},
+   {t:'等待烘烤', act:'direct', desc:'沿用重构后的指引，直接执行"等待并观察烘烤状态"。'},
+   {t:'端到餐桌', act:'direct', desc:'任务收尾阶段，路径明确，不再检索。'}
+  ]
+ },
+ web: {
+  title:'任务：购买一件不含羊毛、40 美元以内的深色卫衣',
+  steps:[
+   {t:'打开搜索框', act:'direct', desc:'第一步是标准搜索动作，没有触发检索。'},
+   {t:'输入关键词', act:'direct', desc:'继续沿用当前观察生成搜索词，不涉及历史经验。'},
+   {t:'查看结果页', act:'query', q:'当结果页信息与筛选目标冲突时该怎么核对', desc:'结果列表里出现价格区间不完全可信的情况，agent 判断这类冲突之前遇到过，触发检索寻找处理经验。'},
+   {t:'打开商品详情', act:'direct', desc:'重构后的经验已并入观察（"以详情页为准"），直接执行"点开详情页核对材质与价格"。'},
+   {t:'核对材质说明', act:'query', q:'如何快速定位材质成分描述在页面的位置', desc:'"不含羊毛"是强约束条件，agent 判断这类核对步骤值得再查一次经验，避免遗漏。'},
+   {t:'比较候选商品', act:'query', q:'多个候选商品该按什么顺序比较', desc:'进入决策收敛阶段，agent 再次检索比较策略——这是这个 episode 的第 3 次检索，逼近格式奖励允许的区间上限。'},
+   {t:'加入购物车', act:'direct', desc:'比较完成，直接执行下单前动作，不再检索。'},
+   {t:'确认下单', act:'query', q:'追加尺码信息应该在哪一步完成', desc:'第 4 次检索——如果本 episode 再触发一次检索，将触及格式奖励允许区间的上限（5 次）。'}
+  ]
+ }
+};
+
+let cur = 'alf', activeStep = 0;
+
+function render(){
+  const ep = EPISODES[cur];
+  const queries = ep.steps.filter(s=>s.act==='query').length;
+
+  // 预算插槽
+  const slotsEl = document.getElementById('slots');
+  slotsEl.innerHTML = '';
+  for(let i=1;i<=6;i++){
+    const used = i<=queries;
+    const over = i===6 && queries>=5;
+    slotsEl.innerHTML += `<div class="slot ${used?'used':''}${i>5?' over':''}">${i<=5?i:'+'}</div>`;
+  }
+  const note = document.getElementById('budgetnote');
+  if(queries>=1 && queries<=5){ note.className='budgetnote'; note.textContent = `${queries} 次，落在 1–5 次区间内，格式奖励该项满分`; }
+  else if(queries===0){ note.className='budgetnote bad'; note.textContent = '0 次，低于下限，格式奖励该项不满分'; }
+  else { note.className='budgetnote bad'; note.textContent = `${queries} 次，超出上限，格式奖励该项不满分`; }
+
+  // 心电图
+  const n = ep.steps.length;
+  const w = 900, h = 170, midY = 110, stepW = w/n;
+  let path = `M0,${midY}`;
+  ep.steps.forEach((s,i)=>{
+    const x0 = i*stepW, x1 = x0+stepW*0.35, x2 = x0+stepW*0.5, x3=x0+stepW*0.65, x4=(i+1)*stepW;
+    if(s.act==='query'){
+      path += ` L${x0},${midY} L${x1},${midY-58} L${x2},${midY+34} L${x3},${midY} L${x4},${midY}`;
+    } else {
+      path += ` L${x4},${midY}`;
+    }
+  });
+  const svg = document.getElementById('svg');
+  svg.innerHTML = `
+    <line x1="0" y1="${midY}" x2="${w}" y2="${midY}" stroke="#2a3644" stroke-width="1"/>
+    <path d="${path}" fill="none" stroke="var(--pulse)" stroke-width="2.2"/>
+    ${ep.steps.map((s,i)=>{
+      const cx=(i+0.5)*stepW;
+      return s.act==='query' ? `<circle cx="${cx}" cy="${midY-58}" r="4" fill="var(--pulse)"/>` : '';
+    }).join('')}
+  `;
+
+  // 步骤标注
+  const marks = document.getElementById('marks');
+  marks.innerHTML = ep.steps.map((s,i)=>`<div class="stepmark ${i===activeStep?'on':''}" data-i="${i}">
+    <div class="icon">${s.act==='query'?'💓':'·'}</div>${s.t}</div>`).join('');
+
+  showDetail(activeStep);
+}
+
+function showDetail(i){
+  activeStep = i;
+  const ep = EPISODES[cur], s = ep.steps[i];
+  document.querySelectorAll('.stepmark').forEach((el,idx)=>el.classList.toggle('on', idx===i));
+  const d = document.getElementById('detail');
+  if(s.act==='query'){
+    d.innerHTML = `<div class="row"><span class="k">动作类型</span>检索（触发了一次独立的批判+重构前向）</div>
+      <div class="row"><span class="k">query</span>${s.q}</div>
+      <div class="row"><span class="k">判断依据（示意）</span>${s.desc}</div>`;
+  } else {
+    d.innerHTML = `<div class="row"><span class="k">动作类型</span>直接生成环境动作，未触发检索</div>
+      <div class="row"><span class="k">判断依据（示意）</span>${s.desc}</div>`;
+  }
+}
+
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on', x===t));
+  cur = t.dataset.e; activeStep = 0; render();
+});
+document.getElementById('marks').addEventListener('click', e=>{
+  const m = e.target.closest('.stepmark');
+  if(!m) return;
+  showDetail(+m.dataset.i);
+});
+
+document.addEventListener('DOMContentLoaded', render);
+render();
+</script>
+</body>
+</html>

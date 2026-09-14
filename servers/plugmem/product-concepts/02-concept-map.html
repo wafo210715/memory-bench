@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<!--
+  PlugMem 产品形态探索 ② 概念地图记忆导航 —— 示意稿
+  servers/plugmem/product-concepts/02-concept-map.html
+
+  依据：paper-vs-code.md（A3 admit、B3 expand、差异清单 #5 #9）、paper-architecture.md §2.2 语义记忆一节。
+  页面中的标签、事实条目、相似度数字均为示意数据，用于演示交互，不是真实跑分记录或代码输出；
+  仅「阈值 0.8」「意图/标签判重退化为字符串匹配」两点直接引自复核文档，其余数字为配合演示编的示意值。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlugMem 产品形态 ② 概念地图记忆导航</title>
+<style>
+  :root{
+    --bg:#f7f4ee; --panel:#ffffff; --panel2:#f1ede3; --line:#e2dccb;
+    --tx:#2b2a26; --tx2:#6b6558; --tx3:#9a927f;
+    --accent:#1f7a6d; --accent-soft:rgba(31,122,109,.12); --warn:#b5793a; --bad:#b5453a;
+    --shadow:0 8px 26px rgba(60,50,30,.10);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);
+       font:14px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif}
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 22px 60px}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .chip{font-size:11.5px;color:var(--accent);background:var(--accent-soft);
+        border:1px solid rgba(31,122,109,.25);border-radius:20px;padding:4px 12px}
+  h1{font-size:21px;margin:0 0 8px;letter-spacing:.2px;color:#1c1b18}
+  .lead{color:var(--tx2);font-size:13px;max-width:860px;margin:0 0 24px}
+
+  .card{background:var(--panel);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px}
+
+  /* ── 搜索条 ── */
+  .searchbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .searchbar input{flex:1 1 320px;border:1px solid var(--line);background:var(--panel2);
+                    border-radius:9px;padding:10px 14px;font-size:13.5px;color:var(--tx)}
+  .searchbar input:focus{outline:2px solid rgba(31,122,109,.35)}
+  .searchbar button{border:none;background:var(--accent);color:#fff;border-radius:9px;
+                     padding:10px 18px;font-size:13px;cursor:pointer;transition:.15s}
+  .searchbar button:hover{background:#186257}
+  .match-info{font-size:12.5px;color:var(--tx2);background:var(--panel2);border-radius:9px;
+              padding:10px 14px;transition:.2s}
+  .match-info.flash{background:var(--accent-soft)}
+  .match-info b{color:var(--accent)}
+  .match-info .sim{color:var(--tx3);margin-left:4px}
+  .match-info .below{display:block;margin-top:4px;color:var(--tx3);font-size:11.8px}
+  .searchnote{color:var(--tx3);font-size:11px;margin:8px 0 0}
+
+  /* ── 地图 ── */
+  .map-card h2{font-size:15px;margin:0 0 4px;color:#1c1b18}
+  .map-sub{color:var(--tx2);font-size:12.3px;margin:0 0 14px}
+  svg#map{width:100%;height:420px;background:var(--panel2);border-radius:12px;display:block}
+  .tagnode circle{cursor:pointer;transition:.15s}
+  .tagnode text{font-size:11.5px;fill:#3a372f;font-weight:600;pointer-events:none}
+  .factnode circle{cursor:pointer;transition:.15s}
+  .factnode text{font-size:10px;fill:var(--tx2);pointer-events:none}
+  .node-dim circle{opacity:.24}
+  .node-dim text{opacity:.32}
+  .edge{stroke:#c7bfa5;stroke-width:1.4;transition:.15s}
+  .edge.dim{opacity:.12}
+  .edge.merge-hint{stroke:var(--bad);stroke-dasharray:5 4;stroke-width:1.6}
+
+  .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .toolbar label{font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:6px;cursor:pointer}
+  .legend{font-size:11.5px;color:var(--tx3)}
+
+  .detail-panel{background:var(--panel2);border-radius:11px;padding:14px 16px;margin-top:14px;
+                font-size:12.8px;color:var(--tx2);min-height:64px;line-height:1.75}
+  .detail-panel b{color:var(--tx)}
+  .fact-row{padding:8px 0;border-top:1px solid var(--line)}
+  .fact-row:first-child{border-top:none}
+  .fact-row .when{color:var(--tx3);font-size:11px;margin-left:6px}
+  .chip-mini{display:inline-block;font-size:10.5px;color:var(--accent);background:var(--accent-soft);
+             border-radius:5px;padding:1px 7px;margin:4px 6px 0 0;cursor:pointer;border:none}
+  .chip-mini:hover{background:rgba(31,122,109,.22)}
+  .warn-inline{color:var(--warn);font-size:11.8px;margin-top:8px;display:block}
+
+  /* ── 为什么配 PlugMem ── */
+  details.why{background:var(--panel);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  details.why summary{padding:14px 18px;cursor:pointer;font-size:13px;color:var(--accent);user-select:none;list-style:none}
+  details.why summary::-webkit-details-marker{display:none}
+  details.why summary::before{content:"▸ ";display:inline-block}
+  details.why[open] summary::before{content:"▾ "}
+  .why-body{padding:0 20px 18px;font-size:12.8px;color:var(--tx2);line-height:1.8}
+  .why-body p{margin:0 0 10px}
+  .why-body b{color:#1c1b18}
+  .why-body .neg{color:#8f3a30}
+  .why-body code{background:var(--panel2);padding:1px 5px;border-radius:4px;font-size:11.5px}
+
+  footer{color:var(--tx3);font-size:11.5px;margin-top:26px;line-height:1.9}
+  footer a{color:var(--tx2)}
+  footer code{background:var(--panel2);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="chips">
+  <span class="chip">机制 · 概念标签路由</span>
+  <span class="chip">高层节点 = 路标，不进结果</span>
+  <span class="chip">对应 LongMemEval 长对话历史</span>
+</div>
+<h1>概念地图 —— 按主题而不是关键词，找回记忆</h1>
+<p class="lead">
+  给最终用户看的探索式记忆浏览器：先看一组主题气泡（概念标签），点一个气泡展开它路由到的具体记忆条目，
+  而不是把所有历史对话堆成一条时间线让人从头翻。标签本身不是答案，它只是把语义相关的事实聚在一起的路标。
+</p>
+
+<div class="card">
+  <div class="searchbar">
+    <input id="q" type="text" value="关于摄影的事" placeholder="想找什么？比如“关于摄影的事”">
+    <button id="searchBtn">找相关的记忆</button>
+  </div>
+  <div class="match-info" id="matchInfo">
+    最接近的概念标签：<b>摄影 / 相机</b><span class="sim">相似度 0.86</span>
+    <span class="below">「拍照爱好」相似度 0.79，低于路由阈值 0.80，这次不会被选中。</span>
+  </div>
+  <p class="searchnote">示意说明：真实系统这一步由 embedding 相似度计算完成；为了不接入模型，这里直接演示命中结果，不代表输入任意文本都会精确匹配到这个例子。</p>
+</div>
+
+<div class="card map-card">
+  <h2>记忆地图</h2>
+  <p class="map-sub">大圆是概念标签（路标），小圆是它路由到的语义事实。点节点查看详情，一条事实可以同时挂在多个标签下。</p>
+  <svg id="map" viewBox="0 0 900 420" preserveAspectRatio="xMidYMid meet"></svg>
+  <div class="toolbar">
+    <label><input type="checkbox" id="mergeHint"> 高亮显示「本该合并但没合并」的重复标签</label>
+    <span class="legend">● 概念标签（路标）　○ 语义事实（结果）</span>
+  </div>
+  <div class="detail-panel" id="detail">点一个标签气泡，展开它路由到的具体记忆；或直接点一条事实看它属于哪些标签。</div>
+</div>
+
+<details class="why">
+  <summary>为什么这个形态配 PlugMem</summary>
+  <div class="why-body">
+    <p><b>机制依据</b>：概念标签是语义图里独立的高层节点，作用是路由/索引，不是内容本身——
+      真正的信息都在挂在标签下面的命题节点里，标签在检索时「只当路标，永远不进候选集」。
+      这个设计天然对应「先选主题、再看细节」的两层浏览方式，不需要把索引和内容混进同一个搜索框。</p>
+    <p><b>机制依据</b>：查询到标签的匹配走 embedding 相似度、带阈值——代码里是「每个查询标签只取
+      最像的 1 个标签节点，阈值 0.8」。地图上「输入一句模糊描述也能定位到对的标签」这件事是机制原生支持的，
+      不需要额外维护一张同义词表。</p>
+    <p><b>适用场景</b>：对应 LongMemEval 一类长对话历史 QA（实测 75.1 Acc）。这类场景记忆量大、话题杂，
+      按主题地图导航比线性翻聊天记录更容易定位到想找的那类事。</p>
+    <p class="neg"><b>诚实的局限</b>：判重逻辑退化了。复核材料明确写到「概念标签和意图都按字符串精确匹配，
+      完全相同的才让 LLM 合并」——本该走的是 embedding 余弦相似度判重。地图上「摄影 / 相机」和
+      「拍照爱好」这两个语义重复但措辞不同的标签，就是这个局限的直接后果：长期使用下去，
+      标签云会越长越乱，需要产品自己在写入路径上补一层归并逻辑，不能假设现成实现会自动清理。</p>
+    <p class="neg">默认配置一次查询只路由到 1 个标签（top-1、阈值 0.8）。如果同一个主题的记忆分散在
+      两个措辞相近的标签下，这张地图默认只会展开其中一个，另一个哪怕高度相关也不会被带出来——
+      这也是为什么上面搜索结果特意展示了「拍照爱好」被阈值挡在门外的样子，而不是假装它不存在。</p>
+  </div>
+</details>
+
+<footer>
+  产出位置 <code>servers/plugmem/product-concepts/02-concept-map.html</code>　·　
+  依据 <code>servers/plugmem/paper-vs-code.md</code>（A3 admit、B3 expand、差异清单 #5 #9）、
+  <code>paper-architecture.md</code> §2.2<br>
+  标签、事实条目与相似度数字均为示意数据，用于演示交互，非真实跑分记录或代码输出。<br>
+  同系列另外两个形态：<a href="01-prescription-copilot.html">① 处方 Copilot</a>　
+  <a href="03-evidence-trail-qa.html">③ 多跳溯源问答台</a>
+</footer>
+
+</div>
+
+<script>
+  var TAGS = {
+    T1:{label:'摄影 / 相机', x:170, y:100, r:42},
+    T2:{label:'旅行',        x:430, y:85,  r:48},
+    T3:{label:'家庭',        x:700, y:110, r:34},
+    T4:{label:'拍照爱好',    x:300, y:190, r:20}
+  };
+  var FACTS = [
+    {id:'F1', label:'买了台二手胶片相机，一直想学胶片摄影', when:'2025-11', x:80,  y:270, r:15, tags:['T1']},
+    {id:'F2', label:'冲胶卷店离家有点远，攒够一卷再去',       when:'2025-12', x:170, y:320, r:13, tags:['T1']},
+    {id:'F7', label:'订阅了摄影器材的新闻邮件',               when:'2026-01', x:100, y:360, r:12, tags:['T1']},
+    {id:'F3', label:'上次旅行专门带了相机，拍了很多海边照片', when:'2026-02', x:330, y:260, r:17, tags:['T1','T2']},
+    {id:'F4', label:'计划明年去日本旅行，安排两周',           when:'2026-03', x:480, y:240, r:14, tags:['T2']},
+    {id:'F5', label:'喜欢和家人一起看老照片',                 when:'2026-03', x:600, y:300, r:15, tags:['T2','T3']},
+    {id:'F6', label:'偶尔用手机随手拍些生活照',               when:'2026-04', x:350, y:340, r:11, tags:['T4']}
+  ];
+  var EDGES = [];
+  FACTS.forEach(function(f){ f.tags.forEach(function(t){ EDGES.push({tag:t, fact:f.id}); }); });
+
+  var svg = document.getElementById('map');
+  var sel = null;          // {type:'tag'|'fact', id:...}
+  var showMerge = false;
+
+  function connected(id, type){
+    if (!sel) return true;
+    if (sel.type === 'tag' && type === 'tag') return sel.id === id;
+    if (sel.type === 'tag' && type === 'fact') return EDGES.some(function(e){return e.tag===sel.id && e.fact===id;});
+    if (sel.type === 'fact' && type === 'fact') return sel.id === id;
+    if (sel.type === 'fact' && type === 'tag') return EDGES.some(function(e){return e.fact===sel.id && e.tag===id;});
+    return false;
+  }
+
+  function draw(){
+    var parts = [];
+    EDGES.forEach(function(e){
+      var A = TAGS[e.tag], B = FACTS.filter(function(f){return f.id===e.fact;})[0];
+      var dim = sel && !(connected(e.tag,'tag') && connected(e.fact,'fact'));
+      parts.push('<line class="edge'+(dim?' dim':'')+'" x1="'+A.x+'" y1="'+A.y+'" x2="'+B.x+'" y2="'+B.y+'"/>');
+    });
+    if (showMerge){
+      var a = TAGS.T1, b = TAGS.T4;
+      parts.push('<line class="edge merge-hint" x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'"/>');
+      parts.push('<text x="'+((a.x+b.x)/2)+'" y="'+((a.y+b.y)/2 - 8)+'" text-anchor="middle" font-size="10.5" fill="#b5453a">语义重复，未合并</text>');
+    }
+    Object.keys(TAGS).forEach(function(id){
+      var t = TAGS[id]; var dim = !connected(id,'tag');
+      parts.push('<g class="tagnode'+(dim?' node-dim':'')+'" onclick="pickTag(\''+id+'\')">'+
+        '<circle cx="'+t.x+'" cy="'+t.y+'" r="'+t.r+'" fill="'+(sel&&sel.type==='tag'&&sel.id===id?'#1f7a6d':'#cfe4de')+'" '+
+        'stroke="'+(sel&&sel.type==='tag'&&sel.id===id?'#155e53':'#9fc9bf')+'" stroke-width="2"/>'+
+        '<text x="'+t.x+'" y="'+(t.y+4)+'" text-anchor="middle" fill="'+(sel&&sel.type==='tag'&&sel.id===id?'#fff':'#234942')+'">'+t.label+'</text>'+
+        '</g>');
+    });
+    FACTS.forEach(function(f){
+      var dim = !connected(f.id,'fact');
+      parts.push('<g class="factnode'+(dim?' node-dim':'')+'" onclick="pickFact(\''+f.id+'\')">'+
+        '<circle cx="'+f.x+'" cy="'+f.y+'" r="'+f.r+'" fill="'+(sel&&sel.type==='fact'&&sel.id===f.id?'#1f7a6d':'#fff')+'" '+
+        'stroke="#b7ae95" stroke-width="1.6"/>'+
+        '<text x="'+f.x+'" y="'+(f.y+f.r+13)+'" text-anchor="middle">'+f.label.slice(0,10)+(f.label.length>10?'…':'')+'</text>'+
+        '</g>');
+    });
+    svg.innerHTML = parts.join('');
+  }
+
+  function tagChipsFor(factId){
+    var f = FACTS.filter(function(x){return x.id===factId;})[0];
+    return f.tags.map(function(t){
+      return '<button class="chip-mini" onclick="pickTag(\''+t+'\')">'+TAGS[t].label+'</button>';
+    }).join('');
+  }
+
+  function renderDetail(){
+    var el = document.getElementById('detail');
+    if (!sel){
+      el.innerHTML = '点一个标签气泡，展开它路由到的具体记忆；或直接点一条事实看它属于哪些标签。';
+      return;
+    }
+    if (sel.type === 'tag'){
+      var t = TAGS[sel.id];
+      var facts = FACTS.filter(function(f){ return f.tags.indexOf(sel.id) !== -1; });
+      var rows = facts.map(function(f){
+        return '<div class="fact-row">'+f.label+'<span class="when">记于 '+f.when+'</span>'+
+          (f.tags.length>1 ? '<div>'+tagChipsFor(f.id)+'</div>' : '')+'</div>';
+      }).join('');
+      el.innerHTML = '<b>'+t.label+'</b> <span style="color:var(--tx3)">· 路标节点，本身不作为结果返回</span>'+
+        '<div style="margin-top:8px">'+rows+'</div>';
+    } else {
+      var f = FACTS.filter(function(x){return x.id===sel.id;})[0];
+      el.innerHTML = '<b>'+f.label+'</b><span class="when"> · 记于 '+f.when+'</span>'+
+        '<div style="margin-top:8px">同时属于：'+tagChipsFor(f.id)+'</div>';
+    }
+  }
+
+  window.pickTag = function(id){ sel = (sel && sel.type==='tag' && sel.id===id) ? null : {type:'tag', id:id}; draw(); renderDetail(); };
+  window.pickFact = function(id){ sel = (sel && sel.type==='fact' && sel.id===id) ? null : {type:'fact', id:id}; draw(); renderDetail(); };
+
+  document.getElementById('mergeHint').addEventListener('change', function(){
+    showMerge = this.checked; draw();
+  });
+
+  document.getElementById('searchBtn').addEventListener('click', function(){
+    pickTag('T1');
+    var mi = document.getElementById('matchInfo');
+    mi.classList.add('flash');
+    setTimeout(function(){ mi.classList.remove('flash'); }, 500);
+    document.getElementById('map').scrollIntoView({behavior:'smooth', block:'center'});
+  });
+
+  draw();
+</script>
+</body>
+</html>

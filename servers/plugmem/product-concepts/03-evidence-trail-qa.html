@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<!--
+  PlugMem 产品形态探索 ③ 多跳溯源问答台 —— 示意稿
+  servers/plugmem/product-concepts/03-evidence-trail-qa.html
+
+  依据：paper-vs-code.md（B1/B3/B4/B6/B8 阶段行、差异清单 #1 #3）、paper-architecture.md §3.2/§3.3、
+        benchmark 一节的 T_max 消融数字（Appendix F.2）。
+  页面中的问答案例、抽象查询、命中证据均为示意数据，用于演示交互，不是真实跑分记录或代码输出；
+  仅 T_max=2/4 的 EM/F1 数字直接引自论文附录，其余内容为配合演示编的示意值。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlugMem 产品形态 ③ 多跳溯源问答台</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --panel:#ffffff; --panel2:#eef1f8; --line:#dbe1ee;
+    --tx:#1c2333; --tx2:#5b6478; --tx3:#8790a3;
+    --accent:#3f51d4; --accent-soft:rgba(63,81,212,.10);
+    --yes:#1f8a5f; --no:#c2790a; --bad:#c94f43;
+    --shadow:0 8px 26px rgba(30,40,70,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);
+       font:14px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif}
+  .wrap{max-width:920px;margin:0 auto;padding:28px 22px 60px}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .chip{font-size:11.5px;color:var(--accent);background:var(--accent-soft);
+        border:1px solid rgba(63,81,212,.25);border-radius:20px;padding:4px 12px}
+  h1{font-size:21px;margin:0 0 8px;letter-spacing:.2px}
+  .lead{color:var(--tx2);font-size:13px;max-width:820px;margin:0 0 24px}
+
+  .card{background:var(--panel);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px}
+
+  /* ── 问答 ── */
+  .q{font-size:14.5px;font-weight:600;margin-bottom:12px}
+  .q::before{content:"提问　";color:var(--tx3);font-weight:400;font-size:12px}
+  .a{background:var(--accent-soft);border-radius:10px;padding:14px 16px}
+  .a-text{font-size:13.8px;line-height:1.7}
+  .a-text::before{content:"答案　";color:var(--accent);font-weight:600;font-size:12px;display:block;margin-bottom:4px}
+  .traceBtn{margin-top:12px;border:1px solid rgba(63,81,212,.35);background:#fff;color:var(--accent);
+            border-radius:8px;padding:8px 16px;font-size:12.8px;cursor:pointer;transition:.15s}
+  .traceBtn:hover{background:var(--accent-soft)}
+
+  /* ── 推理链 ── */
+  #trace{display:none;margin-top:18px}
+  #trace.show{display:block}
+  details.hop{background:var(--panel2);border-radius:12px;margin-bottom:12px;overflow:hidden}
+  details.hop summary{padding:12px 16px;cursor:pointer;font-size:13.2px;font-weight:600;user-select:none;
+                       list-style:none;display:flex;align-items:center;gap:10px}
+  details.hop summary::-webkit-details-marker{display:none}
+  details.hop summary::before{content:"▸";color:var(--tx3);display:inline-block;font-size:11px}
+  details.hop[open] summary::before{content:"▾"}
+  .hop-mode{font-weight:400;color:var(--tx3);font-size:11.8px;margin-left:auto}
+  .hop-body{padding:0 16px 16px}
+  .row{display:flex;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:12.8px}
+  .row:first-child{border-top:none}
+  .row .k{flex:0 0 132px;color:var(--tx3)}
+  .row .v{flex:1;color:var(--tx)}
+  .row .v.tag i{color:var(--tx3);font-style:normal;font-size:11.3px}
+  .row .v.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.8px;color:#2a3a8f;
+               background:#eef0fb;padding:6px 8px;border-radius:6px;display:block}
+  ul.ev{margin:4px 0 0;padding-left:18px}
+  ul.ev li{padding:2px 0}
+  .row.check .v{font-weight:600}
+  .row.check.no .v{color:var(--no)}
+  .row.check.yes .v{color:var(--yes)}
+
+  .hop.reason{background:#eef7f1}
+  .hop.reason .hop-head{padding:12px 16px 0;font-size:13.2px;font-weight:600}
+  .hop.reason p{padding:0 16px;font-size:12.8px;color:var(--tx2)}
+  .compressed{background:#fff;border-radius:8px;padding:10px 12px;margin:0 16px 14px !important;
+              font-size:12.6px;color:var(--tx)}
+
+  /* ── T_max ── */
+  .tmax-label{font-size:12.8px;color:var(--tx2);margin-bottom:10px}
+  .tmax-btns{display:flex;gap:8px;margin-bottom:12px}
+  .tmaxbtn{border:1px solid var(--line);background:#fff;color:var(--tx2);border-radius:8px;
+           padding:7px 16px;font-size:12.8px;cursor:pointer;transition:.15s}
+  .tmaxbtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .tmax-result{font-size:13.2px;background:var(--panel2);border-radius:9px;padding:10px 14px}
+  .tmax-result b{color:var(--accent)}
+  .tmax-note{color:var(--tx3);font-size:11.8px;margin-top:8px}
+
+  /* ── 为什么配 PlugMem ── */
+  details.why{background:var(--panel);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  details.why summary{padding:14px 18px;cursor:pointer;font-size:13px;color:var(--accent);user-select:none;list-style:none}
+  details.why summary::-webkit-details-marker{display:none}
+  details.why summary::before{content:"▸ ";display:inline-block}
+  details.why[open] summary::before{content:"▾ "}
+  .why-body{padding:0 20px 18px;font-size:12.8px;color:var(--tx2);line-height:1.8}
+  .why-body p{margin:0 0 10px}
+  .why-body b{color:var(--tx)}
+  .why-body .neg{color:#9a3a30}
+  .why-body code{background:var(--panel2);padding:1px 5px;border-radius:4px;font-size:11.5px}
+
+  footer{color:var(--tx3);font-size:11.5px;margin-top:26px;line-height:1.9}
+  footer a{color:var(--tx2)}
+  footer code{background:var(--panel2);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="chips">
+  <span class="chip">机制 · 多跳「抽象 → 具体」traversal</span>
+  <span class="chip">证据充分性自评循环</span>
+  <span class="chip">对应 HotpotQA 多跳 QA</span>
+</div>
+<h1>多跳溯源问答台 —— 看清一个答案是怎么被拼出来的</h1>
+<p class="lead">
+  面向要核实一个跨实体、跨记录答案的用户：问一个需要多跳才能回答的问题，答案下面挂一条可展开的推理链，
+  逐跳展示这一跳的抽象查询是什么、命中了哪个路标节点、激活了哪些候选证据、这一跳后系统自评「证据够不够」，
+  不够就看下一跳的新查询是怎么拼出来的。
+</p>
+
+<div class="card">
+  <div class="q">与《潮汐之间》导演长期合作的摄影师，后来独立执导过哪部获奖纪录片？</div>
+  <div class="a">
+    <div class="a-text">该摄影师是林知远，他 2025 年独立执导的纪录片《海雾计划》获得了当年的最佳摄影纪录片奖。</div>
+  </div>
+  <button class="traceBtn" id="traceBtn">查看推理过程 ▾</button>
+
+  <div id="trace">
+    <details class="hop" open>
+      <summary>Hop 1<span class="hop-mode">路由（Get_Mode）→ 语义记忆</span></summary>
+      <div class="hop-body">
+        <div class="row"><span class="k">抽象查询（Get_Plan）</span><span class="v">概念：《潮汐之间》· 导演 · 长期合作摄影师</span></div>
+        <div class="row"><span class="k">命中路标节点</span><span class="v tag">概念标签「潮汐之间（剧组）」　<i>· 路标，不进入结果</i></span></div>
+        <div class="row"><span class="k">激活的候选证据</span>
+          <span class="v"><ul class="ev">
+            <li>《潮汐之间》导演是陈明哲，与摄影师林知远合作了三部长片</li>
+            <li>林知远是陈明哲从第二部作品起固定合作的摄影指导</li>
+          </ul></span>
+        </div>
+        <div class="row check no"><span class="k">证据是否足够？</span><span class="v">否 —— 缺少林知远后续独立作品的信息</span></div>
+        <div class="row"><span class="k">下一跳查询怎么构造</span>
+          <span class="v mono">原查询 ＋「已知：摄影师是林知远」→ 拼接成 Hop 2 查询（默认策略是字符串拼接，不是 LLM 改写）</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="hop">
+      <summary>Hop 2<span class="hop-mode">路由沿用 → 语义记忆</span></summary>
+      <div class="hop-body">
+        <div class="row"><span class="k">抽象查询（Get_Plan）</span><span class="v">概念：林知远 · 独立执导 · 纪录片 · 获奖</span></div>
+        <div class="row"><span class="k">命中路标节点</span><span class="v tag">概念标签「林知远（作品）」　<i>· 路标，不进入结果</i></span></div>
+        <div class="row"><span class="k">激活的候选证据</span>
+          <span class="v"><ul class="ev">
+            <li>林知远 2025 年独立执导纪录片《海雾计划》</li>
+            <li>《海雾计划》获当年最佳摄影纪录片奖</li>
+          </ul></span>
+        </div>
+        <div class="row check yes"><span class="k">证据是否足够？</span><span class="v">是 —— 停止迭代（第 2 跳，未触及跳数上限）</span></div>
+      </div>
+    </details>
+
+    <div class="hop reason">
+      <div class="hop-head">推理压缩　<span class="hop-mode" style="margin-left:8px">Reasoning Module · Reason_Semantic</span></div>
+      <p>把两跳命中的 4 条证据压缩成一段紧凑、可执行的指导，交给 base agent 生成最终回答：</p>
+      <p class="compressed">"陈明哲执导《潮汐之间》时的固定摄影师是林知远；林知远 2025 年独立执导纪录片《海雾计划》，该片获最佳摄影纪录片奖。"</p>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="tmax-label">跳数上限 T<sub>max</sub>（论文 Appendix F.2 消融，仅两个已知锚点，不做插值）</div>
+  <div class="tmax-btns">
+    <button class="tmaxbtn on" data-t="2">T_max = 2</button>
+    <button class="tmaxbtn" data-t="4">T_max = 4</button>
+  </div>
+  <div class="tmax-result" id="tmaxResult">HotpotQA 子集 EM / F1：<b>66.00 / 74.73</b></div>
+  <p class="tmax-note">更多跳数换更完整的证据链，也意味着更多轮 LLM 调用——这是检索深度和成本的直接权衡，不是免费的。</p>
+</div>
+
+<details class="why">
+  <summary>为什么这个形态配 PlugMem</summary>
+  <div class="why-body">
+    <p><b>机制依据</b>：多跳「抽象 → 具体」traversal——每跳用高层节点（概念/意图）当路标去激活相邻的具体节点，
+      这套机制天然对应「图上一步步找证据」的可视化，把一次黑盒检索变成人能读懂的推理轨迹，
+      不需要额外设计一套解释系统去猜答案从哪来。</p>
+    <p><b>机制依据</b>：证据充分性自评循环（Multi-Hop Ctrl）——论文设计里每跳都有一次显式的
+      「证据够不够」判断，这个判断本身就是很自然的 UI 锚点，可以直接做成上面这种可展开的分跳卡片。</p>
+    <p><b>适用场景</b>：对应 HotpotQA 一类需要桥接两个实体的多跳 QA（实测 61.4 EM / 74.1 F1）。
+      这类问题的正确答案天然需要「先找到中间实体，再用它去找最终答案」，和这套机制的设计目标直接对应。</p>
+    <p class="neg"><b>最重要的一条诚实限制</b>：上面这套「不够就继续下一跳」的完整循环，是论文对检索模块的
+      <b>默认设计</b>，但在代码本体里并不存在——`plugmem/` 包搜不到任何跳数控制、停止判断的实现。
+      唯一的实现落在 HotpotQA 评测脚本里，且只对语义模式生效，默认只跑 <b>1 轮</b>（也就是默认配置根本不走多跳）；
+      就算手动打开开关，脚本那套算法也和论文不同——各轮结果取并集而非逐跳剪枝，多一个「没有新证据就提前停」
+      的条件。换句话说，这个页面完整展示的是论文设想的理想机制；如果现在直接对接现有代码，
+      用户实际会看到的只是「一跳」的检索结果——做出这个产品的完整体验，需要重新实现一遍论文里的迭代控制器，
+      不能假设现成代码已经支持。</p>
+    <p class="neg">推理压缩（Reasoning Module）在代码里同样被移出了记忆系统边界：调用方要自己再补一次
+      LLM 调用做压缩，两个基准评测都是额外接了 gpt-4o 完成这一步。消融显示省掉它准确率只跌 2.7 个百分点，
+      但记忆 token 用量会涨约 26 倍——所以产品设计上这一步不能省，但要讲清楚它现在是「调用方职责」，
+      不是记忆系统自带能力。</p>
+  </div>
+</details>
+
+<footer>
+  产出位置 <code>servers/plugmem/product-concepts/03-evidence-trail-qa.html</code>　·　
+  依据 <code>servers/plugmem/paper-vs-code.md</code>（B1/B3/B4/B6/B8、差异清单 #1 #3、Appendix F.2 消融数字）、
+  <code>paper-architecture.md</code> §3.2/§3.3<br>
+  问答案例、抽象查询与命中证据均为示意数据，用于演示交互，非真实跑分记录或代码输出；
+  T_max=2/4 的 EM/F1 数字直接引自论文附录。<br>
+  同系列另外两个形态：<a href="01-prescription-copilot.html">① 处方 Copilot</a>　
+  <a href="02-concept-map.html">② 概念地图记忆导航</a>
+</footer>
+
+</div>
+
+<script>
+  document.getElementById('traceBtn').addEventListener('click', function(){
+    var el = document.getElementById('trace');
+    el.classList.toggle('show');
+    this.textContent = el.classList.contains('show') ? '收起推理过程 ▴' : '查看推理过程 ▾';
+  });
+
+  var results = {2:'66.00 / 74.73', 4:'69.00 / 78.11'};
+  document.querySelectorAll('.tmaxbtn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tmaxbtn').forEach(function(b){ b.classList.remove('on'); });
+      this.classList.add('on');
+      document.getElementById('tmaxResult').innerHTML =
+        'HotpotQA 子集 EM / F1：<b>' + results[this.dataset.t] + '</b>';
+    });
+  });
+</script>
+</body>
+</html>

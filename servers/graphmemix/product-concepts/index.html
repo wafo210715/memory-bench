@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>GraphMemix 产品形态一览</title>
+<style>
+  :root{
+    --bg:#12141a; --panel:#1b1e27; --panel2:#20232e; --text:#e7e9ee; --muted:#8b8fa3; --accent:#6ea8fe;
+    --shadow: 0 8px 24px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.25);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;line-height:1.6}
+  .wrap{max-width:980px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-size:24px;margin:0 0 8px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 30px;max-width:680px}
+  .profile{background:var(--panel2);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:32px}
+  .profile h2{font-size:14.5px;margin:0 0 10px;color:var(--accent)}
+  .profile ul{margin:0;padding-left:20px;font-size:13px;color:#c7cbda}
+  .profile li{margin-bottom:6px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+  .concept-card{background:var(--panel);border-radius:16px;padding:22px 22px 20px;box-shadow:var(--shadow);text-decoration:none;color:var(--text);display:block;transition:transform .15s, box-shadow .15s;position:relative;overflow:hidden}
+  .concept-card:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(0,0,0,.45)}
+  .concept-card .idx{position:absolute;top:16px;right:18px;font-size:34px;font-weight:800;color:#2a2f3d}
+  .concept-card h3{font-size:16.5px;margin:0 0 6px;padding-right:40px}
+  .concept-card .en{color:var(--muted);font-size:12px;font-weight:400}
+  .concept-card p{font-size:13px;color:#c7cbda;margin:8px 0 12px}
+  .concept-card .tag{display:inline-block;background:#26304a;color:#9db8f7;font-size:11px;padding:3px 9px;border-radius:999px;margin-right:6px;margin-bottom:6px}
+  .concept-card .open{color:var(--accent);font-size:12.5px;font-weight:600}
+  footer{color:var(--muted);font-size:12px;text-align:center;margin-top:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>GraphMemix 产品形态探索</h1>
+  <p class="sub">三个围绕 GraphMemix 查询期组合优化机制发散出的产品形态示意。共用同一个示例场景：一段跨月的厨房台面装修长期记忆，以及一个具体问题「最终选定的台面材质和颜色是什么，为什么放弃了大理石」。</p>
+
+  <div class="profile">
+    <h2>机制画像回顾</h2>
+    <ul>
+      <li>写入期只做编码 + 建「发现图」（结构邻接 + 语义近邻），不调生成式模型。</li>
+      <li>查询期现算：多视角种子检索 → 1 跳候选扩展 → 节点验证 + 关系验证(ECV，六选一角色) → 变基数森林优化 → 分量根排序 + BFS 交付。</li>
+      <li>特长：关系带角色标签（冗余/冲突/澄清/佐证是一等公民）、证据数量是精确求解出来的而非固定 top-k、交付顺序自带语义（锚点先、补充后）。</li>
+    </ul>
+  </div>
+
+  <div class="grid">
+    <a class="concept-card" href="evidence-forest-inspector.html">
+      <div class="idx">01</div>
+      <h3>证据森林检视器<br><span class="en">Evidence Forest Inspector</span></h3>
+      <p>逐级展开查询期五步组合优化过程：种子 → 候选 → 双重验证 → 森林优化 → BFS 交付顺序。面向想审计"agent 为什么这么回答"的高级用户。</p>
+      <span class="tag">开发者/审计工具</span>
+      <div class="open">打开示意页 →</div>
+    </a>
+    <a class="concept-card" href="memory-conflict-sentinel.html">
+      <div class="idx">02</div>
+      <h3>记忆冲突哨兵<br><span class="en">Memory Conflict Sentinel</span></h3>
+      <p>常驻侧边面板，把 ECV 关系验证顺带发现的"冗余"与"冲突"关系升级成主动提醒，而不是等用户自己撞见前后矛盾的回答。</p>
+      <span class="tag">主动提醒/仪表盘</span>
+      <div class="open">打开示意页 →</div>
+    </a>
+    <a class="concept-card" href="adaptive-evidence-briefing.html">
+      <div class="idx">03</div>
+      <h3>自适应证据简报卡<br><span class="en">Adaptive Evidence Briefing Card</span></h3>
+      <p>嵌入聊天回复下方：锚点优先展示，补充证据按关系树可展开，并诚实标出"预算 24 条，这次只用了 8 条"。</p>
+      <span class="tag">聊天内嵌组件</span>
+      <div class="open">打开示意页 →</div>
+    </a>
+  </div>
+
+  <footer>memory-bench · GraphMemix (arXiv:2608.26983) 复现流程三件套之三 · 示意数据，非真实运行结果</footer>
+</div>
+</body>
+</html>

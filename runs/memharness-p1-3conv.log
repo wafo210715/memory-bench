@@ -1,0 +1,297 @@
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      memharness, 3.4.7                           │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 4.0.3                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[09/13/26 03:38:14] INFO     Starting MCP server 'memharness'   transport.py:241
+                             with transport 'stdio'                             
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      memharness_noadapt, 3.4.7                   │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 4.0.3                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[09/13/26 04:28:52] INFO     Starting MCP server                transport.py:241
+                             'memharness_noadapt' with                          
+                             transport 'stdio'                                  
+
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                         ▄▀▀ ▄▀█ █▀▀ ▀█▀ █▀▄▀█ █▀▀ █▀█                        │
+│                         █▀  █▀█ ▄▄█  █  █ ▀ █ █▄▄ █▀▀                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                FastMCP 3.4.7                                 │
+│                            https://gofastmcp.com                             │
+│                                                                              │
+│                  🖥  Server:      rag_baseline, 3.4.7                         │
+│                  🚀 Deploy free: https://horizon.prefect.io                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                          🎉 Update available: 4.0.3                          │
+│                      Run: pip install --upgrade fastmcp                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+[09/13/26 04:28:53] INFO     Starting MCP server 'rag_baseline' transport.py:241
+                             with transport 'stdio'                             
+run: /Users/guanhongli/Documents/repo/memory-bench/runs/memharness-p1-3conv
+arms=['memharness', 'memharness_noadapt', 'rag_baseline'] convs=3 n=3
+  [memharness] 全部已灌，restore(locomo_full) OK
+  [memharness] conv-26 retrieve 完成（累计新增 0）
+  [memharness] conv-30 retrieve 完成（累计新增 0）
+  [memharness] conv-49 retrieve 完成（累计新增 428）
+  [memharness] evidence 就绪（skip 1072，新增 428）
+  [memharness_noadapt] 全部已灌，restore(locomo_full) OK
+  [memharness_noadapt] conv-26 retrieve 完成（累计新增 0）
+  [memharness_noadapt] conv-30 retrieve 完成（累计新增 0）
+  [memharness_noadapt] conv-49 retrieve 完成（累计新增 0）
+  [memharness_noadapt] evidence 就绪（skip 1500，新增 0）
+  [rag_baseline] 全部已灌，restore(locomo_full) OK
+  [rag_baseline] conv-26 retrieve 完成（累计新增 0）
+  [rag_baseline] conv-30 retrieve 完成（累计新增 0）
+  [rag_baseline] conv-49 retrieve 完成（累计新增 0）
+  [rag_baseline] evidence 就绪（skip 1500，新增 0）
+Phase B: 待答 4421 题，并发 16，答题=glm-5.3，判分=glm-5.3
+  进度 25/4421（0.5 题/s，ETA 140.1 min）
+  进度 50/4421（0.7 题/s，ETA 107.0 min）
+  进度 75/4421（0.7 题/s，ETA 106.2 min）
+  进度 100/4421（0.7 题/s，ETA 97.5 min）
+  进度 125/4421（0.8 题/s，ETA 94.2 min）
+  进度 150/4421（0.8 题/s，ETA 92.1 min）
+  进度 175/4421（0.8 题/s，ETA 94.1 min）
+  进度 200/4421（0.8 题/s，ETA 90.9 min）
+  进度 225/4421（0.8 题/s，ETA 89.0 min）
+  LLM 失败（连续 1）: memharness|conv-26|q30|rep1: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  LLM 失败（连续 2）: memharness|conv-26|q4|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  LLM 失败（连续 1）: memharness|conv-26|q32|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 250/4421（0.8 题/s，ETA 88.9 min）
+  进度 275/4421（0.8 题/s，ETA 86.3 min）
+  进度 300/4421（0.8 题/s，ETA 83.6 min）
+  进度 325/4421（0.8 题/s，ETA 84.7 min）
+  进度 350/4421（0.8 题/s，ETA 84.2 min）
+  进度 375/4421（0.8 题/s，ETA 83.0 min）
+  进度 400/4421（0.8 题/s，ETA 82.2 min）
+  进度 425/4421（0.8 题/s，ETA 81.8 min）
+  进度 450/4421（0.8 题/s，ETA 81.4 min）
+  进度 475/4421（0.8 题/s，ETA 79.8 min）
+  LLM 失败（连续 1）: memharness|conv-26|q109|rep1: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 500/4421（0.8 题/s，ETA 79.5 min）
+  进度 525/4421（0.8 题/s，ETA 78.3 min）
+  进度 550/4421（0.8 题/s，ETA 77.9 min）
+  LLM 失败（连续 1）: memharness|conv-26|q135|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  LLM 失败（连续 1）: memharness|conv-26|q138|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 575/4421（0.8 题/s，ETA 76.8 min）
+  进度 600/4421（0.8 题/s，ETA 76.3 min）
+  进度 625/4421（0.8 题/s，ETA 75.4 min）
+  进度 650/4421（0.8 题/s，ETA 74.5 min）
+  进度 675/4421（0.8 题/s，ETA 73.5 min）
+  进度 700/4421（0.9 题/s，ETA 72.7 min）
+  进度 725/4421（0.9 题/s，ETA 71.8 min）
+  进度 750/4421（0.9 题/s，ETA 70.8 min）
+  LLM 失败（连续 1）: memharness|conv-26|q193|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 775/4421（0.9 题/s，ETA 70.0 min）
+  进度 800/4421（0.9 题/s，ETA 69.2 min）
+  进度 825/4421（0.9 题/s，ETA 68.3 min）
+  LLM 失败（连续 1）: memharness|conv-30|q21|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 850/4421（0.9 题/s，ETA 68.1 min）
+  进度 875/4421（0.9 题/s，ETA 67.3 min）
+  LLM 失败（连续 1）: memharness|conv-30|q36|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 900/4421（0.9 题/s，ETA 67.0 min）
+  进度 925/4421（0.9 题/s，ETA 66.2 min）
+  进度 950/4421（0.9 题/s，ETA 65.7 min）
+  进度 975/4421（0.9 题/s，ETA 65.7 min）
+  进度 1000/4421（0.9 题/s，ETA 65.5 min）
+  LLM 失败（连续 1）: memharness|conv-30|q88|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 1025/4421（0.9 题/s，ETA 65.1 min）
+  进度 1050/4421（0.9 题/s，ETA 64.6 min）
+  进度 1075/4421（0.9 题/s，ETA 64.5 min）
+  进度 1100/4421（0.9 题/s，ETA 64.3 min）
+  进度 1125/4421（0.9 题/s，ETA 63.7 min）
+  进度 1150/4421（0.9 题/s，ETA 63.7 min）
+  进度 1175/4421（0.9 题/s，ETA 63.1 min）
+  进度 1200/4421（0.9 题/s，ETA 62.8 min）
+  进度 1225/4421（0.9 题/s，ETA 62.1 min）
+  LLM 失败（连续 1）: memharness|conv-49|q59|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 1250/4421（0.9 题/s，ETA 61.8 min）
+  LLM 失败（连续 1）: memharness|conv-49|q69|rep1: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 1275/4421（0.9 题/s，ETA 61.0 min）
+  进度 1300/4421（0.9 题/s，ETA 60.3 min）
+  进度 1325/4421（0.9 题/s，ETA 59.6 min）
+  进度 1350/4421（0.9 题/s，ETA 59.1 min）
+  进度 1375/4421（0.9 题/s，ETA 59.2 min）
+  进度 1400/4421（0.9 题/s，ETA 58.9 min）
+  进度 1425/4421（0.9 题/s，ETA 58.0 min）
+  进度 1450/4421（0.9 题/s，ETA 57.0 min）
+  进度 1475/4421（0.9 题/s，ETA 56.2 min）
+  进度 1500/4421（0.9 题/s，ETA 55.7 min）
+  进度 1525/4421（0.9 题/s，ETA 55.3 min）
+  进度 1550/4421（0.9 题/s，ETA 54.5 min）
+  进度 1575/4421（0.9 题/s，ETA 54.0 min）
+  进度 1600/4421（0.9 题/s，ETA 53.1 min）
+  进度 1625/4421（0.9 题/s，ETA 52.4 min）
+  进度 1650/4421（0.9 题/s，ETA 51.6 min）
+  进度 1675/4421（0.9 题/s，ETA 50.8 min）
+  进度 1700/4421（0.9 题/s，ETA 50.1 min）
+  进度 1725/4421（0.9 题/s，ETA 49.4 min）
+  进度 1750/4421（0.9 题/s，ETA 48.7 min）
+  进度 1775/4421（0.9 题/s，ETA 48.0 min）
+  进度 1800/4421（0.9 题/s，ETA 47.2 min）
+  LLM 失败（连续 1）: memharness_noadapt|conv-26|q10|rep1: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 1825/4421（0.9 题/s，ETA 46.7 min）
+  进度 1850/4421（0.9 题/s，ETA 46.2 min）
+  进度 1875/4421（0.9 题/s，ETA 45.5 min）
+  进度 1900/4421（0.9 题/s，ETA 44.9 min）
+  进度 1925/4421（0.9 题/s，ETA 44.3 min）
+  进度 1950/4421（0.9 题/s，ETA 43.6 min）
+  进度 1975/4421（1.0 题/s，ETA 42.9 min）
+  进度 2000/4421（1.0 题/s，ETA 42.2 min）
+  进度 2025/4421（1.0 题/s，ETA 41.5 min）
+  LLM 失败（连续 1）: memharness_noadapt|conv-26|q34|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 2050/4421（1.0 题/s，ETA 41.0 min）
+  进度 2075/4421（1.0 题/s，ETA 40.5 min）
+  进度 2100/4421（1.0 题/s，ETA 39.9 min）
+  进度 2125/4421（1.0 题/s，ETA 39.4 min）
+  进度 2150/4421（1.0 题/s，ETA 38.7 min）
+  进度 2175/4421（1.0 题/s，ETA 38.2 min）
+  进度 2200/4421（1.0 题/s，ETA 37.7 min）
+  进度 2225/4421（1.0 题/s，ETA 37.1 min）
+  进度 2250/4421（1.0 题/s，ETA 36.5 min）
+  进度 2275/4421（1.0 题/s，ETA 35.9 min）
+  进度 2300/4421（1.0 题/s，ETA 35.3 min）
+  进度 2325/4421（1.0 题/s，ETA 34.7 min）
+  进度 2350/4421（1.0 题/s，ETA 34.2 min）
+  进度 2375/4421（1.0 题/s，ETA 33.7 min）
+  进度 2400/4421（1.0 题/s，ETA 33.1 min）
+  进度 2425/4421（1.0 题/s，ETA 32.7 min）
+  进度 2450/4421（1.0 题/s，ETA 32.2 min）
+  进度 2475/4421（1.0 题/s，ETA 31.8 min）
+  进度 2500/4421（1.0 题/s，ETA 31.3 min）
+  进度 2525/4421（1.0 题/s，ETA 30.8 min）
+  进度 2550/4421（1.0 题/s，ETA 30.3 min）
+  LLM 失败（连续 1）: memharness_noadapt|conv-30|q44|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 2575/4421（1.0 题/s，ETA 29.8 min）
+  进度 2600/4421（1.0 题/s，ETA 29.3 min）
+  进度 2625/4421（1.0 题/s，ETA 28.9 min）
+  进度 2650/4421（1.0 题/s，ETA 28.4 min）
+  进度 2675/4421（1.0 题/s，ETA 27.9 min）
+  进度 2700/4421（1.0 题/s，ETA 27.5 min）
+  进度 2725/4421（1.0 题/s，ETA 27.0 min）
+  LLM 失败（连续 1）: memharness_noadapt|conv-49|q11|rep0: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 2750/4421（1.0 题/s，ETA 26.6 min）
+  进度 2775/4421（1.1 题/s，ETA 26.1 min）
+  进度 2800/4421（1.1 题/s，ETA 25.6 min）
+  进度 2825/4421（1.1 题/s，ETA 25.2 min）
+  LLM 失败（连续 1）: memharness_noadapt|conv-49|q37|rep2: 429 退避耗尽（9 次）: HTTP 429: {"type":"error","error":{"type":"rate_limit_error","code":"1302","message":"[130
+  进度 2850/4421（1.1 题/s，ETA 24.7 min）
+  进度 2875/4421（1.1 题/s，ETA 24.3 min）
+  LLM 失败（连续 1）: memharness_noadapt|conv-49|q97|rep0: 重试耗尽（4 次）: HTTP 500: {"type":"error","error":{"type":"api_error","code":"1234","message":"[1234][网络错误，错误id 202609130511534c1bfd22e6984348 ，请稍
+  进度 2900/4421（1.1 题/s，ETA 23.8 min）
+  进度 2925/4421（1.1 题/s，ETA 23.4 min）
+  进度 2950/4421（1.1 题/s，ETA 23.0 min）
+  进度 2975/4421（1.1 题/s，ETA 22.6 min）
+  进度 3000/4421（1.1 题/s，ETA 22.2 min）
+  进度 3025/4421（1.1 题/s，ETA 21.8 min）
+  进度 3050/4421（1.1 题/s，ETA 21.4 min）
+  进度 3075/4421（1.1 题/s，ETA 21.0 min）
+  进度 3100/4421（1.1 题/s，ETA 20.6 min）
+  进度 3125/4421（1.1 题/s，ETA 20.2 min）
+  进度 3150/4421（1.1 题/s，ETA 19.7 min）
+  进度 3175/4421（1.1 题/s，ETA 19.3 min）
+  进度 3200/4421（1.1 题/s，ETA 18.9 min）
+  进度 3225/4421（1.1 题/s，ETA 18.4 min）
+  进度 3250/4421（1.1 题/s，ETA 18.0 min）
+  进度 3275/4421（1.1 题/s，ETA 17.5 min）
+  进度 3300/4421（1.1 题/s，ETA 17.1 min）
+  进度 3325/4421（1.1 题/s，ETA 16.7 min）
+  进度 3350/4421（1.1 题/s，ETA 16.3 min）
+  进度 3375/4421（1.1 题/s，ETA 15.9 min）
+  进度 3400/4421（1.1 题/s，ETA 15.5 min）
+  进度 3425/4421（1.1 题/s，ETA 15.1 min）
+  进度 3450/4421（1.1 题/s，ETA 14.7 min）
+  进度 3475/4421（1.1 题/s，ETA 14.3 min）
+  进度 3500/4421（1.1 题/s，ETA 13.9 min）
+  进度 3525/4421（1.1 题/s，ETA 13.6 min）
+  进度 3550/4421（1.1 题/s，ETA 13.2 min）
+  进度 3575/4421（1.1 题/s，ETA 12.9 min）
+  进度 3600/4421（1.1 题/s，ETA 12.5 min）
+  进度 3625/4421（1.1 题/s，ETA 12.1 min）
+  进度 3650/4421（1.1 题/s，ETA 11.7 min）
+  进度 3675/4421（1.1 题/s，ETA 11.3 min）
+  进度 3700/4421（1.1 题/s，ETA 10.9 min）
+  进度 3725/4421（1.1 题/s，ETA 10.5 min）
+  进度 3750/4421（1.1 题/s，ETA 10.2 min）
+  进度 3775/4421（1.1 题/s，ETA 9.8 min）
+  进度 3800/4421（1.1 题/s，ETA 9.4 min）
+  进度 3825/4421（1.1 题/s，ETA 9.0 min）
+  进度 3850/4421（1.1 题/s，ETA 8.6 min）
+  进度 3875/4421（1.1 题/s，ETA 8.3 min）
+  进度 3900/4421（1.1 题/s，ETA 7.9 min）
+  进度 3925/4421（1.1 题/s，ETA 7.5 min）
+  进度 3950/4421（1.1 题/s，ETA 7.2 min）
+  进度 3975/4421（1.1 题/s，ETA 6.8 min）
+  进度 4000/4421（1.1 题/s，ETA 6.4 min）
+  进度 4025/4421（1.1 题/s，ETA 6.0 min）
+  进度 4050/4421（1.1 题/s，ETA 5.6 min）
+  进度 4075/4421（1.1 题/s，ETA 5.2 min）
+  进度 4100/4421（1.1 题/s，ETA 4.9 min）
+  进度 4125/4421（1.1 题/s，ETA 4.5 min）
+  进度 4150/4421（1.1 题/s，ETA 4.1 min）
+  进度 4175/4421（1.1 题/s，ETA 3.7 min）
+  进度 4200/4421（1.1 题/s，ETA 3.3 min）
+  进度 4225/4421（1.1 题/s，ETA 3.0 min）
+  进度 4250/4421（1.1 题/s，ETA 2.6 min）
+  进度 4275/4421（1.1 题/s，ETA 2.2 min）
+  进度 4300/4421（1.1 题/s，ETA 1.8 min）
+  进度 4325/4421（1.1 题/s，ETA 1.4 min）
+  进度 4350/4421（1.1 题/s，ETA 1.1 min）
+  进度 4375/4421（1.1 题/s，ETA 0.7 min）
+  进度 4400/4421（1.1 题/s，ETA 0.3 min）
+Phase B 完成：4403 题，3992s
+
+arm               n judge_acc     F1  cat 切片（1=multihop 2=temporal 3=open 4=single 5=adv）
+memharness     1488     0.435  0.172  c1:102/237 c2:143/285 c3:55/77 c4:298/558 c5:50/331
+memharness_noadapt 1494     0.466  0.223  c1:111/237 c2:210/287 c3:35/78 c4:323/559 c5:17/333
+rag_baseline   1500     0.423  0.189  c1:45/240 c2:171/288 c3:35/78 c4:358/561 c5:26/333
+（judge 解析失败行: 0）
+
+完成。产物：/Users/guanhongli/Documents/repo/memory-bench/runs/memharness-p1-3conv/answers.jsonl
